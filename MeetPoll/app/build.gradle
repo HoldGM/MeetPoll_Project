@@ -7,9 +7,10 @@ android {
     defaultConfig {
         applicationId "odb234.meetpoll"
         minSdkVersion 15
-        targetSdkVersion 23
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     buildTypes {
         release {

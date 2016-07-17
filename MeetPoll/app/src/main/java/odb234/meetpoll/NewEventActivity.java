@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -19,6 +21,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -32,6 +35,9 @@ import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import java.io.IOException;
+import java.util.Locale;
 
 public class NewEventActivity extends AppCompatActivity {
 
@@ -63,8 +69,6 @@ public class NewEventActivity extends AppCompatActivity {
     private int db_rating;
 
 
-
-
     public static LocationManager locMan;
     static LocationListener locationListener;
 
@@ -74,12 +78,14 @@ public class NewEventActivity extends AppCompatActivity {
 
     public static boolean resetGPS;
 
+    static Geocoder gc;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_event);
 
-        //Intent intent = getIntent();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         resetGPS = false;
         eventName = (EditText) findViewById(R.id.event_name); //Event name edit text box
         locText = (EditText) findViewById(R.id.event_location); // Event location
@@ -87,6 +93,7 @@ public class NewEventActivity extends AppCompatActivity {
         locMan = (LocationManager) getSystemService(LOCATION_SERVICE);
         dateBtn = (Button) findViewById(R.id.event_date); // set date button
         timeBtn = (Button) findViewById(R.id.event_time); // set time button
+        gc = new Geocoder(this);
 
         locationListener = new LocationListener() {
             @Override
@@ -225,7 +232,17 @@ public class NewEventActivity extends AppCompatActivity {
         if (resetGPS) {
 //            locMan.requestLocationUpdates("gps", 50000, 25, locationListener);
             Location location = locMan.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            locText.setText(location.getLatitude() + ", " + location.getLongitude());
+            Address address = new Address(Locale.ENGLISH);
+            try {
+                address = gc.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0);
+            }catch (IOException e){
+                Log.d(tag, "Gecoding failed");
+            }
+            locText.setText(address.getAddressLine(0) + ", " + address.getAddressLine(1));
+            longitude = location.getLongitude();
+            latitude = location.getLatitude();
+
+
         }
 
     }
@@ -248,9 +265,23 @@ public class NewEventActivity extends AppCompatActivity {
         db_price = priceSpinner.getSelectedItem().toString();
         db_rating = (int)Math.floor(ratingBar.getRating());
 
+
         dbc.insertEvent(hostName, db_eventName, db_eventLocation, db_radius, db_date, db_time, db_locationType, db_locationSubtype, db_price, db_rating);
 
+        Intent intent = new Intent(this, SearchResultsActivity.class);
+        intent.putExtra("newLat", latitude);
+        intent.putExtra("newLng", longitude);
+
+        startActivity(intent);
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home){
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
