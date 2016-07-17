@@ -48,6 +48,7 @@ public class SettingsActivity extends AppCompatActivity {
             userInput.setText(tv.getText());
             userInput.setSelection(userInput.length());
             userInput.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+            userInput.setSelection();
             builder.setView(userInput);
             builder.setMessage("Change your name: ")
                     .setPositiveButton("Save", new DialogInterface.OnClickListener() {
