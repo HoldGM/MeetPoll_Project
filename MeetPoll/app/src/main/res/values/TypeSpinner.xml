@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="restaurant_types">
+        <item>Any</item>
+        <item>American</item>
+        <item>Mexican</item>
+        <item>Italian</item>
+        <item>Cajun</item>
+        <item>Thai</item>
+        <item>Greek</item>
+        <item>Chinese</item>
+        <item>Mediterranean</item>
+        <item>French</item>
+        <item>Spanish</item>
+        <item>German</item>
+        <item>Vietnamese</item>
+        <item>Caribbean</item>
+    </string-array>
+    <string-array name="bar_types">
+        <item>Any</item>
+        <item>Pub</item>
+        <item>Sports</item>
+        <item>Lounge</item>
+        <item>Dive</item>
+    </string-array>
+    <string-array name="club_types">
+        <item>Any</item>
+        <item>Dance</item>
+        <item>Live Music</item>
+        <item>Piano Bar</item>
+        <item>Comedy</item>
+        <item>Adult</item>
+    </string-array>
+</resources>

@@ -1,0 +1,30 @@
+<application>
+  <component name="StatisticsApplicationUsages">
+    <group name="language-level">
+      <project id="MeetPoll" values="JDK_1_7" collectionTime="1468264981009" />
+    </group>
+    <group name="frameworks">
+      <project id="MeetPoll" values="java-gradle,android-gradle,android" collectionTime="1468264980966" />
+    </group>
+    <group name="vcs">
+      <project id="MeetPoll" values="Git" collectionTime="1468264980966" />
+    </group>
+    <group name="file-type">
+      <project id="MeetPoll" values="Groovy,Images,IDEA_MODULE,XML,Properties,ProGuard File,ARCHIVE,AIDL,PLAIN_TEXT,JAVA,UNKNOWN" collectionTime="1468264981006" />
+    </group>
+    <group name="module type">
+      <project id="MeetPoll" values="JAVA_MODULE" collectionTime="1468264980966" />
+    </group>
+    <group name="run-configuration-type">
+      <project id="MeetPoll" values="AndroidRunConfigurationType" collectionTime="1468264980966" />
+    </group>
+  </component>
+  <component name="UsageTrigger">
+    <counts>
+      <entry feature="execute.AndroidRunConfigurationType.Run" count="4" />
+      <entry feature="ide.settings.Android_SDK" count="4" />
+      <entry feature="ide.settings.Project_Structure" count="3" />
+      <entry feature="ideaapp.started" count="10" />
+    </counts>
+  </component>
+</application>

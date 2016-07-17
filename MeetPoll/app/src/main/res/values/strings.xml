@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Meet Poll</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="meet_title">Meet</string>
+    <string name="poll_title">Poll</string>
+    <string name="new_event_label">New Event</string>
+    <string name="event_name">Enter Event Name</string>
+    <string name="location_text">Enter address or intersection</string>
+    <string name="location_string">Use Your Location</string>
+    <string name="radius_string">Radius</string>
+    <string name="event_time">Time</string>
+    <string name="event_location">Location</string>
+    <string name="event_type">Type</string>
+    <string name="event_price">Price</string>
+    <string name="find_places">Find Places</string>
+    <string name="delete_event">Delete Event</string>
+    <string name="settings_string">Settings</string>
+    <string name="name">Name</string>
+    <string name="title_name_preference">Name</string>
+    <string name="dialogTitle_name_preference">What is your name?</string>
+    <string name="alert_dialog_ok">Yes</string>
+    <string name="alert_dialog_cancel">No</string>
+    <string name="alert_dialog_two_buttons_title">Do you want to use your current location instead of location entered?</string>
+    <string name="rating">Rating</string>
+</resources>

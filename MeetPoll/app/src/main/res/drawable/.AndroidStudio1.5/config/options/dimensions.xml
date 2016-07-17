@@ -1,0 +1,45 @@
+<application>
+  <component name="DimensionService">
+    <location key="#Updates.0.0.1920.1200" x="320" y="398" />
+    <location key="SettingsEditor.0.0.1920.1200" x="464" y="350" />
+    <location key="WELCOME_SCREEN.0.0.1920.1200" x="988" y="319" />
+    <location key="FileChooserDialogImpl.0.0.1680.1050" x="317" y="316" />
+    <location key="SettingsEditor.0.0.1680.1050" x="69" y="299" />
+    <location key="#com.intellij.execution.impl.EditConfigurationsDialog.0.0.1680.1050" x="66" y="214" />
+    <location key="WELCOME_SCREEN.0.0.1680.1050" x="872" y="319" />
+    <location key="FileChooserDialogImpl.0.0.1920.1200" x="752" y="591" />
+    <location key="com.intellij.ide.util.TipDialog.0.0.1920.1200" x="703" y="428" />
+    <location key="IdeErrosDialog.0.0.1920.1200" x="551" y="453" />
+    <location key="AndroidExtendedDeviceChooserDialog.0.0.1920.1200" x="703" y="462" />
+    <location key="OptionsEditor.0.0.1920.1200" x="578" y="275" />
+    <location key="#Project_Structure.0.0.1920.1200" x="583" y="256" />
+    <size key="SettingsEditor.0.0.1920.1200" width="1039" height="691" />
+    <size key="FileChooserDialogImpl.0.0.1680.1050" width="426" height="520" />
+    <size key="SettingsEditor.0.0.1680.1050" width="1037" height="662" />
+    <size key="FileChooserDialogImpl.0.0.1920.1200" width="455" height="491" />
+    <size key="GridCell.Tab.0.left.0.0.1920.1200" width="1358" height="288" />
+    <size key="GridCell.Tab.0.center.0.0.1920.1200" width="1358" height="288" />
+    <size key="GridCell.Tab.0.right.0.0.1920.1200" width="1358" height="288" />
+    <size key="GridCell.Tab.0.bottom.0.0.1920.1200" width="1358" height="288" />
+    <size key="GridCell.Tab.1.left.0.0.1920.1200" width="1358" height="288" />
+    <size key="GridCell.Tab.1.center.0.0.1920.1200" width="1358" height="288" />
+    <size key="GridCell.Tab.1.right.0.0.1920.1200" width="1358" height="288" />
+    <size key="GridCell.Tab.1.bottom.0.0.1920.1200" width="1358" height="288" />
+    <size key="GridCell.Tab.2.left.0.0.1920.1200" width="1358" height="288" />
+    <size key="GridCell.Tab.2.center.0.0.1920.1200" width="1358" height="288" />
+    <size key="GridCell.Tab.2.right.0.0.1920.1200" width="1358" height="288" />
+    <size key="GridCell.Tab.2.bottom.0.0.1920.1200" width="1358" height="288" />
+    <size key="GridCell.Tab.3.left.0.0.1920.1200" width="1358" height="288" />
+    <size key="GridCell.Tab.3.center.0.0.1920.1200" width="1358" height="288" />
+    <size key="GridCell.Tab.3.right.0.0.1920.1200" width="1358" height="288" />
+    <size key="GridCell.Tab.3.bottom.0.0.1920.1200" width="1358" height="288" />
+    <size key="GridCell.Tab.4.left.0.0.1920.1200" width="1358" height="288" />
+    <size key="GridCell.Tab.4.center.0.0.1920.1200" width="1358" height="288" />
+    <size key="GridCell.Tab.4.right.0.0.1920.1200" width="1358" height="288" />
+    <size key="GridCell.Tab.4.bottom.0.0.1920.1200" width="1358" height="288" />
+    <size key="IdeErrosDialog.0.0.1920.1200" width="875" height="344" />
+    <size key="AndroidExtendedDeviceChooserDialog.0.0.1920.1200" width="574" height="410" />
+    <size key="OptionsEditor.0.0.1920.1200" width="820" height="672" />
+    <size key="#Project_Structure.0.0.1920.1200" width="822" height="701" />
+  </component>
+</application>
