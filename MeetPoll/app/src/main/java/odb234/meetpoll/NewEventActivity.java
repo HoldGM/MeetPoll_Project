@@ -236,7 +236,7 @@ public class NewEventActivity extends AppCompatActivity {
         Log.d(tag, "Event inserted into DB");
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        String hostName = sp.getString("name_preference", "host");
+        String hostName = sp.getString("name", "host");
 
         db_eventName = eventName.getText().toString();
         db_eventLocation = locText.getText().toString();
