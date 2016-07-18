@@ -42,7 +42,7 @@ import java.util.Locale;
 public class NewEventActivity extends AppCompatActivity {
 
     EditText eventName;
-    TextView radius;
+//    TextView radius;
     static EditText locText;
     SeekBar radiusSeekBar;
     Button dateBtn;
@@ -60,7 +60,7 @@ public class NewEventActivity extends AppCompatActivity {
     private long row_id;
     private String db_eventName;
     private String db_eventLocation;
-    private int db_radius;
+//    private int db_radius;
     private String db_date;
     private String db_time;
     private String db_locationType;
@@ -94,6 +94,7 @@ public class NewEventActivity extends AppCompatActivity {
         dateBtn = (Button) findViewById(R.id.event_date); // set date button
         timeBtn = (Button) findViewById(R.id.event_time); // set time button
         gc = new Geocoder(this);
+
 
         locationListener = new LocationListener() {
             @Override
@@ -132,24 +133,24 @@ public class NewEventActivity extends AppCompatActivity {
             gpsAlert();
         }
 
-        radius= (TextView) findViewById(R.id.radius_value); // radius value,
-        radiusSeekBar = (SeekBar) findViewById(R.id.radius_seekbar); // radius seekbar slider
-        radiusSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                radius.setText(String.valueOf(i + " mi"));
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
+//        radius= (TextView) findViewById(R.id.radius_value); // radius value,
+//        radiusSeekBar = (SeekBar) findViewById(R.id.radius_seekbar); // radius seekbar slider
+//        radiusSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+//                radius.setText(String.valueOf(i + " mi"));
+//            }
+//
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//        });
 
         locSpinner = (Spinner) findViewById(R.id.location_spinner); // spinner for location type
         ArrayAdapter<CharSequence> locAdapter = ArrayAdapter.createFromResource(this, R.array.location_list, android.R.layout.simple_spinner_dropdown_item);
@@ -257,7 +258,7 @@ public class NewEventActivity extends AppCompatActivity {
 
         db_eventName = eventName.getText().toString();
         db_eventLocation = locText.getText().toString();
-        db_radius = radiusSeekBar.getProgress();
+//        db_radius = radiusSeekBar.getProgress();
         db_date = dateBtn.getText().toString();
         db_time = timeBtn.getText().toString();
         db_locationType = locSpinner.getSelectedItem().toString();
@@ -266,7 +267,7 @@ public class NewEventActivity extends AppCompatActivity {
         db_rating = (int)Math.floor(ratingBar.getRating());
 
 
-        dbc.insertEvent(hostName, db_eventName, db_eventLocation, db_radius, db_date, db_time, db_locationType, db_locationSubtype, db_price, db_rating);
+        dbc.insertEvent(hostName, db_eventName, db_eventLocation, db_date, db_time, db_locationType, db_locationSubtype, db_price, db_rating);
 
         Intent intent = new Intent(this, SearchResultsActivity.class);
         intent.putExtra("newLat", latitude);

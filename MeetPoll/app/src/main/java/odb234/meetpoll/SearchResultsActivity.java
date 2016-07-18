@@ -10,6 +10,8 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -95,11 +97,28 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home){
-            finish();
-            return true;
-        }
 
-        return super.onOptionsItemSelected(item);
+        switch(item.getItemId()){
+            case android.R.id.home:
+                finish();
+                return true;
+            case R.id.send_event:
+                Intent intent = new Intent(SearchResultsActivity.this, MainActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.settings:
+                Intent intent2 = new Intent(SearchResultsActivity.this,SettingsActivity.class);
+                startActivity(intent2);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.map_menu,menu);
+        return true;
     }
 }

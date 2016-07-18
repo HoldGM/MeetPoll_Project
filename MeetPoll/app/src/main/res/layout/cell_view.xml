@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight=".2"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:orientation="vertical">
+        <ImageView
+            android:id="@+id/host_image"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".8"
+            android:src="@drawable/default_image"/>
+        <TextView
+            android:id="@+id/list_event_host"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight=".2"
+            android:textSize="10dp"
+            android:text="Host Name"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight=".7"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginRight="5dp">
+
+        <TextView
+            android:id="@+id/list_event_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:text="Event Name"
+            android:singleLine="true"/>
+
+        <TextView
+            android:id="@+id/list_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:text="Location"
+            android:singleLine="true"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/list_event_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:text="Date"
+                android:textSize="15dp"/>
+            <TextView
+                android:id="@+id/list_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15dp"
+                android:text="Time"/>
+        </LinearLayout>
+
+    </LinearLayout>
+    <Button
+        android:id="@+id/edit_event"
+        android:layout_width="0dp"
+        android:layout_weight=".1"
+        android:layout_height="30dp"
+        android:background="@drawable/ic_edit_black_18dp"
+        android:layout_gravity="center"/>
+
+</LinearLayout>
