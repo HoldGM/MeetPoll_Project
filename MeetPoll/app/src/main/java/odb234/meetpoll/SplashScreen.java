@@ -8,6 +8,7 @@ import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.ImageView;
 
 public class SplashScreen extends AppCompatActivity {
 
@@ -16,7 +17,8 @@ public class SplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_screen);
 
-
+//        ImageView logo = (ImageView) findViewById(R.id.splash_logo);
+//        logo.getPaint
         Thread timerThread = new  Thread(){
             public void run(){
                 try{

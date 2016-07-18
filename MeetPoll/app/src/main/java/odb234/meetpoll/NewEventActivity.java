@@ -20,6 +20,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatDialog;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -42,7 +43,7 @@ import java.util.Locale;
 public class NewEventActivity extends AppCompatActivity {
 
     EditText eventName;
-//    TextView radius;
+    //    TextView radius;
     static EditText locText;
     SeekBar radiusSeekBar;
     Button dateBtn;
@@ -60,7 +61,7 @@ public class NewEventActivity extends AppCompatActivity {
     private long row_id;
     private String db_eventName;
     private String db_eventLocation;
-//    private int db_radius;
+    //    private int db_radius;
     private String db_date;
     private String db_time;
     private String db_locationType;
@@ -119,6 +120,8 @@ public class NewEventActivity extends AppCompatActivity {
             }
         };
 
+        locMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                     && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -126,10 +129,11 @@ public class NewEventActivity extends AppCompatActivity {
                         Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
                 }, 10);
                 return;
-            }else{
+            } else {
                 gpsAlert();
             }
-        }else{
+        } else {
+//            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 5);
             gpsAlert();
         }
 
@@ -159,32 +163,33 @@ public class NewEventActivity extends AppCompatActivity {
 
         typeLayout = (LinearLayout) findViewById(R.id.type_layout);
         typeSpinner = (Spinner) findViewById(R.id.type_spinner); // location for theme type for location selection
-        locSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
-           @Override
-           public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id){
-
-               switch(position){
-                   case 0:
-                       ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.restaurant_types, android.R.layout.simple_spinner_item);
-                       typeSpinner.setAdapter(typeAdapter);
-                       typeLayout.setVisibility(View.VISIBLE);
-                       break;
-                   case 2:
-                       typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.bar_types, android.R.layout.simple_spinner_item);
-                       typeSpinner.setAdapter(typeAdapter);
-                       typeLayout.setVisibility(View.VISIBLE);
-                       break;
-                   case 3:
-                       typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.club_types, android.R.layout.simple_spinner_item);
-                       typeSpinner.setAdapter(typeAdapter);
-                       typeLayout.setVisibility(View.VISIBLE);
-                       break;
-                   default:
-                       typeLayout.setVisibility(View.GONE);
-               }
-           }
+        locSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onNothingSelected(AdapterView<?> parentView){
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+
+                switch (position) {
+                    case 0:
+                        ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.restaurant_types, android.R.layout.simple_spinner_item);
+                        typeSpinner.setAdapter(typeAdapter);
+                        typeLayout.setVisibility(View.VISIBLE);
+                        break;
+                    case 2:
+                        typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.bar_types, android.R.layout.simple_spinner_item);
+                        typeSpinner.setAdapter(typeAdapter);
+                        typeLayout.setVisibility(View.VISIBLE);
+                        break;
+                    case 3:
+                        typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.club_types, android.R.layout.simple_spinner_item);
+                        typeSpinner.setAdapter(typeAdapter);
+                        typeLayout.setVisibility(View.VISIBLE);
+                        break;
+                    default:
+                        typeLayout.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
                 typeLayout.setVisibility(View.GONE);
             }
         });
@@ -193,15 +198,16 @@ public class NewEventActivity extends AppCompatActivity {
         ArrayAdapter<CharSequence> priceAdapter = ArrayAdapter.createFromResource(this, R.array.price_list, android.R.layout.simple_spinner_dropdown_item);
         priceSpinner.setAdapter(priceAdapter);
 
-        ratingBar = (RatingBar)findViewById(R.id.location_rating); // rating bar for location ratings
-        findPlacesBtn = (Button)findViewById(R.id.find_places_btn);
+        ratingBar = (RatingBar) findViewById(R.id.location_rating); // rating bar for location ratings
+        findPlacesBtn = (Button) findViewById(R.id.find_places_btn);
 
     }
 
     public void showTimePickerDialog(View v) {
         TimePickerFragment newFragment = TimePickerFragment.newInstance(v);
-        newFragment.show(getFragmentManager(),"timePicker");
+        newFragment.show(getFragmentManager(), "timePicker");
     }
+
     public void showDatePickerDialog(View v) {
         DatePickerFragment newFragment = DatePickerFragment.newInstance(v);
         newFragment.show(getFragmentManager(), "datePicker");
@@ -210,9 +216,9 @@ public class NewEventActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch(requestCode){
+        switch (requestCode) {
             case 10:
-                if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                     gpsAlert();
                 return;
         }
@@ -229,14 +235,15 @@ public class NewEventActivity extends AppCompatActivity {
             }
         });
     }
-    public static void resetLocation(){
+
+    public static void resetLocation() {
         if (resetGPS) {
 //            locMan.requestLocationUpdates("gps", 50000, 25, locationListener);
             Location location = locMan.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             Address address = new Address(Locale.ENGLISH);
             try {
                 address = gc.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0);
-            }catch (IOException e){
+            } catch (IOException e) {
                 Log.d(tag, "Gecoding failed");
             }
             locText.setText(address.getAddressLine(0) + ", " + address.getAddressLine(1));
@@ -248,7 +255,7 @@ public class NewEventActivity extends AppCompatActivity {
 
     }
 
-    public void saveEvent(View v){
+    public void saveEvent(View v) {
         DatabaseConnector dbc = new DatabaseConnector(this);
 
         Log.d(tag, "Event inserted into DB");
@@ -264,7 +271,7 @@ public class NewEventActivity extends AppCompatActivity {
         db_locationType = locSpinner.getSelectedItem().toString();
         db_locationSubtype = typeSpinner.getSelectedItem().toString();
         db_price = priceSpinner.getSelectedItem().toString();
-        db_rating = (int)Math.floor(ratingBar.getRating());
+        db_rating = (int) Math.floor(ratingBar.getRating());
 
 
         dbc.insertEvent(hostName, db_eventName, db_eventLocation, db_date, db_time, db_locationType, db_locationSubtype, db_price, db_rating);
@@ -272,7 +279,26 @@ public class NewEventActivity extends AppCompatActivity {
         Intent intent = new Intent(this, SearchResultsActivity.class);
         intent.putExtra("newLat", latitude);
         intent.putExtra("newLng", longitude);
+        intent.putExtra("eventName", eventName.getText().toString());
+        intent.putExtra("eventLocation", locText.getText().toString());
+        intent.putExtra("date", dateBtn.getText().toString());
+        intent.putExtra("time", timeBtn.getText().toString());
+        intent.putExtra("locationType", locSpinner.getSelectedItem().toString());
+        intent.putExtra("locationSubtype", typeSpinner.getSelectedItem().toString());
+        intent.putExtra("price", priceSpinner.getSelectedItem().toString());
+        intent.putExtra("rating", (int) Math.floor(ratingBar.getRating()));
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locMan.removeUpdates(locationListener);
         startActivity(intent);
 
     }

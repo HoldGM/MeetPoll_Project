@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -13,6 +14,11 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="odb234.meetpoll.NewEventActivity"
     android:orientation="vertical">
+    <!--<fragment
+        android:id="@+id/place_autocomplete_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"/>-->
     <EditText
         android:id="@+id/event_name"
         android:layout_width="match_parent"
@@ -23,6 +29,7 @@
         android:inputType="textCapWords"/>
 
     <EditText
+
         android:id="@+id/event_location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -90,8 +97,11 @@
             android:layout_width="0sp"
             android:layout_weight=".8"
             android:layout_height="wrap_content"
-            android:drawableRight="@android:drawable/ic_menu_my_calendar"
-            android:onClick="showDatePickerDialog"/>
+            android:drawableRight="@drawable/ic_date_range_white_24dp"
+            android:textSize="25sp"
+            android:onClick="showDatePickerDialog"
+            android:backgroundTint="@color/splash_orange"
+            android:textColor="@android:color/white"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -108,10 +118,11 @@
             android:layout_width="0sp"
             android:layout_weight=".8"
             android:layout_height="wrap_content"
-            android:drawableEnd="@android:drawable/arrow_down_float"
-            android:drawableRight="@android:drawable/sym_call_incoming"
+            android:drawableRight="@drawable/ic_access_time_white_24dp"
             android:onClick="showTimePickerDialog"
-            />
+            android:textSize="25sp"
+            android:backgroundTint="@color/splash_orange"
+            android:textColor="@android:color/white"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -182,11 +193,11 @@
             android:layout_gravity="center"/>
         <RatingBar
             android:id="@+id/location_rating"
-            android:layout_width="0sp"
-            android:layout_weight=".9"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:numStars="5"
-            android:stepSize="1"/>
+            android:stepSize="1"
+            android:isIndicator="true"/>
     </LinearLayout>
     <Button
         android:id="@+id/find_places_btn"

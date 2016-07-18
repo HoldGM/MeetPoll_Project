@@ -18,22 +18,29 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
     private Button mBtn;
     private static View rootView;
     private final String tag = "DatePickerFragment";
-
+    static int year;
+    static int month;
+    static int day;
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState){
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        final Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
+        if (year == 0){
+            final Calendar c = Calendar.getInstance();
+            year = c.get(Calendar.YEAR);
+            month = c.get(Calendar.MONTH);
+            day = c.get(Calendar.DAY_OF_MONTH);
+        }
 
         return new DatePickerDialog(getActivity(), this, year, month, day);
     }
 
     public void onDateSet(DatePicker view,int year, int month, int day){
         mBtn = (Button) rootView.findViewById(R.id.event_date);
+        this.year = year;
+        this.month = month;
+        this.day = day;
 //        Log.d(tag,mBtn.getText().toString());
-        mBtn.setText(month + "/" + day + "/" + year);
+        mBtn.setText(month + 1 + "/" + day + "/" + year);
     }
     public static DatePickerFragment newInstance(View v) {
         rootView = v;

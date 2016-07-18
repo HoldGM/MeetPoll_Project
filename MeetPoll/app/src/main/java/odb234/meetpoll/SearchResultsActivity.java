@@ -14,6 +14,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -25,7 +28,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class SearchResultsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class SearchResultsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "Map activity";
     private GoogleMap mMap;
@@ -37,6 +40,8 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
     private String address;
     private String city;
     private String country;
+
+    private GoogleApiClient mGoogleApiClient;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,15 +57,25 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
         intent = getIntent();
         newLat = intent.getDoubleExtra("newLat", 30);
         newLng = intent.getDoubleExtra("newLng", -97);
-
         try{
             getLocation();
         }catch(IOException e){
             Log.d(TAG, "get location failed");
         }
 
+        mGoogleApiClient = new GoogleApiClient
+                .Builder(this)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .enableAutoManage(this, this)
+                .build();
+
     }
 
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
 
     /**
      * Manipulates the map once available.
