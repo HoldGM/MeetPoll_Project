@@ -23,4 +23,6 @@
     <string name="alert_dialog_two_buttons_title">Do you want to use your current location instead of location entered?</string>
     <string name="rating">Rating</string>
     <string name="title_activity_search_results">Map</string>
+    <string name="gps_request_descript">This app requires GPS location service.</string>
+    <string name="send_event">Send Event</string>
 </resources>

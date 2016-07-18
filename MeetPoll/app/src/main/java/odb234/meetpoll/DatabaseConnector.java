@@ -19,6 +19,8 @@ public class DatabaseConnector {
     private SQLiteDatabase database;
     private DatabaseOpenHelper databaseOpenHelper;
 
+    private static final String[] query = new String[] {"_id", "host_name", "event_name", "event_location", "date", "time", "location_type", "location_subtype", "price", "rating"};
+
     public DatabaseConnector(Context context){
         databaseOpenHelper = new DatabaseOpenHelper(context, DATABASE_NAME, null, 1);
         database = databaseOpenHelper.getWritableDatabase();
@@ -35,10 +37,10 @@ public class DatabaseConnector {
             database.close();
     }
 
-    public void insertEvent(String hostName, String eventName, String eventLocation, int radius,
+    public void insertEvent(String hostName, String eventName, String eventLocation,
                             String date, String time, String locationType,
                             String locationSubtype, String price, int rating){
-        ContentValues newEvent = createEvent(hostName, eventLocation, radius, date, time, locationType, locationSubtype, price, rating);
+        ContentValues newEvent = createEvent(hostName, eventLocation, date, time, locationType, locationSubtype, price, rating);
 
         newEvent.put("event_name", eventName);
 //        try{
@@ -51,13 +53,12 @@ public class DatabaseConnector {
 //        }
     }
 
-    private ContentValues createEvent(String hostName, String eventLocation, int radius,
+    private ContentValues createEvent(String hostName, String eventLocation,
                                       String date, String time, String locationType,
                                       String locationSubtype, String price, int rating){
         ContentValues result = new ContentValues();
         result.put("host_name", hostName);
         result.put("event_location", eventLocation);
-        result.put("radius", radius);
         result.put("date", date);
         result.put("time", time);
         result.put("location_type", locationType);
@@ -69,9 +70,9 @@ public class DatabaseConnector {
     }
 
     public void updateEvent(long id, String hostName, String eventName, String eventlocation,
-                            int radius, String date, String time, String locationType,
+                            String date, String time, String locationType,
                             String locationSubtype, String price, int rating){
-        ContentValues editEvent = createEvent(hostName, eventlocation, radius, date, time, locationType, locationSubtype, price, rating);
+        ContentValues editEvent = createEvent(hostName, eventlocation, date, time, locationType, locationSubtype, price, rating);
         try{
             open();
             database.update("events", editEvent, "_id=" + id, null);
@@ -81,33 +82,10 @@ public class DatabaseConnector {
         }
     }
 
-    public String[] getAllEvents() {
-        Cursor c = database.query(true, "events", new String[]{"host_name", "event_name", "event_location", "rating"}, null, null, null, null, null, null);
 
-        if (c.getCount() > 0) {
-            String[] tempList = new String[c.getCount()];
-            if (c != null) {
-                c.moveToFirst();
-                tempList[0] = c.getString(c.getColumnIndex("host_name")) + " ";
-                tempList[0] += c.getString(c.getColumnIndex("event_name")) + " ";
-                tempList[0] += c.getString(c.getColumnIndex("event_location")) + " ";
-                tempList[0] += c.getString(c.getColumnIndex("rating")) + " ";
-
-            }
-
-            int i = 1;
-            while (c.moveToNext()) {
-                tempList[i] = c.getString(c.getColumnIndex("host_name")) + " ";
-                tempList[i] += c.getString(c.getColumnIndex("event_name")) + " ";
-                tempList[i] += c.getString(c.getColumnIndex("event_location")) + " ";
-                tempList[i] += c.getString(c.getColumnIndex("rating"));
-                i++;
-            }
-            return tempList;
-        }
-        return null;
+    public Cursor getCursor(){
+        return database.query(true, "events", query, null, null, null, null, null, null);
     }
-
     public Cursor getOneEvent(long id){
         return database.query("events", null, "_id=" + id, null, null, null, null);
     }
@@ -149,7 +127,6 @@ public class DatabaseConnector {
                     "host_name TEXT," +
                     "event_name TEXT," +
                     "event_location TEXT," +
-                    "radius INTEGER," +
                     "date TEXT," +
                     "time TEXT," +
                     "location_type TEXT," +

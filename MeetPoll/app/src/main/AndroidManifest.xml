@@ -2,8 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="odb234.meetpoll">
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-feature android:name="android.hardware.location.gps" android:required="true"/>
 
     <application
         android:allowBackup="true"
@@ -32,7 +34,8 @@
         <activity
             android:name=".NewEventActivity"
             android:label="@string/new_event_label"
-            android:windowSoftInputMode="stateAlwaysHidden" />
+            android:windowSoftInputMode="stateAlwaysHidden"
+            android:permission="android.permission.ACCESS_FINE_LOCATION"/>
         <activity
             android:name=".SettingsActivity"
             android:label="@string/settings_string"
@@ -51,7 +54,8 @@
 
         <activity
             android:name=".SearchResultsActivity"
-            android:label="@string/title_activity_search_results"></activity>
+            android:label="@string/title_activity_search_results"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

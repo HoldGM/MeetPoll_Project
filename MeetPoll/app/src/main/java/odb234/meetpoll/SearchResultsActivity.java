@@ -1,9 +1,18 @@
 package odb234.meetpoll;
 
+import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -12,24 +21,44 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class SearchResultsActivity extends FragmentActivity implements OnMapReadyCallback {
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
+public class SearchResultsActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    private static final String TAG = "Map activity";
     private GoogleMap mMap;
     private double newLat;
     private double newLng;
+    Geocoder gc;
     Intent intent;
+    //Current location info
+    private String address;
+    private String city;
+    private String country;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_search_results);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         intent = getIntent();
         newLat = intent.getDoubleExtra("newLat", 30);
-        newLng = intent.getDoubleExtra("newlng", -97);
+        newLng = intent.getDoubleExtra("newLng", -97);
+
+        try{
+            getLocation();
+        }catch(IOException e){
+            Log.d(TAG, "get location failed");
+        }
+
     }
 
 
@@ -47,8 +76,49 @@ public class SearchResultsActivity extends FragmentActivity implements OnMapRead
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(newLat, newLng);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng youAreHere = new LatLng(newLat, newLng);
+        mMap.addMarker(new MarkerOptions().position(youAreHere).title(address + ", " + city));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(youAreHere, 17));
+    }
+
+    public void getLocation() throws IOException{
+        gc = new Geocoder(this);
+        List<Address> list = gc.getFromLocation(newLat, newLng, 1);
+
+        try{
+            address = list.get(0).getAddressLine(0);
+            city = list.get(0).getAddressLine(1);
+            country = list.get(0).getAddressLine(2);
+        }catch(IllegalArgumentException a){
+            Log.d(TAG, "illegal argument");
+        }
+        Log.d(TAG, Arrays.deepToString(list.toArray()));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch(item.getItemId()){
+            case android.R.id.home:
+                finish();
+                return true;
+            case R.id.send_event:
+                Intent intent = new Intent(SearchResultsActivity.this, MainActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.settings:
+                Intent intent2 = new Intent(SearchResultsActivity.this,SettingsActivity.class);
+                startActivity(intent2);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.map_menu,menu);
+        return true;
     }
 }

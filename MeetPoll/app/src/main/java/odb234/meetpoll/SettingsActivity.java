@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -29,13 +30,15 @@ public class SettingsActivity extends AppCompatActivity {
         sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         tv.setText(sp.getString("name",tv.getText().toString()));
         editor = sp.edit();
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     public void changeName(View v)
     {
         FragmentManager fm = getFragmentManager();
         nameFragment nf = new nameFragment();
-        nf.show(fm,"nameFragment");
+        nf.show(fm, "nameFragment");
     }
 
     public static class nameFragment extends DialogFragment
@@ -67,5 +70,14 @@ public class SettingsActivity extends AppCompatActivity {
                     });
             return builder.create();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home){
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
