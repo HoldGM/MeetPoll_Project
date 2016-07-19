@@ -4,8 +4,10 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -37,16 +39,26 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
 
     private static final String TAG = "Map activity";
     private GoogleMap mMap;
-    private double newLat;
-    private double newLng;
     Geocoder gc;
     Intent intent;
     //Current location info
     private String address;
     private String city;
     private String country;
+    //------------------------------------------
+    private double newLat;
+    private double newLng;
+    private String eventName;
+    private String searchLoaction;
+    private String eventDate;
+    private String eventTime;
+    private String locationType;
+    private String locationSubtype;
+    private String eventPrice;
+    private int eventRating;
 
-    int PLACE_PICKER_REQUEST = 1;
+
+//    int PLACE_PICKER_REQUEST = 1;
     private GoogleApiClient mGoogleApiClient;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +75,16 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
         intent = getIntent();
         newLat = intent.getDoubleExtra("newLat", 30);
         newLng = intent.getDoubleExtra("newLng", -97);
+        eventName = intent.getStringExtra("eventName");
+        searchLoaction = intent.getStringExtra("eventLocation");
+        eventDate = intent.getStringExtra("date");
+        eventTime = intent.getStringExtra("time");
+        locationType = intent.getStringExtra("locationType");
+        locationSubtype = intent.getStringExtra("locationSubtype");
+        eventPrice = intent.getStringExtra("price");
+        eventRating = intent.getIntExtra("rating", 0);
+
+
         try{
             getLocation();
         }catch(IOException e){
@@ -143,6 +165,11 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
                 finish();
                 return true;
             case R.id.send_event:
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                String hostName = sp.getString("name", "host");
+                DatabaseConnector dbc = new DatabaseConnector(this);
+                dbc.insertEvent(hostName, eventName, searchLoaction, eventDate, eventTime, locationType, locationSubtype, eventPrice, eventRating);
+                Log.d(TAG, "Event inserted into DB");
                 Intent intent = new Intent(SearchResultsActivity.this, MainActivity.class);
                 startActivity(intent);
                 return true;

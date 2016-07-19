@@ -37,6 +37,7 @@ import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -98,7 +99,6 @@ public class NewEventActivity extends AppCompatActivity {
         timeBtn = (Button) findViewById(R.id.event_time); // set time button
         gc = new Geocoder(this);
 
-        setCurrentDateTime();
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
@@ -268,25 +268,38 @@ public class NewEventActivity extends AppCompatActivity {
     }
 
     public void saveEvent(View v) {
+        String str = "";
+        if(eventName.getText().toString().equals(""))
+            str += "Event Name, ";
+        if(locText.getText().toString().equals(""))
+            str += "Search Location, ";
+        if(dateBtn.getText().toString().equals(""))
+            str += "Event Date, ";
+        if(timeBtn.getText().toString().equals(""))
+            str += "Event Time.";
+        if(!str.equals("")) {
+            Toast.makeText(getApplicationContext(), "Missing information for " + str, Toast.LENGTH_LONG).show();
+            return;
+        }
+        recreate();
         DatabaseConnector dbc = new DatabaseConnector(this);
 
         Log.d(tag, "Event inserted into DB");
 
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        String hostName = sp.getString("name", "host");
+//        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+//        String hostName = sp.getString("name", "host");
 
-        db_eventName = eventName.getText().toString();
-        db_eventLocation = locText.getText().toString();
-//        db_radius = radiusSeekBar.getProgress();
-        db_date = dateBtn.getText().toString();
-        db_time = timeBtn.getText().toString();
-        db_locationType = locSpinner.getSelectedItem().toString();
-        db_locationSubtype = typeSpinner.getSelectedItem().toString();
-        db_price = priceSpinner.getSelectedItem().toString();
-        db_rating = (int) Math.floor(ratingBar.getRating());
+//        db_eventName = eventName.getText().toString();
+//        db_eventLocation = locText.getText().toString();
+//        db_date = dateBtn.getText().toString();
+//        db_time = timeBtn.getText().toString();
+//        db_locationType = locSpinner.getSelectedItem().toString();
+//        db_locationSubtype = typeSpinner.getSelectedItem().toString();
+//        db_price = priceSpinner.getSelectedItem().toString();
+//        db_rating = (int) Math.floor(ratingBar.getRating());
 
 
-        dbc.insertEvent(hostName, db_eventName, db_eventLocation, db_date, db_time, db_locationType, db_locationSubtype, db_price, db_rating);
+//        dbc.insertEvent(hostName, db_eventName, db_eventLocation, db_date, db_time, db_locationType, db_locationSubtype, db_price, db_rating);
 
         Intent intent = new Intent(this, SearchResultsActivity.class);
         intent.putExtra("newLat", latitude);
@@ -324,11 +337,4 @@ public class NewEventActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void setCurrentDateTime(){
-        java.util.Calendar c = java.util.Calendar.getInstance();
-        String str = c.get(java.util.Calendar.MONTH)+1 + "/" + c.get(java.util.Calendar.DATE) + "/" + c.get(java.util.Calendar.YEAR);
-        dateBtn.setText(str);
-        str = String.format(String.format("%d:%02d %s", c.get(java.util.Calendar.HOUR)%12, c.get(java.util.Calendar.MINUTE), (c.get(java.util.Calendar.AM_PM)==1)?"PM":"AM") );
-        timeBtn.setText(str);
-    }
 }
