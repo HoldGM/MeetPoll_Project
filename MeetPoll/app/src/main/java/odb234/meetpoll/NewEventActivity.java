@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.icu.util.Calendar;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -52,6 +53,7 @@ public class NewEventActivity extends AppCompatActivity {
     Spinner locSpinner;
     Spinner typeSpinner;
     LinearLayout typeLayout;
+    LinearLayout priceLayout;
     Spinner priceSpinner;
     DatePicker eventDate;
     RatingBar ratingBar;
@@ -96,7 +98,7 @@ public class NewEventActivity extends AppCompatActivity {
         timeBtn = (Button) findViewById(R.id.event_time); // set time button
         gc = new Geocoder(this);
 
-
+        setCurrentDateTime();
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
@@ -120,7 +122,6 @@ public class NewEventActivity extends AppCompatActivity {
             }
         };
 
-        locMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -162,6 +163,7 @@ public class NewEventActivity extends AppCompatActivity {
         locSpinner.setAdapter(locAdapter);
 
         typeLayout = (LinearLayout) findViewById(R.id.type_layout);
+        priceLayout = (LinearLayout) findViewById(R.id.price_layout);
         typeSpinner = (Spinner) findViewById(R.id.type_spinner); // location for theme type for location selection
         locSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -172,19 +174,23 @@ public class NewEventActivity extends AppCompatActivity {
                         ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.restaurant_types, android.R.layout.simple_spinner_item);
                         typeSpinner.setAdapter(typeAdapter);
                         typeLayout.setVisibility(View.VISIBLE);
+                        priceLayout.setVisibility(View.VISIBLE);
                         break;
                     case 2:
                         typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.bar_types, android.R.layout.simple_spinner_item);
                         typeSpinner.setAdapter(typeAdapter);
                         typeLayout.setVisibility(View.VISIBLE);
+                        priceLayout.setVisibility(View.VISIBLE);
                         break;
                     case 3:
                         typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.club_types, android.R.layout.simple_spinner_item);
                         typeSpinner.setAdapter(typeAdapter);
                         typeLayout.setVisibility(View.VISIBLE);
+                        priceLayout.setVisibility(View.VISIBLE);
                         break;
                     default:
                         typeLayout.setVisibility(View.GONE);
+                        priceLayout.setVisibility(View.GONE);
                 }
             }
 
@@ -219,6 +225,7 @@ public class NewEventActivity extends AppCompatActivity {
         switch (requestCode) {
             case 10:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    locMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
                     gpsAlert();
                 return;
         }
@@ -229,20 +236,25 @@ public class NewEventActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //dialog call
-                FragmentManager fm = getFragmentManager();
-                LocationDialogFragment ld = new LocationDialogFragment();
-                ld.show(fm, "resetLocation");
+                Log.d(tag, locText.getText().toString());
+                if(!locText.getText().toString().equals("")) {
+                    FragmentManager fm = getFragmentManager();
+                    LocationDialogFragment ld = new LocationDialogFragment();
+                    ld.show(fm, "resetLocation");
+                }else
+                    resetLocation();
             }
         });
     }
 
     public static void resetLocation() {
-        if (resetGPS) {
+//        if (resetGPS) {
 //            locMan.requestLocationUpdates("gps", 50000, 25, locationListener);
             Location location = locMan.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             Address address = new Address(Locale.ENGLISH);
             try {
-                address = gc.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0);
+                if(!gc.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0).equals(""))
+                    address = gc.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0);
             } catch (IOException e) {
                 Log.d(tag, "Gecoding failed");
             }
@@ -251,7 +263,7 @@ public class NewEventActivity extends AppCompatActivity {
             latitude = location.getLatitude();
 
 
-        }
+//        }
 
     }
 
@@ -310,5 +322,13 @@ public class NewEventActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setCurrentDateTime(){
+        java.util.Calendar c = java.util.Calendar.getInstance();
+        String str = c.get(java.util.Calendar.MONTH)+1 + "/" + c.get(java.util.Calendar.DATE) + "/" + c.get(java.util.Calendar.YEAR);
+        dateBtn.setText(str);
+        str = String.format(String.format("%d:%02d %s", c.get(java.util.Calendar.HOUR)%12, c.get(java.util.Calendar.MINUTE), (c.get(java.util.Calendar.AM_PM)==1)?"PM":"AM") );
+        timeBtn.setText(str);
     }
 }
