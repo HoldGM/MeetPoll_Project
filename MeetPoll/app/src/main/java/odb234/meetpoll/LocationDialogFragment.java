@@ -27,7 +27,7 @@ public class LocationDialogFragment extends DialogFragment {
                 .setPositiveButton(R.string.alert_dialog_ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         NewEventActivity.resetGPS = true;
-                        NewEventActivity.resetLocation();
+                        new NewEventActivity().resetLocation();
                         dismiss();
                     }
                 })

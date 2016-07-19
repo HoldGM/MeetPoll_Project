@@ -10,16 +10,16 @@
         android:layout_height="wrap_content"
         android:src="@drawable/splash_img"
         android:paddingTop="@dimen/activity_vertical_margin"
-        android:id="@+id/splash_graphic"
-        android:layout_centerInParent="true"/>
+        android:id="@+id/splash_graphic"/>
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/splash_logo"
+        android:src="@drawable/meetpoll_logo"
         android:id="@+id/splash_logo"
         android:layout_margin="@dimen/activity_vertical_margin"
         android:layout_below="@+id/splash_graphic"
-        android:layout_centerInParent="true"/>
-
+        android:layout_centerInParent="true"
+        android:scaleX="1"
+        android:scaleY="1"/>
 </RelativeLayout>

@@ -13,6 +13,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -29,6 +30,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -39,13 +41,31 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.AutocompletePrediction;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBuffer;
+import com.google.android.gms.location.places.Places;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class NewEventActivity extends AppCompatActivity {
 
     EditText eventName;
-    //    TextView radius;
     static EditText locText;
     SeekBar radiusSeekBar;
     Button dateBtn;
@@ -60,29 +80,30 @@ public class NewEventActivity extends AppCompatActivity {
     RatingBar ratingBar;
     Button findPlacesBtn;
 
-    //Database Access variables
-    private long row_id;
-    private String db_eventName;
-    private String db_eventLocation;
-    //    private int db_radius;
-    private String db_date;
-    private String db_time;
-    private String db_locationType;
-    private String db_locationSubtype;
-    private String db_price;
-    private int db_rating;
-
-
     public static LocationManager locMan;
     static LocationListener locationListener;
 
     private final static String tag = "THINGS ARE HAPPENING";
-    public static double longitude;
-    public static double latitude;
+    public double longitude;
+    public double latitude;
 
     public static boolean resetGPS;
 
     static Geocoder gc;
+
+    private static final String API_KEY = "AIzaSyAAzuLsfoR8fRIrdEkXC8up5KfdbHV3lno";
+    private String[] places;
+    private ArrayList<MyPlace> resultPlaces;
+
+    protected GoogleApiClient mGoogleApiClient;
+
+    private PlaceAutocompleteAdapter mAdapter;
+
+    private AutoCompleteTextView mAutocompleteView;
+
+    private TextView mPlaceDetailsText;
+
+    private TextView mPlaceDetailsAttribution;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +118,20 @@ public class NewEventActivity extends AppCompatActivity {
         locMan = (LocationManager) getSystemService(LOCATION_SERVICE);
         dateBtn = (Button) findViewById(R.id.event_date); // set date button
         timeBtn = (Button) findViewById(R.id.event_time); // set time button
-        gc = new Geocoder(this);
+        gc = new Geocoder(getApplicationContext(), Locale.ENGLISH);
+
+        mGoogleApiClient = new GoogleApiClient
+                .Builder(this)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .enableAutoManage(this,0,null) //null maybe bad
+                .build();
+        mAutocompleteView = (AutoCompleteTextView)
+                findViewById(R.id.event_location);
+        mAutocompleteView.setOnItemClickListener(mAutocompleteClickListener);
+        mAdapter = new PlaceAutocompleteAdapter(this, mGoogleApiClient, null,
+                null);
+        mAutocompleteView.setAdapter(mAdapter);
 
         locationListener = new LocationListener() {
             @Override
@@ -125,9 +159,10 @@ public class NewEventActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                    checkSelfPermission(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{
-                        Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
+                        Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.INTERNET
                 }, 10);
                 return;
             } else {
@@ -219,6 +254,47 @@ public class NewEventActivity extends AppCompatActivity {
         newFragment.show(getFragmentManager(), "datePicker");
     }
 
+    private AdapterView.OnItemClickListener mAutocompleteClickListener
+            = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            final AutocompletePrediction item = mAdapter.getItem(position);
+            final String placeId = item.getPlaceId();
+            final CharSequence primaryText = item.getPrimaryText(null);
+
+            PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
+                    .getPlaceById(mGoogleApiClient, placeId);
+            placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
+
+            Toast.makeText(getApplicationContext(), "Clicked: " + primaryText,
+                    Toast.LENGTH_SHORT).show();
+
+        }
+    };
+
+    private ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback
+            = new ResultCallback<PlaceBuffer>() {
+        @Override
+        public void onResult(PlaceBuffer places) {
+            if (!places.getStatus().isSuccess()) {
+                places.release();
+                return;
+            }
+
+            final Place place = places.get(0);
+           /* Place[] results = new Place[10];
+            for (int i=0;i<10;i++){
+                results[i]=places.get(i);
+            }*/
+
+
+
+
+            places.release();
+        }
+    };
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -237,17 +313,17 @@ public class NewEventActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //dialog call
                 Log.d(tag, locText.getText().toString());
-                if(!locText.getText().toString().equals("")) {
+                if (!locText.getText().toString().equals("")) {
                     FragmentManager fm = getFragmentManager();
                     LocationDialogFragment ld = new LocationDialogFragment();
                     ld.show(fm, "resetLocation");
-                }else
+                } else
                     resetLocation();
             }
         });
     }
 
-    public static void resetLocation() {
+    public void resetLocation() {
 //        if (resetGPS) {
 //            locMan.requestLocationUpdates("gps", 50000, 25, locationListener);
             Location location = locMan.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -282,25 +358,29 @@ public class NewEventActivity extends AppCompatActivity {
             return;
         }
         recreate();
-        DatabaseConnector dbc = new DatabaseConnector(this);
 
-        Log.d(tag, "Event inserted into DB");
+        //---------------------------------------------------------------
+        new GetPlaces().execute();
+        //---------------------------------------------------------------
 
-//        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-//        String hostName = sp.getString("name", "host");
+        Log.d(tag, "Before try: " + latitude + ", " + longitude);
+        Log.d(tag, locText.getText().toString());
 
-//        db_eventName = eventName.getText().toString();
-//        db_eventLocation = locText.getText().toString();
-//        db_date = dateBtn.getText().toString();
-//        db_time = timeBtn.getText().toString();
-//        db_locationType = locSpinner.getSelectedItem().toString();
-//        db_locationSubtype = typeSpinner.getSelectedItem().toString();
-//        db_price = priceSpinner.getSelectedItem().toString();
-//        db_rating = (int) Math.floor(ratingBar.getRating());
-
-
-//        dbc.insertEvent(hostName, db_eventName, db_eventLocation, db_date, db_time, db_locationType, db_locationSubtype, db_price, db_rating);
-
+        if( latitude == 0.0 || longitude == 0.0 ){
+            List<Address> tempAdd = null;
+            try {
+                Log.d(tag, "Inside try start");
+                tempAdd = gc.getFromLocationName(locText.getText().toString(), 1);
+                Log.d(tag, "Inside Try: " + tempAdd.get(0).toString());
+                Address a = tempAdd.get(0);
+                latitude = a.getLatitude();
+                longitude = a.getLongitude();
+            }catch(Exception e){
+                Log.e(tag, "Catch: " + e);
+            }
+        }
+        
+        Log.d(tag, "After try: " + latitude + ", " + longitude);
         Intent intent = new Intent(this, SearchResultsActivity.class);
         intent.putExtra("newLat", latitude);
         intent.putExtra("newLng", longitude);
@@ -335,6 +415,30 @@ public class NewEventActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    private class GetPlaces extends AsyncTask<Void, com.google.android.gms.location.places.Place, Void> {
+
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            resultPlaces = new ArrayList<>();
+            PlacesService service = new PlacesService(API_KEY);
+            try {
+                resultPlaces = service.findPlaces(longitude, latitude);
+            } catch (JSONException e) {
+                Log.d(tag, "json fail :/");
+            }
+
+
+            for (int i = 0; i < resultPlaces.size(); i++) {
+
+                MyPlace placeDetail = resultPlaces.get(i);
+                Log.e(tag, "places : " + placeDetail.getName());
+            }
+            return null;
+        }
     }
 
 }

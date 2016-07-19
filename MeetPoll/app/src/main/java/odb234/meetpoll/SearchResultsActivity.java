@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -31,7 +32,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONException;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -56,6 +60,8 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
     private String locationSubtype;
     private String eventPrice;
     private int eventRating;
+
+    private static final String API_KEY = "AIzaSyAAzuLsfoR8fRIrdEkXC8up5KfdbHV3lno";
 
 
 //    int PLACE_PICKER_REQUEST = 1;
@@ -147,6 +153,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
         gc = new Geocoder(this);
         List<Address> list = gc.getFromLocation(newLat, newLng, 1);
 
+        Log.d(TAG, newLat + ", " + newLng);
         try{
             address = list.get(0).getAddressLine(0);
             city = list.get(0).getAddressLine(1);
@@ -188,4 +195,6 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
         inflater.inflate(R.menu.map_menu,menu);
         return true;
     }
+
+
 }

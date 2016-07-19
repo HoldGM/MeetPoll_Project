@@ -28,19 +28,19 @@
         android:textStyle="bold"
         android:inputType="textCapWords"/>
 
-    <EditText
-
+    <AutoCompleteTextView
         android:id="@+id/event_location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/location_text"
+        android:layout_gravity="center_horizontal"
         android:padding="10sp"
         android:layout_marginTop="10sp"
         android:background="@drawable/edit_text_bg"
-        android:inputType="textPostalAddress"/>
+        android:hint="@string/location_text"
+        android:singleLine="true" />
     <Button
         android:id="@+id/location_button"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="@string/location_string"
