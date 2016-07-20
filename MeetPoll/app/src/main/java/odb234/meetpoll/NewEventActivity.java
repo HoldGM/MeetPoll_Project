@@ -115,6 +115,21 @@ public class NewEventActivity extends AppCompatActivity {
         eventName = (EditText) findViewById(R.id.event_name); //Event name edit text box
         locText = (EditText) findViewById(R.id.event_location); // Event location
         locBtn = (Button) findViewById(R.id.location_button); // Find location button
+
+        locBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //dialog call
+                Log.d(tag, locText.getText().toString());
+                if (!locText.getText().toString().equals("")) {
+                    FragmentManager fm = getFragmentManager();
+                    LocationDialogFragment ld = new LocationDialogFragment();
+                    ld.show(fm, "resetLocation");
+                } else
+                    resetLocation();
+            }
+        });
+
         locMan = (LocationManager) getSystemService(LOCATION_SERVICE);
         dateBtn = (Button) findViewById(R.id.event_date); // set date button
         timeBtn = (Button) findViewById(R.id.event_time); // set time button
@@ -157,21 +172,9 @@ public class NewEventActivity extends AppCompatActivity {
         };
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                    checkSelfPermission(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{
-                        Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.INTERNET
-                }, 10);
-                return;
-            } else {
-                gpsAlert();
-            }
-        } else {
-//            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 5);
-            gpsAlert();
-        }
+
+
+
 
 //        radius= (TextView) findViewById(R.id.radius_value); // radius value,
 //        radiusSeekBar = (SeekBar) findViewById(R.id.radius_seekbar); // radius seekbar slider
@@ -269,7 +272,8 @@ public class NewEventActivity extends AppCompatActivity {
 
             Toast.makeText(getApplicationContext(), "Clicked: " + primaryText,
                     Toast.LENGTH_SHORT).show();
-
+            Log.d(tag, placeResult.toString());
+            autoCompleteUpdateLocation();
         }
     };
 
@@ -288,9 +292,6 @@ public class NewEventActivity extends AppCompatActivity {
                 results[i]=places.get(i);
             }*/
 
-
-
-
             places.release();
         }
     };
@@ -301,31 +302,34 @@ public class NewEventActivity extends AppCompatActivity {
         switch (requestCode) {
             case 10:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                                checkSelfPermission(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+                            requestPermissions(new String[]{
+                                    Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.INTERNET
+                            }, 10);
+                            return;
+                        }
+                    }
                     locMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-                    gpsAlert();
+//                    gpsAlert();
                 return;
         }
-    }
-
-    public void gpsAlert() {
-        locBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //dialog call
-                Log.d(tag, locText.getText().toString());
-                if (!locText.getText().toString().equals("")) {
-                    FragmentManager fm = getFragmentManager();
-                    LocationDialogFragment ld = new LocationDialogFragment();
-                    ld.show(fm, "resetLocation");
-                } else
-                    resetLocation();
-            }
-        });
     }
 
     public void resetLocation() {
 //        if (resetGPS) {
 //            locMan.requestLocationUpdates("gps", 50000, 25, locationListener);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{
+                        Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
+                }, 10);
+                return;
+            }
+        }
             Location location = locMan.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             Address address = new Address(Locale.ENGLISH);
             try {
@@ -337,7 +341,7 @@ public class NewEventActivity extends AppCompatActivity {
             locText.setText(address.getAddressLine(0) + ", " + address.getAddressLine(1));
             longitude = location.getLongitude();
             latitude = location.getLatitude();
-
+            this.recreate();
 
 //        }
 
@@ -357,10 +361,15 @@ public class NewEventActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Missing information for " + str, Toast.LENGTH_LONG).show();
             return;
         }
-        recreate();
 
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if(checkSelfPermission(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[]{Manifest.permission.INTERNET}, 5);
+                return;
+            }
+        }
         //---------------------------------------------------------------
-        new GetPlaces().execute();
+//        new GetPlaces().execute();
         //---------------------------------------------------------------
 
         Log.d(tag, "Before try: " + latitude + ", " + longitude);
@@ -370,11 +379,13 @@ public class NewEventActivity extends AppCompatActivity {
             List<Address> tempAdd = null;
             try {
                 Log.d(tag, "Inside try start");
-                tempAdd = gc.getFromLocationName(locText.getText().toString(), 1);
-                Log.d(tag, "Inside Try: " + tempAdd.get(0).toString());
-                Address a = tempAdd.get(0);
-                latitude = a.getLatitude();
-                longitude = a.getLongitude();
+                if(gc.isPresent()) {
+                    tempAdd = gc.getFromLocationName(locText.getText().toString(), 1);
+                    Log.d(tag, "Inside Try: " + tempAdd.get(0).toString());
+                    Address a = tempAdd.get(0);
+                    latitude = a.getLatitude();
+                    longitude = a.getLongitude();
+                }
             }catch(Exception e){
                 Log.e(tag, "Catch: " + e);
             }
@@ -439,6 +450,26 @@ public class NewEventActivity extends AppCompatActivity {
             }
             return null;
         }
+    }
+
+    private void autoCompleteUpdateLocation(){
+        List<Address> tempAdd = null;
+        try {
+            Log.d(tag, "Updating autocomplete location");
+            if(gc.isPresent()) {
+                tempAdd = gc.getFromLocationName(locText.getText().toString(), 1);
+                Address a = tempAdd.get(0);
+                latitude = a.getLatitude();
+                longitude = a.getLongitude();
+                Log.d(tag, "New LatLng: " + latitude + ", " + longitude);
+            }
+        }catch(Exception e){
+            Log.e(tag, "Catch: " + e);
+        }
+    }
+
+    public void newEventClearText(View v) {
+        locText.getText().clear();
     }
 
 }

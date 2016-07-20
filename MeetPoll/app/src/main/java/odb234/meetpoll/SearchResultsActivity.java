@@ -30,11 +30,23 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpRequestFactory;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,6 +72,12 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
     private String locationSubtype;
     private String eventPrice;
     private int eventRating;
+
+    private ArrayList<MyPlace> nearbyPlaces;
+
+    private List<LatLng> markerList;
+
+
 
     private static final String API_KEY = "AIzaSyAAzuLsfoR8fRIrdEkXC8up5KfdbHV3lno";
 
@@ -89,11 +107,12 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
         locationSubtype = intent.getStringExtra("locationSubtype");
         eventPrice = intent.getStringExtra("price");
         eventRating = intent.getIntExtra("rating", 0);
+        markerList = new ArrayList<>();
 
 
-        try{
+        try {
             getLocation();
-        }catch(IOException e){
+        } catch (IOException e) {
             Log.d(TAG, "get location failed");
         }
 
@@ -103,27 +122,8 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
                 .addApi(Places.PLACE_DETECTION_API)
                 .enableAutoManage(this, this)
                 .build();
-//-----------------Place Picker, may want to use at some point----------------------------------
-//        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-//
-//        try {
-//            startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
-//        } catch (GooglePlayServicesRepairableException e) {
-//            e.printStackTrace();
-//        } catch (GooglePlayServicesNotAvailableException e) {
-//            e.printStackTrace();
-//        }
+        new findNearby().execute();
     }
-
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (requestCode == PLACE_PICKER_REQUEST) {
-//            if (resultCode == RESULT_OK) {
-//                Place place = PlacePicker.getPlace(data, this);
-//                String toastMsg = String.format("Place: %s", place.getName());
-//                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
-//            }
-//        }
-//    }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
@@ -145,7 +145,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
 
         // Add a marker in Sydney and move the camera
         LatLng youAreHere = new LatLng(newLat, newLng);
-        mMap.addMarker(new MarkerOptions().position(youAreHere).title(address + ", " + city));
+//        mMap.addMarker(new MarkerOptions().position(youAreHere).title(address + ", " + city));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(youAreHere, 17));
     }
 
@@ -195,6 +195,88 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
         inflater.inflate(R.menu.map_menu,menu);
         return true;
     }
+
+    private class findNearby extends AsyncTask<Void, com.google.android.gms.location.places.Place, Void>{
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            Log.d(TAG, "Starting nearby places search");
+            nearbyPlaces = new ArrayList<>();
+
+            PlacesService service = new PlacesService(getString(R.string.google_maps_key));
+            try{
+                String urlString = service.makeUrl(newLat, newLng);
+                Log.d(TAG, "JSON String: " + urlString);
+                DefaultHttpClient client = new DefaultHttpClient();
+                HttpGet req = new HttpGet(urlString);
+                HttpResponse res = client.execute(req);
+                HttpEntity jsonEntity = res.getEntity();
+                InputStream in = jsonEntity.getContent();
+                JSONObject jsonObj = new JSONObject(convertStreamtoString(in));
+                JSONArray resArray = jsonObj.getJSONArray("results");
+                addMarkers(resArray);
+                if(resArray.length() > 0){
+                    for(int i = 0; i < resArray.length(); i++){
+                        double lat = resArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lat");
+                        double lng = resArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lng");
+//                        Log.d(TAG, resArray.getJSONObject(i).getString("name") + "  lat:" + resArray.getJSONObject(i).getJSONObject() + "  lng: " + resArray.getJSONObject(i).getDouble("lng"));
+                    }
+                }
+            }catch(JSONException e){
+                Log.d(TAG, "JSON failed");
+            }catch(IOException e) {
+                Log.d(TAG, "HTTP Request Failed");
+            }
+
+            Log.d(TAG, "In findNearby nearbyPlaces length: " + nearbyPlaces.size());
+
+             return null;
+        }
+
+        private String convertStreamtoString(InputStream in){
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            StringBuilder jsonStr = new StringBuilder();
+            String line;
+            try{
+                while((line = br.readLine())!= null){
+                    String t = line +"\n";
+                    jsonStr.append(t);
+                }
+                br.close();
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+            return jsonStr.toString();
+        }
+
+        private void addMarkers(JSONArray jsonArray){
+            for(int i = 0; i < jsonArray.length(); i++){
+                try {
+                    double lat = jsonArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lat");
+                    double lng = jsonArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lng");
+                    markerList.add(new LatLng(lat, lng));
+//                    LatLng latLng = new LatLng(jsonArray.getJSONObject(i).getDouble("lat"), jsonArray.getJSONObject(i).getDouble("lng"));
+//                    mMap.addMarker(new MarkerOptions().position(latLng).title("marker " + i));
+                }catch (JSONException e){
+                    Log.d(TAG, "invalid json element");
+                }
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            for(int i = 0; i < markerList.size(); i++){
+                mMap.addMarker(new MarkerOptions().position(markerList.get(i)));
+            }
+
+//            LatLngBounds.Builder bounds = new LatLngBounds.Builder();
+//            for(Marker marker : mMa){
+//
+//            }
+        }
+    }
+
 
 
 }
