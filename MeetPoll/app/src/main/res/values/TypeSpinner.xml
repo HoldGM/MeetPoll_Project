@@ -1,34 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="restaurant_types">
-        <item>Any</item>
-        <item>American</item>
-        <item>Mexican</item>
-        <item>Italian</item>
-        <item>Cajun</item>
-        <item>Thai</item>
-        <item>Greek</item>
-        <item>Chinese</item>
-        <item>Mediterranean</item>
-        <item>French</item>
-        <item>Spanish</item>
-        <item>German</item>
-        <item>Vietnamese</item>
-        <item>Caribbean</item>
+    <string-array name="food_types">
+        <item>Bakery</item>
+        <item>Bar</item>
+        <item>Cafe</item>
+        <item>Meal_Delivery</item>
+        <item>Meal_Takeaway</item>
+        <item>Restaurant</item>
     </string-array>
-    <string-array name="bar_types">
-        <item>Any</item>
-        <item>Pub</item>
-        <item>Sports</item>
-        <item>Lounge</item>
-        <item>Dive</item>
+    <string-array name="entertainment_types">
+        <item>Amusement_Park</item>
+        <item>Aquarium</item>
+        <item>Bowling_Alley</item>
+        <item>Casino</item>
+        <item>Movie_Theater</item>
+        <item>Museum</item>
+        <item>Night_Club</item>
+        <item>Zoo</item>
     </string-array>
-    <string-array name="club_types">
-        <item>Any</item>
-        <item>Dance</item>
-        <item>Live Music</item>
-        <item>Piano Bar</item>
-        <item>Comedy</item>
-        <item>Adult</item>
+    <string-array name="cultural_types">
+        <item>Art_Gallery</item>
+        <item>Book_Store</item>
+        <item>Library</item>
+    </string-array>
+    <string-array name="outdoors_types">
+        <item>Campground</item>
+        <item>Gym</item>
+        <item>Lodging</item>
+        <item>Park</item>
+        <item>Shopping_Mall</item>
+        <item>Spa</item>
+    </string-array>
+    <string-array name="religious_types">
+        <item>Church</item>
+        <item>Hindu_Temple</item>
+        <item>Mosque</item>
+        <item>Synagogue</item>
     </string-array>
 </resources>

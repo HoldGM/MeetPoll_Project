@@ -207,12 +207,11 @@
             android:textSize="18sp"
             android:layout_gravity="center"/>
         <RatingBar
-            android:id="@+id/location_rating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/location_rating"
             android:numStars="5"
-            android:stepSize="1"
-            android:isIndicator="true"/>
+            android:stepSize="1"/>
     </LinearLayout>
     <Button
         android:id="@+id/find_places_btn"

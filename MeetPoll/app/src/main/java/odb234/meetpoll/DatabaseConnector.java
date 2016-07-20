@@ -39,7 +39,7 @@ public class DatabaseConnector {
 
     public void insertEvent(String hostName, String eventName, String eventLocation,
                             String date, String time, String locationType,
-                            String locationSubtype, String price, int rating){
+                            String locationSubtype, int price, int rating){
         ContentValues newEvent = createEvent(hostName, eventLocation, date, time, locationType, locationSubtype, price, rating);
 
         newEvent.put("event_name", eventName);
@@ -55,7 +55,7 @@ public class DatabaseConnector {
 
     private ContentValues createEvent(String hostName, String eventLocation,
                                       String date, String time, String locationType,
-                                      String locationSubtype, String price, int rating){
+                                      String locationSubtype, int price, int rating){
         ContentValues result = new ContentValues();
         result.put("host_name", hostName);
         result.put("event_location", eventLocation);
@@ -71,7 +71,7 @@ public class DatabaseConnector {
 
     public void updateEvent(long id, String hostName, String eventName, String eventlocation,
                             String date, String time, String locationType,
-                            String locationSubtype, String price, int rating){
+                            String locationSubtype, int price, int rating){
         ContentValues editEvent = createEvent(hostName, eventlocation, date, time, locationType, locationSubtype, price, rating);
         try{
             open();
@@ -131,7 +131,7 @@ public class DatabaseConnector {
                     "time TEXT," +
                     "location_type TEXT," +
                     "location_subtype TEXT," +
-                    "price TEXT," +
+                    "price INTEGER," +
                     "rating INTEGER);";
             db.execSQL(createQuery);
         }

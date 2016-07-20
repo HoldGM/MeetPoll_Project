@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="location_list">
-        <item>Restaurant</item>
-        <item>Cafe</item>
-        <item>Bar</item>
-        <item>Club</item>
-        <item>Library</item>
+        <item>Food</item>
+        <item>Entertainment</item>
+        <item>Cultural</item>
+        <item>Outdoors</item>
+        <item>Religious</item>
     </string-array>
 </resources>

@@ -30,7 +30,7 @@ public class PlacesService {
     public ArrayList<MyPlace> findPlaces(double latitude, double longitude
                                       ) throws JSONException {
 
-        String urlString = makeUrl(latitude, longitude);
+        String urlString = makeUrl(latitude, longitude, "", 0);
 
         try {
             Log.d(TAG, "Starting JSON stuff");
@@ -59,7 +59,7 @@ public class PlacesService {
     }
 
     // https://maps.googleapis.com/maps/api/place/search/json?location=28.632808,77.218276&radius=500&types=atm&sensor=false&key=apikey
-    public String makeUrl(double latitude, double longitude) {
+    public String makeUrl(double latitude, double longitude, String type, int price) {
         StringBuilder urlString = new StringBuilder(
                 "https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
 
@@ -69,7 +69,8 @@ public class PlacesService {
             urlString.append(Double.toString(longitude));
             urlString.append("&rankby=distance");
 //            urlString.append("&radius=10000");
-            urlString.append("&types=meal_takeaway");
+            urlString.append("&minprice=" + price);
+            urlString.append("&type=" + type.toLowerCase());
             urlString.append("&key=" + API_KEY);
 
         return urlString.toString();

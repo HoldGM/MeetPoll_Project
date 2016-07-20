@@ -70,7 +70,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
     private String eventTime;
     private String locationType;
     private String locationSubtype;
-    private String eventPrice;
+    private int eventPrice;
     private int eventRating;
 
     private ArrayList<MyPlace> nearbyPlaces;
@@ -105,16 +105,16 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
         eventTime = intent.getStringExtra("time");
         locationType = intent.getStringExtra("locationType");
         locationSubtype = intent.getStringExtra("locationSubtype");
-        eventPrice = intent.getStringExtra("price");
+        eventPrice = intent.getIntExtra("price", 0);
         eventRating = intent.getIntExtra("rating", 0);
         markerList = new ArrayList<>();
 
 
-        try {
-            getLocation();
-        } catch (IOException e) {
-            Log.d(TAG, "get location failed");
-        }
+//        try {
+//            getLocation();
+//        } catch (IOException e) {
+//            Log.d(TAG, "get location failed");
+//        }
 
         mGoogleApiClient = new GoogleApiClient
                 .Builder(this)
@@ -145,7 +145,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
 
         // Add a marker in Sydney and move the camera
         LatLng youAreHere = new LatLng(newLat, newLng);
-//        mMap.addMarker(new MarkerOptions().position(youAreHere).title(address + ", " + city));
+//        mMap.addMarker(new MarkerOptions().position(youAreHere));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(youAreHere, 17));
     }
 
@@ -205,7 +205,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
 
             PlacesService service = new PlacesService(getString(R.string.google_maps_key));
             try{
-                String urlString = service.makeUrl(newLat, newLng);
+                String urlString = service.makeUrl(newLat, newLng, locationSubtype, eventPrice);
                 Log.d(TAG, "JSON String: " + urlString);
                 DefaultHttpClient client = new DefaultHttpClient();
                 HttpGet req = new HttpGet(urlString);
@@ -219,7 +219,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
                     for(int i = 0; i < resArray.length(); i++){
                         double lat = resArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lat");
                         double lng = resArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lng");
-//                        Log.d(TAG, resArray.getJSONObject(i).getString("name") + "  lat:" + resArray.getJSONObject(i).getJSONObject() + "  lng: " + resArray.getJSONObject(i).getDouble("lng"));
+                        Log.d(TAG, resArray.getJSONObject(i).getString("name") + "  lat:" + lat + ", lng: " + lng);
                     }
                 }
             }catch(JSONException e){
@@ -250,7 +250,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
         }
 
         private void addMarkers(JSONArray jsonArray){
-            for(int i = 0; i < jsonArray.length(); i++){
+            for(int i = 0; i < jsonArray.length() && i < 10; i++){
                 try {
                     double lat = jsonArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lat");
                     double lng = jsonArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lng");
@@ -270,10 +270,11 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
                 mMap.addMarker(new MarkerOptions().position(markerList.get(i)));
             }
 
-//            LatLngBounds.Builder bounds = new LatLngBounds.Builder();
-//            for(Marker marker : mMa){
-//
-//            }
+            LatLngBounds.Builder bounds = new LatLngBounds.Builder();
+            for(int i = 0; i < markerList.size(); i++){
+                bounds.include(markerList.get(i));
+            }
+            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 100));
         }
     }
 
