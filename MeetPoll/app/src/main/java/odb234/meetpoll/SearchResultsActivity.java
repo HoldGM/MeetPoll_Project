@@ -70,8 +70,8 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
     private String eventTime;
     private String locationType;
     private String locationSubtype;
-    private int eventPrice;
     private int eventRating;
+    private String[] ids;
 
     private ArrayList<MyPlace> nearbyPlaces;
 
@@ -105,16 +105,8 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
         eventTime = intent.getStringExtra("time");
         locationType = intent.getStringExtra("locationType");
         locationSubtype = intent.getStringExtra("locationSubtype");
-        eventPrice = intent.getIntExtra("price", 0);
         eventRating = intent.getIntExtra("rating", 0);
         markerList = new ArrayList<>();
-
-
-//        try {
-//            getLocation();
-//        } catch (IOException e) {
-//            Log.d(TAG, "get location failed");
-//        }
 
         mGoogleApiClient = new GoogleApiClient
                 .Builder(this)
@@ -175,7 +167,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                 String hostName = sp.getString("name", "host");
                 DatabaseConnector dbc = new DatabaseConnector(this);
-                dbc.insertEvent(hostName, eventName, searchLoaction, eventDate, eventTime, locationType, locationSubtype, eventPrice, eventRating);
+                dbc.insertEvent(hostName, eventName, searchLoaction, eventDate, eventTime, locationType, locationSubtype, eventRating, ids);
                 Log.d(TAG, "Event inserted into DB");
                 Intent intent = new Intent(SearchResultsActivity.this, MainActivity.class);
                 startActivity(intent);
@@ -205,7 +197,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
 
             PlacesService service = new PlacesService(getString(R.string.google_maps_key));
             try{
-                String urlString = service.makeUrl(newLat, newLng, locationSubtype, eventPrice);
+                String urlString = service.makeUrl(newLat, newLng, locationSubtype);
                 Log.d(TAG, "JSON String: " + urlString);
                 DefaultHttpClient client = new DefaultHttpClient();
                 HttpGet req = new HttpGet(urlString);
@@ -250,11 +242,16 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
         }
 
         private void addMarkers(JSONArray jsonArray){
+            ids = new String[10];
             for(int i = 0; i < jsonArray.length() && i < 10; i++){
                 try {
                     double lat = jsonArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lat");
                     double lng = jsonArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lng");
-                    markerList.add(new LatLng(lat, lng));
+                    Double rating = jsonArray.getJSONObject(i).getDouble("rating");
+                    if(rating >= eventRating) {
+                        markerList.add(new LatLng(lat, lng));
+                        ids[i] = jsonArray.getJSONObject(i).getString("id");
+                    }
 //                    LatLng latLng = new LatLng(jsonArray.getJSONObject(i).getDouble("lat"), jsonArray.getJSONObject(i).getDouble("lng"));
 //                    mMap.addMarker(new MarkerOptions().position(latLng).title("marker " + i));
                 }catch (JSONException e){
@@ -270,11 +267,18 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
                 mMap.addMarker(new MarkerOptions().position(markerList.get(i)));
             }
 
-            LatLngBounds.Builder bounds = new LatLngBounds.Builder();
-            for(int i = 0; i < markerList.size(); i++){
-                bounds.include(markerList.get(i));
+            if(markerList.size() != 0) {
+                LatLngBounds.Builder bounds = new LatLngBounds.Builder();
+                for (int i = 0; i < markerList.size(); i++) {
+                    bounds.include(markerList.get(i));
+                }
+                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 100));
+            }else {
+                Toast.makeText(getApplicationContext(), "No results found. Please refine search criteria.", Toast.LENGTH_LONG).show();
+                finish();
             }
-            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 100));
+
+            Log.d(TAG, Arrays.toString(ids));
         }
     }
 

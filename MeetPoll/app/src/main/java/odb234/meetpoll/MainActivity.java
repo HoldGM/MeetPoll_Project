@@ -97,7 +97,8 @@ public class MainActivity extends AppCompatActivity {
     private void populateList() {
         String[] from = new String[] {"host_name", "event_name", "event_location", "date", "time"};
         int[] to = new int[] {R.id.list_event_host,R.id.list_event_name, R.id.list_location, R.id.list_event_date, R.id.list_time};
-        ca = new SimpleCursorAdapter(MainActivity.this, R.layout.cell_view, dbc.getCursor(), from, to);
+        Cursor c = dbc.getCursor();
+        ca = new SimpleCursorAdapter(MainActivity.this, R.layout.cell_view, c, from, to);
         eventList.setAdapter(ca);
     }
 

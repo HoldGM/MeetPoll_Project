@@ -15,11 +15,11 @@ import java.sql.SQLException;
  */
 public class DatabaseConnector {
     private static final String tag = "DATABASE PROBLEM:";
-    private static final String DATABASE_NAME = "EventsDB";
+    private static final String DATABASE_NAME = "EventsDB001";
     private SQLiteDatabase database;
     private DatabaseOpenHelper databaseOpenHelper;
 
-    private static final String[] query = new String[] {"_id", "host_name", "event_name", "event_location", "date", "time", "location_type", "location_subtype", "price", "rating"};
+    private static final String[] query = new String[] {"_id", "host_name", "event_name", "event_location", "date", "time", "location_type", "location_subtype", "rating", "placeid_1", "placeid_2", "placeid_3", "placeid_4", "placeid_5", "placeid_6", "placeid_7", "placeid_8", "placeid_9", "placeid_10"};
 
     public DatabaseConnector(Context context){
         databaseOpenHelper = new DatabaseOpenHelper(context, DATABASE_NAME, null, 1);
@@ -39,8 +39,8 @@ public class DatabaseConnector {
 
     public void insertEvent(String hostName, String eventName, String eventLocation,
                             String date, String time, String locationType,
-                            String locationSubtype, int price, int rating){
-        ContentValues newEvent = createEvent(hostName, eventLocation, date, time, locationType, locationSubtype, price, rating);
+                            String locationSubtype, int rating, String[] ids){
+        ContentValues newEvent = createEvent(hostName, eventLocation, date, time, locationType, locationSubtype, rating, ids);
 
         newEvent.put("event_name", eventName);
 //        try{
@@ -55,7 +55,7 @@ public class DatabaseConnector {
 
     private ContentValues createEvent(String hostName, String eventLocation,
                                       String date, String time, String locationType,
-                                      String locationSubtype, int price, int rating){
+                                      String locationSubtype, int rating, String[] ids){
         ContentValues result = new ContentValues();
         result.put("host_name", hostName);
         result.put("event_location", eventLocation);
@@ -63,16 +63,20 @@ public class DatabaseConnector {
         result.put("time", time);
         result.put("location_type", locationType);
         result.put("location_subtype", locationSubtype);
-        result.put("price", price);
         result.put("rating", rating);
+        for (int i = 0; i < ids.length; i++){
+            String str = "placeid_" + (i + 1);
+            Log.d(tag, str);
+            result.put(str, ids[i]);
+        }
 
         return result;
     }
 
     public void updateEvent(long id, String hostName, String eventName, String eventlocation,
                             String date, String time, String locationType,
-                            String locationSubtype, int price, int rating){
-        ContentValues editEvent = createEvent(hostName, eventlocation, date, time, locationType, locationSubtype, price, rating);
+                            String locationSubtype, int rating, String[] ids){
+        ContentValues editEvent = createEvent(hostName, eventlocation, date, time, locationType, locationSubtype, rating, ids);
         try{
             open();
             database.update("events", editEvent, "_id=" + id, null);
@@ -83,8 +87,14 @@ public class DatabaseConnector {
     }
 
 
-    public Cursor getCursor(){
-        return database.query(true, "events", query, null, null, null, null, null, null);
+    public Cursor getCursor() {
+        try{
+            this.open();
+            return database.query(true, "events", query, null, null, null, null, null, null);
+        }catch(Exception e){
+            Log.d(tag, e.toString());
+        }
+        return null;
     }
     public Cursor getOneEvent(long id){
         return database.query("events", null, "_id=" + id, null, null, null, null);
@@ -131,8 +141,17 @@ public class DatabaseConnector {
                     "time TEXT," +
                     "location_type TEXT," +
                     "location_subtype TEXT," +
-                    "price INTEGER," +
-                    "rating INTEGER);";
+                    "rating INTEGER," +
+                    "placeid_1 TEXT," +
+                    "placeid_2 TEXT," +
+                    "placeid_3 TEXT," +
+                    "placeid_4 TEXT," +
+                    "placeid_5 TEXT," +
+                    "placeid_6 TEXT," +
+                    "placeid_7 TEXT," +
+                    "placeid_8 TEXT," +
+                    "placeid_9 TEXT," +
+                    "placeid_10 TEXT);";
             db.execSQL(createQuery);
         }
     }

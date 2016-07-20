@@ -74,8 +74,6 @@ public class NewEventActivity extends AppCompatActivity {
     Spinner locSpinner;
     Spinner typeSpinner;
     LinearLayout typeLayout;
-    LinearLayout priceLayout;
-    Spinner priceSpinner;
     DatePicker eventDate;
     RatingBar ratingBar;
     Button findPlacesBtn;
@@ -190,7 +188,6 @@ public class NewEventActivity extends AppCompatActivity {
         locSpinner.setAdapter(locAdapter); // selection for category of meeting location
 
         typeLayout = (LinearLayout) findViewById(R.id.type_layout);
-        priceLayout = (LinearLayout) findViewById(R.id.price_layout);
         typeSpinner = (Spinner) findViewById(R.id.type_spinner); // location type for meeting
         locSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -225,21 +222,6 @@ public class NewEventActivity extends AppCompatActivity {
                 typeLayout.setVisibility(View.GONE);
             }
         });
-
-        priceSpinner = (Spinner) findViewById(R.id.price_spinner); // Price spinner showing price '$' value
-        priceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                price = i;
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                price = 0;
-            }
-        });
-        ArrayAdapter<CharSequence> priceAdapter = ArrayAdapter.createFromResource(this, R.array.price_list, android.R.layout.simple_spinner_dropdown_item);
-        priceSpinner.setAdapter(priceAdapter);
 
         ratingBar = (RatingBar) findViewById(R.id.location_rating); // rating bar for location ratings
 
@@ -330,20 +312,14 @@ public class NewEventActivity extends AppCompatActivity {
     }
 
     public void resetLocation() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{
-                        Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
-                }, 10);
-                return;
-            }
-        }
+
             Location location = locMan.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             Address address = new Address(Locale.ENGLISH);
             try {
-                if(!gc.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0).equals(""))
-                    address = gc.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0);
+                if(gc.isPresent()) {
+                    if (!gc.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0).equals(""))
+                        address = gc.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0);
+                }
             } catch (IOException e) {
                 Log.d(tag, "Gecoding failed");
             }
@@ -351,7 +327,7 @@ public class NewEventActivity extends AppCompatActivity {
             longitude = location.getLongitude();
             latitude = location.getLatitude();
             Log.d(tag, "Before recreate: " + latitude + ", " + longitude);
-            this.recreate();
+//            this.recreate();
 
     }
 
@@ -412,7 +388,6 @@ public class NewEventActivity extends AppCompatActivity {
         intent.putExtra("time", timeBtn.getText().toString());
         intent.putExtra("locationType", locSpinner.getSelectedItem().toString());
         intent.putExtra("locationSubtype", typeSpinner.getSelectedItem().toString());
-        intent.putExtra("price", price);
         intent.putExtra("rating", (int) Math.floor(ratingBar.getRating()));
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
