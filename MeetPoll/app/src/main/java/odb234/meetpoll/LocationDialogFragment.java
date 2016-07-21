@@ -16,10 +16,6 @@ import android.widget.EditText;
  */
 public class LocationDialogFragment extends DialogFragment {
 
-
-    double latitude;
-    double longitude;
-
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

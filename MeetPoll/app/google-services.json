@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1023023798796",
+    "firebase_url": "https://steadfast-leaf-137323.firebaseio.com",
+    "project_id": "steadfast-leaf-137323",
+    "storage_bucket": "steadfast-leaf-137323.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1023023798796:android:476eae7b90b20538",
+        "android_client_info": {
+          "package_name": "odb234.meetpoll"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1023023798796-r8dkvr9sh10vu6ip652e70guft8m5s98.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMAZxrQDiXapq1HluGkoU7w4NPMLDXdMc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

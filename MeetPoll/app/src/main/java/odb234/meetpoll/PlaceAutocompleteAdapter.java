@@ -49,10 +49,6 @@ public class PlaceAutocompleteAdapter
         mPlaceFilter = filter;
     }
 
-    public void setBounds(LatLngBounds bounds) {
-        mBounds = bounds;
-    }
-
     @Override
     public int getCount() {
         return mResultList.size();

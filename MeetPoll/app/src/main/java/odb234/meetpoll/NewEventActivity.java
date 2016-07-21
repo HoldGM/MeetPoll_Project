@@ -24,6 +24,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDialog;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -49,6 +51,7 @@ import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -67,17 +70,14 @@ public class NewEventActivity extends AppCompatActivity {
 
     EditText eventName;
     static EditText locText;
-    SeekBar radiusSeekBar;
     Button dateBtn;
     Button timeBtn;
     static Button locBtn;
     Spinner locSpinner;
     Spinner typeSpinner;
     LinearLayout typeLayout;
-    DatePicker eventDate;
     RatingBar ratingBar;
     Button findPlacesBtn;
-    int price;
 
     public static LocationManager locMan;
     static LocationListener locationListener;
@@ -91,7 +91,6 @@ public class NewEventActivity extends AppCompatActivity {
     static Geocoder gc;
 
     private static final String API_KEY = "AIzaSyAAzuLsfoR8fRIrdEkXC8up5KfdbHV3lno";
-    private String[] places;
     private ArrayList<MyPlace> resultPlaces;
 
     protected GoogleApiClient mGoogleApiClient;
@@ -99,10 +98,6 @@ public class NewEventActivity extends AppCompatActivity {
     private PlaceAutocompleteAdapter mAdapter;
 
     private AutoCompleteTextView mAutocompleteView;
-
-    private TextView mPlaceDetailsText;
-
-    private TextView mPlaceDetailsAttribution;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,16 +143,6 @@ public class NewEventActivity extends AppCompatActivity {
                 null);
         mAutocompleteView.setAdapter(mAdapter);
 
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-//                    && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                requestPermissions(new String[]{
-//                        Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
-//                }, 11);
-//                recreate();
-//                return;
-//            }
-//        }
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
@@ -233,11 +218,39 @@ public class NewEventActivity extends AppCompatActivity {
                 requestPermissions(new String[]{
                         Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
                 }, 11);
-//                recreate();
-                return;
             }
         }
 
+    }
+
+    public void mapSelectLocation(View v){
+        Location loc = locMan.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        double lat = loc.getLatitude();
+        double lng = loc.getLongitude();
+        Intent intent = new Intent(NewEventActivity.this, LocationSelectMap.class);
+        intent.putExtra("lat", lat);
+        intent.putExtra("lng", lng);
+        startActivityForResult(intent, 12);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == resultCode) {
+            LatLng latLng = new LatLng(data.getDoubleExtra("lat", 0.0), data.getDoubleExtra("lng", 0.0));
+            Address address = null;
+            try {
+                if(gc.isPresent()) {
+                    if (!gc.getFromLocation(latLng.latitude, latLng.longitude, 1).get(0).equals(""))
+                        address = gc.getFromLocation(latLng.latitude, latLng.longitude, 1).get(0);
+                }
+            } catch (IOException e) {
+                Log.d(tag, "Gecoding failed");
+            }
+            locText.setText(address.getAddressLine(0) + ", " + address.getAddressLine(1));
+            longitude = latLng.longitude;
+            latitude = latLng.latitude;
+        }
     }
 
     public void showTimePickerDialog(View v) {
@@ -257,14 +270,11 @@ public class NewEventActivity extends AppCompatActivity {
 
             final AutocompletePrediction item = mAdapter.getItem(position);
             final String placeId = item.getPlaceId();
-            final CharSequence primaryText = item.getPrimaryText(null);
 
             PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
                     .getPlaceById(mGoogleApiClient, placeId);
             placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
 
-//            Toast.makeText(getApplicationContext(), "Clicked: " + primaryText,
-//                    Toast.LENGTH_SHORT).show();
             Log.d(tag, placeResult.toString());
             autoCompleteUpdateLocation();
         }
@@ -278,12 +288,6 @@ public class NewEventActivity extends AppCompatActivity {
                 places.release();
                 return;
             }
-
-            final Place place = places.get(0);
-           /* Place[] results = new Place[10];
-            for (int i=0;i<10;i++){
-                results[i]=places.get(i);
-            }*/
 
             places.release();
         }
@@ -306,8 +310,6 @@ public class NewEventActivity extends AppCompatActivity {
                         }
                     }
                     locMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-//                    gpsAlert();
-                return;
         }
     }
 
@@ -327,7 +329,6 @@ public class NewEventActivity extends AppCompatActivity {
             longitude = location.getLongitude();
             latitude = location.getLatitude();
             Log.d(tag, "Before recreate: " + latitude + ", " + longitude);
-//            this.recreate();
 
     }
 
@@ -352,9 +353,6 @@ public class NewEventActivity extends AppCompatActivity {
                 return;
             }
         }
-        //---------------------------------------------------------------
-//        new GetPlaces().execute();
-        //---------------------------------------------------------------
 
         Log.d(tag, "Before try: " + latitude + ", " + longitude);
         Log.d(tag, locText.getText().toString());
@@ -408,35 +406,25 @@ public class NewEventActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home){
-            finish();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu,menu);
+        return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
 
-    private class GetPlaces extends AsyncTask<Void, com.google.android.gms.location.places.Place, Void> {
-
-
-        @Override
-        protected Void doInBackground(Void... arg0) {
-            resultPlaces = new ArrayList<>();
-            PlacesService service = new PlacesService(API_KEY);
-            try {
-                resultPlaces = service.findPlaces(longitude, latitude);
-            } catch (JSONException e) {
-                Log.d(tag, "json fail :/");
-            }
-
-
-            for (int i = 0; i < resultPlaces.size(); i++) {
-
-                MyPlace placeDetail = resultPlaces.get(i);
-                Log.e(tag, "places : " + placeDetail.getName());
-            }
-            return null;
+        switch(item.getItemId()){
+            case android.R.id.home:
+                finish();
+                return true;
+            case R.id.settings:
+                Intent intent2 = new Intent(NewEventActivity.this,SettingsActivity.class);
+                startActivity(intent2);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 

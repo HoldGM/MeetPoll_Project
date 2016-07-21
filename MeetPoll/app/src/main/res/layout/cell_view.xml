@@ -14,7 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight=".8"
-            android:src="@drawable/default_image"/>
+            android:src="@drawable/ic_person_black_36dp"/>
         <TextView
             android:id="@+id/list_event_host"
             android:layout_width="wrap_content"

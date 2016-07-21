@@ -43,14 +43,9 @@ public class DatabaseConnector {
         ContentValues newEvent = createEvent(hostName, eventLocation, date, time, locationType, locationSubtype, rating, ids);
 
         newEvent.put("event_name", eventName);
-//        try{
-//            open();
+
             database.insert("events", null, newEvent);
-//            close();
-//            Log.d(tag, "Event insert completed.");
-//        }catch(SQLException e){
-//            Log.d(tag, "Event insert failed.");
-//        }
+
     }
 
     private ContentValues createEvent(String hostName, String eventLocation,
@@ -111,13 +106,7 @@ public class DatabaseConnector {
     }
 
     public void deleteAllEvents(){
-//        try{
-//            open();
             database.delete("events", null, null);
-//            close();
-//        }catch(SQLException e){
-//            Log.d(tag, "Things happens to the database.");
-//        }
     }
 
     private class DatabaseOpenHelper extends SQLiteOpenHelper {

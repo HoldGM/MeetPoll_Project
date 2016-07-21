@@ -30,6 +30,11 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+        <!--<Button
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/ic_place_black_18dp"
+            android:layout_marginTop="17sp"/>-->
         <AutoCompleteTextView
             android:id="@+id/event_location"
             android:layout_width="match_parent"
@@ -52,20 +57,36 @@
             android:scaleX=".8"
             android:scaleY=".8"/>
     </RelativeLayout>
-    <Button
-        android:id="@+id/location_button"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/location_string"
-        android:drawableLeft="@drawable/ic_gps_fixed_black_18dp"
-        android:drawablePadding="10sp"
-        android:background="@color/splash_blue"
-        android:textColor="#FFFFFF"
-        android:textSize="@dimen/event_text_size"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:paddingLeft="40sp"
-        android:paddingRight="40sp"/>
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/activity_vertical_margin">
+        <Button
+            android:id="@+id/location_button"
+            android:layout_width="0dp"
+            android:layout_weight=".9"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/location_string"
+            android:drawableLeft="@drawable/ic_gps_fixed_black_18dp"
+            android:drawablePadding="10sp"
+            android:background="@drawable/edit_text_bg"
+            android:backgroundTint="@color/splash_blue"
+            android:textColor="#FFFFFF"
+            android:textSize="@dimen/event_text_size"
+            android:paddingLeft="40sp"
+            android:paddingRight="40sp"
+            android:layout_marginRight="15dp"/>
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_weight=".1"
+            android:layout_height="match_parent"
+            android:background="@drawable/edit_text_bg"
+            android:backgroundTint="@color/splash_blue"
+            android:src="@drawable/ic_place_black_18dp"
+            android:onClick="mapSelectLocation"/>
+    </LinearLayout>
  <!--   <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

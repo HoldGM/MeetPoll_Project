@@ -39,7 +39,6 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
         this.year = year;
         this.month = month;
         this.day = day;
-//        Log.d(tag,mBtn.getText().toString());
         mBtn.setText(month + 1 + "/" + day + "/" + year);
     }
     public static DatePickerFragment newInstance(View v) {
