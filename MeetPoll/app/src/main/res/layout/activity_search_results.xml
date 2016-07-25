@@ -15,12 +15,15 @@
         android1:layout_width="wrap_content"
         android1:layout_height="wrap_content"
         android1:id="@+id/map_list_select"
-        android1:layout_alignParentBottom="true"
-        android1:layout_alignParentRight="true"
-        android1:layout_marginRight="24dp"
         android1:checked="false"
         android1:textOff="Map"
         android1:textOn="List"
         android1:scaleX="1.25"
-        android1:scaleY="1.25"/>
+        android1:scaleY="1.25"
+        android1:layout_alignParentTop="true"
+        android1:layout_alignParentRight="true"
+        android1:layout_alignParentEnd="false"
+        android1:layout_marginRight="20dp"
+        android1:layout_marginTop="15dp" />
+
 </RelativeLayout>

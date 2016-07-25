@@ -15,4 +15,17 @@
         android:id="@+id/results_list">
     </ListView>
 
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/switch1"
+        android:textOff="Map"
+        android:textOn="List"
+        android:scaleX="1.25"
+        android:scaleY="1.25"
+        android:layout_alignTop="@+id/results_list"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="5dp"/>
+
 </RelativeLayout>

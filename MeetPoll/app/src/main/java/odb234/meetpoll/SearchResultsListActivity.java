@@ -9,28 +9,34 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Switch;
 
 import java.util.ArrayList;
 
 public class SearchResultsListActivity extends AppCompatActivity {
 
     ListView resultList;
-
+    Switch aSwitch;
     private static final String TAG = "Search Results List";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_results_list);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
+        aSwitch = (Switch) findViewById(R.id.switch1);
+        aSwitch.setChecked(true);
+        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(!b){
+                    finish();
+                }
+                return;
+            }
+        });
         String[] names = getIntent().getStringArrayExtra("names");
         String[] addresses = getIntent().getStringArrayExtra("addresses");
         String[] ids = getIntent().getStringArrayExtra("ids");
@@ -38,7 +44,9 @@ public class SearchResultsListActivity extends AppCompatActivity {
         resultList = (ListView)findViewById(R.id.results_list);
         ListAdapter la = new ResultListAdapter(this, names, addresses, ids, ratings);
         resultList.setAdapter(la);
+
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:clickable="false">
 
     <TextView
         android:layout_width="match_parent"
@@ -14,7 +15,8 @@
         android:layout_below="@+id/results_list_name"
         android:textSize="15dp"
         android:text="Place Address"
-        android:id="@+id/result_list_address"/>
+        android:id="@+id/result_list_address"
+        android:singleLine="true"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -28,6 +30,7 @@
         android:stepSize="0.1"
         android:scaleY=".5"
         android:scaleX=".5"
+        android:paddingTop="5dp"
         android:layout_alignTop="@+id/result_list_address"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"

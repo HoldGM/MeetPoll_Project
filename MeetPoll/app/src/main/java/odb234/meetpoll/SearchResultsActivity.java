@@ -101,23 +101,25 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
         aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if(resArray != null) {
-                    Intent intent = new Intent(getApplicationContext(), SearchResultsListActivity.class); //Create list of places activity
-                    String[] names = new String[mapMarkers.size()];
-                    String[] address = new String[mapMarkers.size()];
-                    String[] id = new String[mapMarkers.size()];
-                    float[] rating = new float[mapMarkers.size()];
-                    for(int i = 0; i < mapMarkers.size(); i++){
-                        names[i] = mapMarkers.get(i).getName();
-                        address[i] = mapMarkers.get(i).getAddress();
-                        id[i] = mapMarkers.get(i).getId();
-                        rating[i] = mapMarkers.get(i).getRating();
+                if (b) {
+                    if (resArray != null) {
+                        Intent intent = new Intent(getApplicationContext(), SearchResultsListActivity.class); //Create list of places activity
+                        String[] names = new String[mapMarkers.size()];
+                        String[] address = new String[mapMarkers.size()];
+                        String[] id = new String[mapMarkers.size()];
+                        float[] rating = new float[mapMarkers.size()];
+                        for (int i = 0; i < mapMarkers.size(); i++) {
+                            names[i] = mapMarkers.get(i).getName();
+                            address[i] = mapMarkers.get(i).getAddress();
+                            id[i] = mapMarkers.get(i).getId();
+                            rating[i] = mapMarkers.get(i).getRating();
+                        }
+                        intent.putExtra("names", names);
+                        intent.putExtra("addresses", address);
+                        intent.putExtra("ids", id);
+                        intent.putExtra("ratings", rating);
+                        startActivityForResult(intent, LIST_SEND);
                     }
-                    intent.putExtra("names", names);
-                    intent.putExtra("addresses", address);
-                    intent.putExtra("ids", id);
-                    intent.putExtra("ratings", rating);
-                    startActivityForResult(intent, LIST_SEND);
                 }
             }
         });
@@ -182,7 +184,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
                 DatabaseConnector dbc = new DatabaseConnector(this);
                 dbc.insertEvent(hostName, eventName, searchLoaction, eventDate, eventTime, locationType, locationSubtype, eventRating, ids);
                 Log.d(TAG, "Event inserted into DB");
-                Intent intent = new Intent(SearchResultsActivity.this, MainActivity.class);
+                Intent intent = new Intent(SearchResultsActivity.this, ContactsListActivity.class);
                 startActivity(intent);
                 return true;
             case R.id.settings:
