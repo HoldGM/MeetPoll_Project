@@ -74,8 +74,12 @@
         <activity
             android:name=".LocationSelectMap"
             android:label="@string/title_activity_location_select_map"
-            android:theme="@style/AppTheme"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".SearchResultsListActivity"
+            android:label="@string/title_activity_search_results_list"
+            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>

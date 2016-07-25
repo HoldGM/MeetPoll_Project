@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -36,6 +38,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,21 +48,25 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
     private static final String TAG = "Map activity";
     private GoogleMap mMap;
     Intent intent;
+    public static final int LIST_SEND = 101;
     //Current location info
     //------------------------------------------
     private double newLat;
     private double newLng;
     private String eventName;
     private String searchLoaction;
+    private int radius;
     private String eventDate;
     private String eventTime;
     private String locationType;
     private String locationSubtype;
     private int eventRating;
-    private String[] ids;
+    private ArrayList<String> ids;
+
+    private Switch aSwitch;
 
     private ArrayList<MapMarker> mapMarkers;
-
+    private JSONArray resArray;
 
 
 
@@ -72,7 +79,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
 
         setContentView(R.layout.activity_search_results);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
@@ -82,12 +89,38 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
         newLng = intent.getDoubleExtra("newLng", -97);
         eventName = intent.getStringExtra("eventName");
         searchLoaction = intent.getStringExtra("eventLocation");
+        radius = intent.getIntExtra("radius", 50000);
+        Log.d(TAG, "Seearch Radius: " + radius);
         eventDate = intent.getStringExtra("date");
         eventTime = intent.getStringExtra("time");
         locationType = intent.getStringExtra("locationType");
         locationSubtype = intent.getStringExtra("locationSubtype");
         eventRating = intent.getIntExtra("rating", 0);
 
+        aSwitch = (Switch) findViewById(R.id.map_list_select);
+        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(resArray != null) {
+                    Intent intent = new Intent(getApplicationContext(), SearchResultsListActivity.class); //Create list of places activity
+                    String[] names = new String[mapMarkers.size()];
+                    String[] address = new String[mapMarkers.size()];
+                    String[] id = new String[mapMarkers.size()];
+                    float[] rating = new float[mapMarkers.size()];
+                    for(int i = 0; i < mapMarkers.size(); i++){
+                        names[i] = mapMarkers.get(i).getName();
+                        address[i] = mapMarkers.get(i).getAddress();
+                        id[i] = mapMarkers.get(i).getId();
+                        rating[i] = mapMarkers.get(i).getRating();
+                    }
+                    intent.putExtra("names", names);
+                    intent.putExtra("addresses", address);
+                    intent.putExtra("ids", id);
+                    intent.putExtra("ratings", rating);
+                    startActivityForResult(intent, LIST_SEND);
+                }
+            }
+        });
         mGoogleApiClient = new GoogleApiClient
                 .Builder(this)
                 .addApi(Places.GEO_DATA_API)
@@ -99,9 +132,17 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        aSwitch.setChecked(false);
+    }
+
+    @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
     }
+
+
 
     /**
      * Manipulates the map once available.
@@ -160,6 +201,27 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
         return true;
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(resultCode) {
+            case LIST_SEND:
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                String hostName = sp.getString("name", "host");
+                DatabaseConnector dbc = new DatabaseConnector(this);
+                dbc.insertEvent(hostName, eventName, searchLoaction, eventDate, eventTime, locationType, locationSubtype, eventRating, ids);
+                Log.d(TAG, "Event inserted into DB");
+                Intent intent = new Intent(SearchResultsActivity.this, MainActivity.class);
+                startActivity(intent);
+                break;
+            default:
+                return;
+        }
+    }
+
+    //----------------------------------------------------------------------
+    //AsyncTask to populate markers for found places from search parameters
+    //----------------------------------------------------------------------
     private class findNearby extends AsyncTask<Void, com.google.android.gms.location.places.Place, Void>{
         @Override
         protected Void doInBackground(Void... voids) {
@@ -168,7 +230,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
 
             PlacesService service = new PlacesService(getString(R.string.google_maps_key));
             try{
-                String urlString = service.makeUrl(newLat, newLng, locationSubtype);
+                String urlString = service.makeUrl(newLat, newLng, locationType, locationSubtype, radius);
                 Log.d(TAG, "JSON String: " + urlString);
                 DefaultHttpClient client = new DefaultHttpClient();
                 HttpGet req = new HttpGet(urlString);
@@ -176,7 +238,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
                 HttpEntity jsonEntity = res.getEntity();
                 InputStream in = jsonEntity.getContent();
                 JSONObject jsonObj = new JSONObject(convertStreamtoString(in));
-                JSONArray resArray = jsonObj.getJSONArray("results");
+                resArray = jsonObj.getJSONArray("results");
                 addMarkers(resArray);
                 if(resArray.length() > 0){
                     for(int i = 0; i < resArray.length(); i++){
@@ -212,22 +274,27 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
         }
 
         private void addMarkers(JSONArray jsonArray){
-            ids = new String[10];
+            ids = new ArrayList<>();
             mapMarkers = new ArrayList<>();
             ArrayList<MapMarker> tempMarkers = new ArrayList<>();
             for(int i = 0; i < jsonArray.length() && i < 10; i++){
                 try {
                     double lat = jsonArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lat");
                     double lng = jsonArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lng");
-                    Double rating = jsonArray.getJSONObject(i).getDouble("rating");
                     String  address = jsonArray.getJSONObject(i).getString("vicinity");
-                    String id = jsonArray.getJSONObject(i).getString("id");
+                    String id = jsonArray.getJSONObject(i).getString("place_id");
                     String name = jsonArray.getJSONObject(i).getString("name");
-                    Log.d(TAG, "Place name: " + name);
-
+                    float rating;
+                    try {
+                        rating = BigDecimal.valueOf(jsonArray.getJSONObject(i).getDouble("rating")).floatValue();
+                    }catch(JSONException e){
+                        Log.d(TAG, name + " rating not available");
+                        rating = 0;
+                    }
                     if(rating >= eventRating) {
+                        Log.d(TAG, name + " rating: " + rating);
                         mapMarkers.add(new MapMarker(new LatLng(lat, lng), address, id, rating, name));
-                        ids[i] = id;
+                        ids.add(id);
                     }else{
                         tempMarkers.add(new MapMarker(new LatLng(lat, lng), address, id, rating, name));
                     }
@@ -235,10 +302,10 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
                     Log.d(TAG, "invalid json element");
                 }
             }
-            for(int i = 0; mapMarkers.size() <= 10 && i < tempMarkers.size(); i++){
-                mapMarkers.add(tempMarkers.get(i));
-                ids[mapMarkers.size()-1] = tempMarkers.get(i).getId();
-            }
+//            for(int i = 0; mapMarkers.size() <= 10 && i < tempMarkers.size(); i++){
+//                mapMarkers.add(tempMarkers.get(i));
+//                ids.add(tempMarkers.get(i).getId());
+//            }
         }
 
         @Override
@@ -260,7 +327,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
                 finish();
             }
 
-            Log.d(TAG, Arrays.toString(ids));
+            Log.d(TAG, ids.toString());
         }
     }
 

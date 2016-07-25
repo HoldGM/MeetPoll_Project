@@ -1,40 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="food_types">
-        <item>Bakery</item>
-        <item>Bar</item>
+        <item>Any</item>
+        <item>Fast Food</item>
+        <item>Burgers</item>
+        <item>Pizza</item>
+        <item>Coffee</item>
+        <item>Casual Dining</item>
+        <item>Fine Dining</item>
+        <item>BBQ</item>
+        <item>Mexican</item>
+        <item>Chinese</item>
+        <item>Thai</item>
         <item>Cafe</item>
-        <item>Meal_Delivery</item>
-        <item>Meal_Takeaway</item>
-        <item>Restaurant</item>
+        <item>Bar</item>
+        <item>Bakery</item>
+        <item>Delivery</item>
+        <item>Takeout</item>
+        <item>Vegetarian</item>
+        <item>Bistro</item>
     </string-array>
     <string-array name="entertainment_types">
-        <item>Amusement_Park</item>
+        <item>Any</item>
+        <item>Amusement Park</item>
         <item>Aquarium</item>
-        <item>Bowling_Alley</item>
+        <item>Bowling</item>
         <item>Casino</item>
-        <item>Movie_Theater</item>
-        <item>Museum</item>
-        <item>Night_Club</item>
+        <item>Movie Theater</item>
         <item>Zoo</item>
+        <item>Night Club</item>
+        <item>Live Music</item>
     </string-array>
     <string-array name="cultural_types">
-        <item>Art_Gallery</item>
-        <item>Book_Store</item>
+        <item>Any</item>
+        <item>Art Gallery</item>
+        <item>Museum</item>
+        <item>Book Store</item>
         <item>Library</item>
     </string-array>
-    <string-array name="outdoors_types">
-        <item>Campground</item>
+    <string-array name="outdoor_types">
+        <item>Any</item>
         <item>Gym</item>
-        <item>Lodging</item>
-        <item>Park</item>
-        <item>Shopping_Mall</item>
         <item>Spa</item>
+        <item>Park</item>
+        <item>Campground</item>
     </string-array>
     <string-array name="religious_types">
+        <item>Any</item>
         <item>Church</item>
-        <item>Hindu_Temple</item>
-        <item>Mosque</item>
         <item>Synagogue</item>
+        <item>Christian</item>
+        <item>Mosque</item>
+        <item>Hindu</item>
+        <item>Catholic</item>
+        <item>Presbyterian</item>
+        <item>Baptist</item>
     </string-array>
 </resources>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="location_list">
-        <item>Food</item>
+        <item>Food &amp; Drinks</item>
         <item>Entertainment</item>
         <item>Cultural</item>
-        <item>Outdoors</item>
         <item>Religious</item>
+        <item>Health &amp; Outdoors</item>
     </string-array>
 </resources>

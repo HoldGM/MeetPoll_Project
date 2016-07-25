@@ -78,6 +78,10 @@ public class NewEventActivity extends AppCompatActivity {
     LinearLayout typeLayout;
     RatingBar ratingBar;
     Button findPlacesBtn;
+    SeekBar radiusSeekBar;
+    TextView radius;
+    int searchRadius;
+    String locationType; //Saves location type to search for
 
     public static LocationManager locMan;
     static LocationListener locationListener;
@@ -126,6 +130,26 @@ public class NewEventActivity extends AppCompatActivity {
 
 
         locMan = (LocationManager) getSystemService(LOCATION_SERVICE);
+        radius = (TextView) findViewById(R.id.radius_value);
+        radiusSeekBar = (SeekBar) findViewById(R.id.radius_seekbar);
+        radiusSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                radius.setText(String.valueOf(i/4.0 + " mi"));
+                searchRadius = (int) Math.floor((i/4.0) * 1609);
+                Log.d(tag, "Search radius in meters: " + searchRadius);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
         dateBtn = (Button) findViewById(R.id.event_date); // set date button
         timeBtn = (Button) findViewById(R.id.event_time); // set time button
         gc = new Geocoder(getApplicationContext(), Locale.ENGLISH);
@@ -182,22 +206,27 @@ public class NewEventActivity extends AppCompatActivity {
                     case 0:
                         ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.food_types, android.R.layout.simple_spinner_item);
                         typeSpinner.setAdapter(typeAdapter);
+                        locationType = getString(R.string.locataion_type_restaurant);
                         break;
                     case 1:
                         typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.entertainment_types, android.R.layout.simple_spinner_item);
                         typeSpinner.setAdapter(typeAdapter);
+                        locationType = getString(R.string.location_type_poi);
                         break;
                     case 2:
                         typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.cultural_types, android.R.layout.simple_spinner_item);
                         typeSpinner.setAdapter(typeAdapter);
+                        locationType = getString(R.string.location_type_poi);
                         break;
                     case 3:
-                        typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.outdoors_types, android.R.layout.simple_spinner_item);
+                        typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.outdoor_types, android.R.layout.simple_spinner_item);
                         typeSpinner.setAdapter(typeAdapter);
+                        locationType = getString(R.string.location_type_poi);
                         break;
                     case 4:
                         typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.religious_types, android.R.layout.simple_spinner_item);
                         typeSpinner.setAdapter(typeAdapter);
+                        locationType = getString(R.string.location_type_poi);
                         break;
                 }
             }
@@ -205,6 +234,18 @@ public class NewEventActivity extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
                 typeLayout.setVisibility(View.GONE);
+            }
+        });
+
+        typeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
             }
         });
 
@@ -220,11 +261,34 @@ public class NewEventActivity extends AppCompatActivity {
                 }, 11);
             }
         }
+        locMan.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, locationListener);
 
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        locMan.removeUpdates(locationListener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        locMan.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, locationListener);
+    }
+
     public void mapSelectLocation(View v){
-        Location loc = locMan.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Location loc = null;
+        if(gc.isPresent()) {
+            loc = locMan.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if(loc == null) {
+                loc = locMan.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            }
+        }
+        if(loc == null){
+            Toast.makeText(getApplicationContext(), "No location found.", Toast.LENGTH_LONG).show();
+            return;
+        }
         double lat = loc.getLatitude();
         double lng = loc.getLongitude();
         Intent intent = new Intent(NewEventActivity.this, LocationSelectMap.class);
@@ -275,7 +339,8 @@ public class NewEventActivity extends AppCompatActivity {
                     .getPlaceById(mGoogleApiClient, placeId);
             placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
 
-            Log.d(tag, placeResult.toString());
+
+            Log.d(tag, "Autocomplete Place Picker" + placeResult);
             autoCompleteUpdateLocation();
         }
     };
@@ -306,7 +371,7 @@ public class NewEventActivity extends AppCompatActivity {
                             requestPermissions(new String[]{
                                     Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.INTERNET
                             }, 10);
-                            return;
+//                            return;
                         }
                     }
                     locMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
@@ -315,20 +380,26 @@ public class NewEventActivity extends AppCompatActivity {
 
     public void resetLocation() {
 
-            Location location = locMan.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            Address address = new Address(Locale.ENGLISH);
-            try {
-                if(gc.isPresent()) {
-                    if (!gc.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0).equals(""))
-                        address = gc.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0);
-                }
-            } catch (IOException e) {
-                Log.d(tag, "Gecoding failed");
+        Location location = locMan.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if(location == null)
+            location = locMan.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if(location == null) {
+            Toast.makeText(getApplicationContext(), "Location Service not available", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Address address = new Address(Locale.ENGLISH);
+        try {
+            if(gc.isPresent()) {
+                if (!gc.getFromLocation(location.getLatitude(), location.getLongitude(), 5).get(0).equals(""))
+                    address = gc.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0);
             }
-            locText.setText(address.getAddressLine(0) + ", " + address.getAddressLine(1));
-            longitude = location.getLongitude();
-            latitude = location.getLatitude();
-            Log.d(tag, "Before recreate: " + latitude + ", " + longitude);
+        } catch (IOException e) {
+            Log.d(tag, "Gecoding failed");
+        }
+        locText.setText(address.getAddressLine(0) + ", " + address.getAddressLine(1));
+        longitude = location.getLongitude();
+        latitude = location.getLatitude();
+        Log.d(tag, "Before recreate: " + latitude + ", " + longitude);
 
     }
 
@@ -382,9 +453,12 @@ public class NewEventActivity extends AppCompatActivity {
         intent.putExtra("newLng", longitude);
         intent.putExtra("eventName", eventName.getText().toString());
         intent.putExtra("eventLocation", locText.getText().toString());
+        if(searchRadius > 0) {
+            intent.putExtra("radius", searchRadius);
+        }
         intent.putExtra("date", dateBtn.getText().toString());
         intent.putExtra("time", timeBtn.getText().toString());
-        intent.putExtra("locationType", locSpinner.getSelectedItem().toString());
+        intent.putExtra("locationType", locationType);
         intent.putExtra("locationSubtype", typeSpinner.getSelectedItem().toString());
         intent.putExtra("rating", (int) Math.floor(ratingBar.getRating()));
 

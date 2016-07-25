@@ -27,9 +27,10 @@
         android:textSize="25sp"
         android:textStyle="bold"
         android:inputType="textCapWords"/>
-    <RelativeLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/button_margin">
         <!--<Button
             android:layout_width="30dp"
             android:layout_height="30dp"
@@ -41,22 +42,21 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:padding="10sp"
-            android:layout_marginTop="10sp"
-            android:background="@drawable/edit_text_bg"
+            android:background="@drawable/edit_text_bg_2"
             android:hint="@string/location_text"
             android:singleLine="true" />
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginTop="10sp"
             android:src="@drawable/ic_clear_black_18dp"
+            android:layout_gravity="right|center_vertical"
+            android:layout_marginRight="@dimen/button_margin"
             android:backgroundTint="@android:color/white"
+            android:background="@android:color/white"
             android:onClick="newEventClearText"
             android:scaleX=".8"
             android:scaleY=".8"/>
-    </RelativeLayout>
+    </FrameLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -73,6 +73,7 @@
             android:drawablePadding="10sp"
             android:background="@drawable/edit_text_bg"
             android:backgroundTint="@color/splash_blue"
+            android:hapticFeedbackEnabled="true"
             android:textColor="#FFFFFF"
             android:textSize="@dimen/event_text_size"
             android:paddingLeft="40sp"
@@ -85,42 +86,43 @@
             android:background="@drawable/edit_text_bg"
             android:backgroundTint="@color/splash_blue"
             android:src="@drawable/ic_place_black_18dp"
-            android:onClick="mapSelectLocation"/>
+            android:onClick="mapSelectLocation"
+            android:hapticFeedbackEnabled="true"/>
     </LinearLayout>
- <!--   <LinearLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="20sp">
         <TextView
             android:layout_width="0sp"
-            android:layout_weight=".3"
+            android:layout_weight=".2"
             android:layout_height="wrap_content"
             android:text="@string/radius_string"
             android:textSize="@dimen/event_text_size"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="0dp"/>
+            android:layout_gravity="center_vertical"/>
         <SeekBar
             android:id="@+id/radius_seekbar"
             android:layout_width="0sp"
-            android:layout_weight=".5"
+            android:layout_weight=".55"
             android:layout_height="wrap_content"
             android:scrollbarSize="@android:dimen/dialog_min_width_major"
-            android:max="5"
+            android:max="20"
             android:onClick="showRadiusValue"/>
         <TextView
             android:layout_width="0sp"
-            android:layout_weight=".2"
+            android:layout_weight=".25"
             android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/button_margin"
             android:text ="0 mi"
             android:textSize="@dimen/event_text_size"
             android:id="@+id/radius_value"/>
-    </LinearLayout>-->
+    </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="15sp">
+        android:layout_marginTop="@dimen/button_margin">
         <TextView
             android:layout_width="0sp"
             android:layout_weight=".2"
@@ -133,15 +135,17 @@
             android:layout_weight=".8"
             android:layout_height="wrap_content"
             android:drawableRight="@drawable/ic_date_range_white_24dp"
+            android:paddingRight="@dimen/button_margin"
             android:textSize="25sp"
             android:onClick="showDatePickerDialog"
-            android:backgroundTint="@color/splash_orange"
+            android:background="@drawable/picker_bg"
             android:textColor="@android:color/white"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/button_margin">
         <TextView
             android:text="@string/event_time"
             android:layout_width="0sp"
@@ -154,16 +158,17 @@
             android:layout_weight=".8"
             android:layout_height="wrap_content"
             android:drawableRight="@drawable/ic_access_time_white_24dp"
+            android:paddingRight="@dimen/button_margin"
             android:onClick="showTimePickerDialog"
             android:textSize="25sp"
-            android:backgroundTint="@color/splash_orange"
+            android:background="@drawable/picker_bg"
             android:textColor="@android:color/white"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="10sp">
+        android:layout_marginTop="@dimen/button_margin">
         <TextView
             android:layout_width="0sp"
             android:layout_weight=".3"
@@ -175,13 +180,13 @@
             android:id="@+id/location_spinner"
             android:layout_width="0sp"
             android:layout_weight=".7"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="10sp"
+        android:layout_marginTop="@dimen/button_margin"
         android:id="@+id/type_layout">
         <TextView
             android:layout_width="0sp"
@@ -200,7 +205,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10sp">
+        android:layout_marginTop="@dimen/button_margin">
         <TextView
             android:layout_width="0sp"
             android:layout_weight=".3"
@@ -217,13 +222,14 @@
     </LinearLayout>
     <Button
         android:id="@+id/find_places_btn"
-        android:layout_width="400sp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="@string/find_places"
-        android:background="@color/splash_blue"
+        android:background="@drawable/edit_text_bg"
         android:textSize="@dimen/event_text_size"
-        android:textColor="#FFFFFF"
-        android:onClick="saveEvent"/>
+        android:textColor="@android:color/white"
+        android:onClick="saveEvent"
+        android:layout_marginTop="@dimen/button_margin"/>
     </LinearLayout>
 </ScrollView>

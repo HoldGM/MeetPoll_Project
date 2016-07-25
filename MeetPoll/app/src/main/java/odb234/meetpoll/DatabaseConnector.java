@@ -9,6 +9,7 @@ import android.util.Log;
 
 import java.sql.SQLDataException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * Created by odb234 on 7/12/16.
@@ -39,7 +40,7 @@ public class DatabaseConnector {
 
     public void insertEvent(String hostName, String eventName, String eventLocation,
                             String date, String time, String locationType,
-                            String locationSubtype, int rating, String[] ids){
+                            String locationSubtype, int rating, ArrayList<String> ids){
         ContentValues newEvent = createEvent(hostName, eventLocation, date, time, locationType, locationSubtype, rating, ids);
 
         newEvent.put("event_name", eventName);
@@ -50,7 +51,7 @@ public class DatabaseConnector {
 
     private ContentValues createEvent(String hostName, String eventLocation,
                                       String date, String time, String locationType,
-                                      String locationSubtype, int rating, String[] ids){
+                                      String locationSubtype, int rating, ArrayList<String> ids){
         ContentValues result = new ContentValues();
         result.put("host_name", hostName);
         result.put("event_location", eventLocation);
@@ -59,10 +60,10 @@ public class DatabaseConnector {
         result.put("location_type", locationType);
         result.put("location_subtype", locationSubtype);
         result.put("rating", rating);
-        for (int i = 0; i < ids.length; i++){
+        for (int i = 0; i < ids.size(); i++){
             String str = "placeid_" + (i + 1);
             Log.d(tag, str);
-            result.put(str, ids[i]);
+            result.put(str, ids.get(i));
         }
 
         return result;
@@ -70,7 +71,7 @@ public class DatabaseConnector {
 
     public void updateEvent(long id, String hostName, String eventName, String eventlocation,
                             String date, String time, String locationType,
-                            String locationSubtype, int rating, String[] ids){
+                            String locationSubtype, int rating, ArrayList<String> ids){
         ContentValues editEvent = createEvent(hostName, eventlocation, date, time, locationType, locationSubtype, rating, ids);
         try{
             open();

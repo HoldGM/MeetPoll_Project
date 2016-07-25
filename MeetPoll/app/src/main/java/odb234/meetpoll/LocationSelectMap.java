@@ -17,6 +17,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class LocationSelectMap extends AppCompatActivity implements OnMapReadyCallback {
@@ -24,6 +25,7 @@ public class LocationSelectMap extends AppCompatActivity implements OnMapReadyCa
     private GoogleMap mMap;
 
     private LatLng marker;
+    private Marker locationSelection;
     private Intent newIntent;
 
     private LatLng center;
@@ -62,7 +64,9 @@ public class LocationSelectMap extends AppCompatActivity implements OnMapReadyCa
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                mMap.addMarker(new MarkerOptions().position(latLng));
+                if(locationSelection != null)
+                    locationSelection.remove();
+                locationSelection = mMap.addMarker(new MarkerOptions().position(latLng));
                 marker = latLng;
             }
         });
