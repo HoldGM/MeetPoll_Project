@@ -135,8 +135,8 @@ public class NewEventActivity extends AppCompatActivity {
         radiusSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                radius.setText(String.valueOf(i/4.0 + " mi"));
-                searchRadius = (int) Math.floor((i/4.0) * 1609);
+                radius.setText(String.valueOf(i / 4.0 + " mi"));
+                searchRadius = (int) Math.floor((i / 4.0) * 1609);
                 Log.d(tag, "Search radius in meters: " + searchRadius);
             }
 
@@ -158,7 +158,7 @@ public class NewEventActivity extends AppCompatActivity {
                 .Builder(this)
                 .addApi(Places.GEO_DATA_API)
                 .addApi(Places.PLACE_DETECTION_API)
-                .enableAutoManage(this,0,null) //null maybe bad
+                .enableAutoManage(this, 0, null) //null maybe bad
                 .build();
         mAutocompleteView = (AutoCompleteTextView)
                 findViewById(R.id.event_location);
@@ -259,9 +259,12 @@ public class NewEventActivity extends AppCompatActivity {
                 requestPermissions(new String[]{
                         Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
                 }, 11);
+            } else {
+                locMan.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, locationListener);
             }
+        } else {
+            locMan.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, locationListener);
         }
-        locMan.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, locationListener);
 
     }
 
@@ -274,6 +277,16 @@ public class NewEventActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         locMan.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, locationListener);
     }
 
@@ -374,7 +387,7 @@ public class NewEventActivity extends AppCompatActivity {
 //                            return;
                         }
                     }
-                    locMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+//                    locMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener)
         }
     }
 
