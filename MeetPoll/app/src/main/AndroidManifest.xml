@@ -80,10 +80,12 @@
         <activity
             android:name=".SearchResultsListActivity"
             android:label="List of Results"
-            android:theme="@style/AppTheme" />
-        <activity android:name=".ContactsListActivity"
             android:theme="@style/AppTheme"
-            android:label="Invite"/>
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ContactsListActivity"
+            android:label="Invite"
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

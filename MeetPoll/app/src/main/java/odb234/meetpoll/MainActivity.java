@@ -26,6 +26,10 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import com.firebase.client.Firebase;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.security.Permission;
 import java.util.Arrays;
 import java.util.List;
@@ -48,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
         dbc = new DatabaseConnector(this);
         eventList = (ListView) findViewById(R.id.event_list);
 
@@ -64,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){

@@ -258,12 +258,13 @@ public class NewEventActivity extends AppCompatActivity {
                     && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{
                         Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
-                }, 11);
+                }, 10);
             } else {
                 locMan.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, locationListener);
             }
         } else {
             locMan.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, locationListener);
+            Log.d(tag, "GPS request started");
         }
 
     }
@@ -345,12 +346,19 @@ public class NewEventActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                if(checkSelfPermission(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED){
+                    requestPermissions(new String[]{Manifest.permission.INTERNET}, 5);
+                    return;
+                }
+            }
             final AutocompletePrediction item = mAdapter.getItem(position);
             final String placeId = item.getPlaceId();
-
-            PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
-                    .getPlaceById(mGoogleApiClient, placeId);
-            placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
+            PendingResult<PlaceBuffer> placeResult = null;
+            if(gc.isPresent()) {
+                placeResult = Places.GeoDataApi.getPlaceById(mGoogleApiClient, placeId);
+                placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
+            }
 
 
             Log.d(tag, "Autocomplete Place Picker" + placeResult);
@@ -376,18 +384,8 @@ public class NewEventActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case 10:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                                checkSelfPermission(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-                            requestPermissions(new String[]{
-                                    Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.INTERNET
-                            }, 10);
-//                            return;
-                        }
-                    }
-//                    locMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener)
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED)
+                   locMan.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
         }
     }
 
@@ -431,12 +429,6 @@ public class NewEventActivity extends AppCompatActivity {
             return;
         }
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            if(checkSelfPermission(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED){
-                requestPermissions(new String[]{Manifest.permission.INTERNET}, 5);
-                return;
-            }
-        }
 
         Log.d(tag, "Before try: " + latitude + ", " + longitude);
         Log.d(tag, locText.getText().toString());
@@ -483,7 +475,7 @@ public class NewEventActivity extends AppCompatActivity {
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 15);
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 10);
             Log.d(tag, "permissions not granted");
             return;
         }

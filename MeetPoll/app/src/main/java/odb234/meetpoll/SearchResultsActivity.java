@@ -14,6 +14,8 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Places;
@@ -69,19 +71,21 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
     private JSONArray resArray;
 
 
-
+    Firebase fdb;
 
     private GoogleApiClient mGoogleApiClient;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Firebase.setAndroidContext(getApplicationContext());
+        fdb = new Firebase("https://steadfast-leaf-137323.firebaseio.com/");
 
         setContentView(R.layout.activity_search_results);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         intent = getIntent();
@@ -183,6 +187,20 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
                 String hostName = sp.getString("name", "host");
                 DatabaseConnector dbc = new DatabaseConnector(this);
                 dbc.insertEvent(hostName, eventName, searchLoaction, eventDate, eventTime, locationType, locationSubtype, eventRating, ids);
+
+                Firebase eventRef = fdb.child("events").child(hostName + "_" + eventName);
+                Event event = new Event(hostName, eventName, searchLoaction, eventDate, eventTime, eventRating, locationType, locationSubtype,  ids, new ContactsListActivity.Contact[]{});
+                eventRef.setValue(event, new Firebase.CompletionListener(){
+                    @Override
+                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                        if(firebaseError != null){
+                            Log.d(TAG, "data could not be saved: "  + firebaseError.getMessage());
+                        }else{
+                            Log.d(TAG, "Firebase worked");
+                        }
+                    }
+                });
+
                 Log.d(TAG, "Event inserted into DB");
                 Intent intent = new Intent(SearchResultsActivity.this, ContactsListActivity.class);
                 startActivity(intent);

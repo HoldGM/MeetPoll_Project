@@ -2,20 +2,14 @@ package odb234.meetpoll;
 
 import android.*;
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,19 +19,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.zip.Inflater;
 
 public class ContactsListActivity extends AppCompatActivity {
 
@@ -56,7 +46,6 @@ public class ContactsListActivity extends AppCompatActivity {
 
         inviteList = (ListView) findViewById(R.id.contact_list);
         contacts = new ArrayList<>();
-//        http://stackoverflow.com/questions/12562151/android-get-all-contacts
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if(checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED)
@@ -121,27 +110,37 @@ public class ContactsListActivity extends AppCompatActivity {
             if(cur.getString(indexNumber).length() > 7) {
                 String name = cur.getString(indexName);
                 String number = cur.getString(indexNumber);
-//            byte[] photo = cur.getBlob(indexPhoto);
                 contacts.add(new Contact(name, number, false));
                 Log.d(TAG, name + ", " + number);
             }
         }while(cur.moveToNext());
-        
+
+        Log.d(TAG, "Contacts List size: " + contacts.size());
         la = new ContactsAdapter(this, contacts);
         inviteList.setAdapter(la);
 
     }
 
-    public class ContactsAdapter extends BaseAdapter{
-        ArrayList<Contact> contacts;
+    private Contact getContact(int position) {
+        return (Contact) inviteList.getAdapter().getItem(position);
+    }
+
+    private class ContactsAdapter extends BaseAdapter{
+        ArrayList<Contact> contactsList;
         LayoutInflater inflater;
-        public ContactsAdapter(Context context, ArrayList<Contact> c){
-            contacts = c;
+        public ContactsAdapter(Context context, ArrayList<Contact> list){
+            contactsList = list;
             inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
         @Override
         public int getCount() {
-            return contacts.size();
+            return contactsList.size();
+        }
+        @Override
+        public long getItemId(int i) { return i; }
+        @Override
+        public Object getItem(int i) {
+            return contactsList.get(i);
         }
 
         @Override
@@ -150,33 +149,40 @@ public class ContactsListActivity extends AppCompatActivity {
             if(currentView == null){
                 currentView = inflater.inflate(R.layout.contact_cell_view, viewGroup, false);
             }
+            contactsList.get(i).toString();
+            TextView textView = (TextView)currentView.findViewById(R.id.contact_name);
+            textView.setText(contactsList.get(i).getName());
+            textView = (TextView)currentView.findViewById(R.id.contact_phone);
+            textView.setText(contactsList.get(i).getPhone());
+            CheckBox checkBox = (CheckBox)currentView.getTag();
+            if(checkBox == null)
+            {
+                checkBox = (CheckBox) currentView.findViewById(R.id.contact_select);
+                currentView.setTag(checkBox);
+                CompoundButton.OnCheckedChangeListener l = new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        Integer itemPosition = (Integer) compoundButton.getTag();
+                        Contact contact = getContact(itemPosition);
+                        contact.safeState = b;
+                    }
+                };
+                checkBox.setOnCheckedChangeListener(l);
+            }
 
-            TextView textView = (TextView)findViewById(R.id.contact_name);
-            textView.setText(contacts.get(i).getName());
-            textView = (TextView)findViewById(R.id.contact_phone);
-            textView.setText(contacts.get(i).getPhone());
-            CheckBox checkBox = (CheckBox)findViewById(R.id.contact_select);
-            checkBox.setChecked(contacts.get(i).getState());
+            Contact c = getContact(i);
+            checkBox.setTag(i);
+            checkBox.setChecked(c.safeState);
             return currentView;
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return i;
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return null;
         }
     }
 
-    private class Contact{
+    public class Contact{
         private String name;
         private String phone;
         private boolean safeState;
 
-        private Contact(String n, String p, boolean s){
+        public Contact(String n, String p, boolean s){
             name = n;
             phone = p;
             safeState = s;
@@ -190,6 +196,9 @@ public class ContactsListActivity extends AppCompatActivity {
         }
         public boolean getState(){
             return safeState;
+        }
+        public void setState(boolean b){
+            this.safeState = b;
         }
         public String toString(){
             return name + ", " + phone;
