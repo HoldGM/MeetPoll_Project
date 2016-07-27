@@ -8,16 +8,16 @@ import java.util.Arrays;
  */
 public class Event {
 
-    public String hostName;
-    public String eventName;
-    public String eventLocation;
-    public String eventDate;
-    public String eventTime;
-    public double rating;
-    public String locationType;
-    public String locationSubtype;
-    public ArrayList<String> ids;
-    public ArrayList<ContactsListActivity.Contact> inviteList;
+    private String hostName;
+    private String eventName;
+    private String eventLocation;
+    private String eventDate;
+    private String eventTime;
+    private double rating;
+    private String locationType;
+    private String locationSubtype;
+    private ArrayList<String> ids;
+    private ArrayList<ContactsListActivity.Contact> inviteList;
 
     public Event(String hn, String en, String el, String ed, String et, double r, String lt, String lst, ArrayList<String> list, ArrayList<ContactsListActivity.Contact> il){
         hostName = hn;
@@ -30,5 +30,36 @@ public class Event {
         locationSubtype = lst;
         ids = list;
         inviteList =il;
+    }
+
+    public String getHostName(){
+        return hostName;
+    }
+    public String getEventName(){
+        return eventName;
+    }
+    public String getEventLocation(){
+        return eventLocation;
+    }
+    public String getEventDate(){
+        return eventDate;
+    }
+    public String getEventTime(){
+        return eventTime;
+    }
+    public double getRating(){
+        return rating;
+    }
+    public String getLocationType(){
+        return locationType;
+    }
+    public String getLocationSubtype(){
+        return locationSubtype;
+    }
+    public ArrayList<String> getIds(){
+        return ids;
+    }
+    public ArrayList<ContactsListActivity.Contact> getInviteList(){
+        return inviteList;
     }
 }

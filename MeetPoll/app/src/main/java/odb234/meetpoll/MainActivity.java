@@ -1,40 +1,27 @@
 package odb234.meetpoll;
 
 import android.Manifest;
-import android.app.ListActivity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
-import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.firebase.client.Firebase;
+import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import java.security.Permission;
-import java.util.Arrays;
-import java.util.List;
-import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,8 +31,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String tag = "permissions";
 
     CursorAdapter ca;
-    Firebase fdb;
-
+    Firebase mRef;
+    com.firebase.client.Query qRef;
     private static final String[] GPS_PERMS = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
         //--------------------------------
         Firebase.setAndroidContext(this);
-        fdb = new Firebase("https://steadfast-leaf-137323.firebaseio.com/events");
+        mRef = new Firebase("https://steadfast-leaf-137323.firebaseio.com/");
         //--------------------------------
 
 
@@ -65,8 +52,19 @@ public class MainActivity extends AppCompatActivity {
         }
         dbc = new DatabaseConnector(this);
         eventList = (ListView) findViewById(R.id.event_list);
-
-        populateList();
+        com.firebase.client.Query childRef = mRef.orderByChild("events");
+//        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+//        ListAdapter adapter = new FirebaseListAdapter<Event>(this, Event.class, R.layout.cell_view, dbRef){
+//            protected void populateView(View view, Event event, int i){
+//                ((TextView)view.findViewById(R.id.list_event_host)).setText(event.getHostName());
+//                ((TextView)view.findViewById(R.id.list_event_date)).setText(event.getEventDate());
+//                ((TextView)view.findViewById(R.id.list_event_name)).setText(event.getEventName());
+//                ((TextView)view.findViewById(R.id.list_location)).setText(event.getEventLocation());
+//                ((TextView)view.findViewById(R.id.list_event_date)).setText(event.getEventTime());
+//                ((TextView)view.findViewById(R.id.list_time)).setText(event.getEventTime());
+//            }
+//        };
+//        eventList.setAdapter(adapter);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -122,11 +120,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void populateList() {
-        String[] from = new String[] {"host_name", "event_name", "event_location", "date", "time"};
-        int[] to = new int[] {R.id.list_event_host,R.id.list_event_name, R.id.list_location, R.id.list_event_date, R.id.list_time};
-        Cursor c = dbc.getCursor();
-        ca = new SimpleCursorAdapter(MainActivity.this, R.layout.cell_view, c, from, to);
-        eventList.setAdapter(ca);
+//        String[] from = new String[] {"host_name", "event_name", "event_location", "date", "time"};
+//        int[] to = new int[] {R.id.list_event_host,R.id.list_event_name, R.id.list_location, R.id.list_event_date, R.id.list_time};
+//        Cursor c = dbc.getCursor();
+//        ca = new SimpleCursorAdapter(MainActivity.this, R.layout.cell_view, c, from, to);
+//        eventList.setAdapter(ca);
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+
+        ListAdapter adapter = new FirebaseListAdapter<Event>(this, Event.class, R.layout.cell_view, ref){
+            protected void populateView(View view, Event event, int i){
+                ((TextView)view.findViewById(R.id.list_event_host)).setText(event.getHostName());
+                ((TextView)view.findViewById(R.id.list_event_date)).setText(event.getEventDate());
+                ((TextView)view.findViewById(R.id.list_event_name)).setText(event.getEventName());
+                ((TextView)view.findViewById(R.id.list_location)).setText(event.getEventLocation());
+                ((TextView)view.findViewById(R.id.list_event_date)).setText(event.getEventTime());
+                ((TextView)view.findViewById(R.id.list_time)).setText(event.getEventTime());
+            }
+        };
+//        eventList.setAdapter(adapter);
+
     }
 
 }
