@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,9 +20,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.firebase.client.Firebase;
-import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,7 +54,8 @@ public class MainActivity extends AppCompatActivity {
         }
         dbc = new DatabaseConnector(this);
         eventList = (ListView) findViewById(R.id.event_list);
-        com.firebase.client.Query childRef = mRef.orderByChild("events");
+//        DatabaseReference childRef = (FirebaseDatabase)mRef.getRef();
+//        Log.d(tag, childRef.toString());
 //        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
 //        ListAdapter adapter = new FirebaseListAdapter<Event>(this, Event.class, R.layout.cell_view, dbRef){
 //            protected void populateView(View view, Event event, int i){
@@ -125,20 +128,6 @@ public class MainActivity extends AppCompatActivity {
 //        Cursor c = dbc.getCursor();
 //        ca = new SimpleCursorAdapter(MainActivity.this, R.layout.cell_view, c, from, to);
 //        eventList.setAdapter(ca);
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-
-        ListAdapter adapter = new FirebaseListAdapter<Event>(this, Event.class, R.layout.cell_view, ref){
-            protected void populateView(View view, Event event, int i){
-                ((TextView)view.findViewById(R.id.list_event_host)).setText(event.getHostName());
-                ((TextView)view.findViewById(R.id.list_event_date)).setText(event.getEventDate());
-                ((TextView)view.findViewById(R.id.list_event_name)).setText(event.getEventName());
-                ((TextView)view.findViewById(R.id.list_location)).setText(event.getEventLocation());
-                ((TextView)view.findViewById(R.id.list_event_date)).setText(event.getEventTime());
-                ((TextView)view.findViewById(R.id.list_time)).setText(event.getEventTime());
-            }
-        };
-//        eventList.setAdapter(adapter);
-
     }
 
 }
