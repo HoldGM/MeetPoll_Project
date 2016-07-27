@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String tag = "permissions";
 
     CursorAdapter ca;
+    Firebase fdb;
 
     private static final String[] GPS_PERMS = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
     @Override
@@ -52,6 +54,15 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //--------------------------------
+        Firebase.setAndroidContext(this);
+        fdb = new Firebase("https://steadfast-leaf-137323.firebaseio.com/events");
+        //--------------------------------
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[]{Manifest.permission.INTERNET}, 10);
+        }
         dbc = new DatabaseConnector(this);
         eventList = (ListView) findViewById(R.id.event_list);
 
@@ -96,6 +107,18 @@ public class MainActivity extends AppCompatActivity {
     {
         super.onResume();
         populateList();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch(requestCode){
+            case 10:
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    //do firebase stuff
+                }
+                return;
+        }
     }
 
     private void populateList() {

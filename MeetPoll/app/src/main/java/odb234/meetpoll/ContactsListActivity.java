@@ -19,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -26,6 +27,9 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 
 import java.util.ArrayList;
 
@@ -38,12 +42,15 @@ public class ContactsListActivity extends AppCompatActivity {
     ListAdapter la;
     private static final String TAG = "Contact List Activity";
 
+    Firebase fdb;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts_list);
-        getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        Firebase.setAndroidContext(this);
+        fdb = new Firebase("https://steadfast-leaf-137323.firebaseio.com/");
         inviteList = (ListView) findViewById(R.id.contact_list);
         contacts = new ArrayList<>();
 
@@ -64,6 +71,29 @@ public class ContactsListActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.send_event:
+                Intent intent = getIntent();
+                Firebase eventRef = fdb.child("events").child(intent.getBundleExtra("bundle").getString("hostName") + "_" + intent.getBundleExtra("bundle").getString("eventName"));
+                ArrayList<ContactsListActivity.Contact> invitees = collectInvites();
+                Event event = new Event(intent.getBundleExtra("bundle").getString("hostName"),
+                        intent.getBundleExtra("bundle").getString("eventName"),
+                        intent.getBundleExtra("bundle").getString("eventLocation"),
+                        intent.getBundleExtra("bundle").getString("date"),
+                        intent.getBundleExtra("bundle").getString("time"),
+                        intent.getBundleExtra("bundle").getDouble("rating"),
+                        intent.getBundleExtra("bundle").getString("locationType"),
+                        intent.getBundleExtra("bundle").getString("locationSubtype"),
+                        intent.getStringArrayListExtra("ids"), invitees);
+                eventRef.setValue(event, new Firebase.CompletionListener(){
+                    @Override
+                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                        if(firebaseError != null){
+                            Log.d(TAG, "data could not be saved: "  + firebaseError.getMessage());
+                        }else{
+                            Log.d(TAG, "Firebase worked");
+                        }
+                    }
+                });
+                startActivity(new Intent(ContactsListActivity.this, MainActivity.class));
                 return true;
             case R.id.settings:
                 Intent intent2 = new Intent(ContactsListActivity.this,SettingsActivity.class);
@@ -118,7 +148,23 @@ public class ContactsListActivity extends AppCompatActivity {
         Log.d(TAG, "Contacts List size: " + contacts.size());
         la = new ContactsAdapter(this, contacts);
         inviteList.setAdapter(la);
+        getListItems();
+    }
 
+    public void getListItems() {
+
+    }
+
+    private ArrayList<Contact> collectInvites(){
+        int listCount = inviteList.getAdapter().getCount();
+        ArrayList<Contact> invites = new ArrayList<>();
+        for(int i = 0; i< listCount; i++){
+            View listView = inviteList.getAdapter().getView(i, null, null);
+            if(((CheckBox)listView.findViewById(R.id.contact_select)).isChecked())
+                invites.add(((ContactsAdapter)inviteList.getAdapter()).getContact(i));
+            Log.d(TAG, "Contact name: " + ((TextView)listView.findViewById(R.id.contact_name)).getText().toString());
+        }
+        return invites;
     }
 
     private Contact getContact(int position) {
@@ -142,7 +188,9 @@ public class ContactsListActivity extends AppCompatActivity {
         public Object getItem(int i) {
             return contactsList.get(i);
         }
-
+        public Contact getContact(int i){
+            return contactsList.get(i);
+        }
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
             View currentView = view;
@@ -205,3 +253,19 @@ public class ContactsListActivity extends AppCompatActivity {
         }
     }
 }
+/*
+
+                Firebase eventRef = fdb.child("events").child(hostName + "_" + eventName);
+                Event event = new Event(hostName, eventName, searchLoaction, eventDate, eventTime, eventRating, locationType, locationSubtype,  ids, new ContactsListActivity.Contact[]{});
+                eventRef.setValue(event, new Firebase.CompletionListener(){
+                    @Override
+                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                        if(firebaseError != null){
+                            Log.d(TAG, "data could not be saved: "  + firebaseError.getMessage());
+                        }else{
+                            Log.d(TAG, "Firebase worked");
+                        }
+                    }
+                });
+
+ */

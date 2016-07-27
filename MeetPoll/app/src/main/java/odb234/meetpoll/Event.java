@@ -19,7 +19,7 @@ public class Event {
     public ArrayList<String> ids;
     public ArrayList<ContactsListActivity.Contact> inviteList;
 
-    public Event(String hn, String en, String el, String ed, String et, double r, String lt, String lst, ArrayList<String> list, ContactsListActivity.Contact[] il){
+    public Event(String hn, String en, String el, String ed, String et, double r, String lt, String lst, ArrayList<String> list, ArrayList<ContactsListActivity.Contact> il){
         hostName = hn;
         eventName = en;
         eventLocation = el;
@@ -29,6 +29,6 @@ public class Event {
         locationType = lt;
         locationSubtype = lst;
         ids = list;
-        inviteList = new ArrayList<>(Arrays.asList(il));
+        inviteList =il;
     }
 }

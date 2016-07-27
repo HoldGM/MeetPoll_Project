@@ -71,14 +71,11 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
     private JSONArray resArray;
 
 
-    Firebase fdb;
 
     private GoogleApiClient mGoogleApiClient;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Firebase.setAndroidContext(getApplicationContext());
-        fdb = new Firebase("https://steadfast-leaf-137323.firebaseio.com/");
 
         setContentView(R.layout.activity_search_results);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -94,7 +91,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
         eventName = intent.getStringExtra("eventName");
         searchLoaction = intent.getStringExtra("eventLocation");
         radius = intent.getIntExtra("radius", 50000);
-        Log.d(TAG, "Seearch Radius: " + radius);
+        Log.d(TAG, "Search Radius: " + radius);
         eventDate = intent.getStringExtra("date");
         eventTime = intent.getStringExtra("time");
         locationType = intent.getStringExtra("locationType");
@@ -185,24 +182,14 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
             case R.id.send_event:
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                 String hostName = sp.getString("name", "host");
-                DatabaseConnector dbc = new DatabaseConnector(this);
-                dbc.insertEvent(hostName, eventName, searchLoaction, eventDate, eventTime, locationType, locationSubtype, eventRating, ids);
-
-                Firebase eventRef = fdb.child("events").child(hostName + "_" + eventName);
-                Event event = new Event(hostName, eventName, searchLoaction, eventDate, eventTime, eventRating, locationType, locationSubtype,  ids, new ContactsListActivity.Contact[]{});
-                eventRef.setValue(event, new Firebase.CompletionListener(){
-                    @Override
-                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                        if(firebaseError != null){
-                            Log.d(TAG, "data could not be saved: "  + firebaseError.getMessage());
-                        }else{
-                            Log.d(TAG, "Firebase worked");
-                        }
-                    }
-                });
-
-                Log.d(TAG, "Event inserted into DB");
+//                DatabaseConnector dbc = new DatabaseConnector(this);
+//                dbc.insertEvent(hostName, eventName, searchLoaction, eventDate, eventTime, locationType, locationSubtype, eventRating, ids);
+//                Log.d(TAG, "Event inserted into DB");
                 Intent intent = new Intent(SearchResultsActivity.this, ContactsListActivity.class);
+                Bundle extras = this.getIntent().getExtras();
+                extras.putString("hostName", hostName);
+                intent.putExtra("bundle", extras);
+                intent.putStringArrayListExtra("ids", ids);
                 startActivity(intent);
                 return true;
             case R.id.settings:
