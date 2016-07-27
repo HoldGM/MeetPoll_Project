@@ -9,6 +9,7 @@ import java.util.Arrays;
 public class Event {
 
     private String hostName;
+    private String hostPhone;
     private String eventName;
     private String eventLocation;
     private String eventDate;
@@ -17,10 +18,13 @@ public class Event {
     private String locationType;
     private String locationSubtype;
     private ArrayList<String> ids;
-    private ArrayList<ContactsListActivity.Contact> inviteList;
+    private ArrayList<Contact> inviteList;
 
-    public Event(String hn, String en, String el, String ed, String et, double r, String lt, String lst, ArrayList<String> list, ArrayList<ContactsListActivity.Contact> il){
+    public Event(){}
+
+    public Event(String hn, String hp, String en, String el, String ed, String et, double r, String lt, String lst, ArrayList<String> list, ArrayList<Contact> il){
         hostName = hn;
+        hostPhone = hp;
         eventName = en;
         eventLocation = el;
         eventDate = ed;
@@ -59,7 +63,8 @@ public class Event {
     public ArrayList<String> getIds(){
         return ids;
     }
-    public ArrayList<ContactsListActivity.Contact> getInviteList(){
+    public ArrayList<Contact> getInviteList(){
         return inviteList;
     }
+    public String getHostPhone(){ return hostPhone; }
 }

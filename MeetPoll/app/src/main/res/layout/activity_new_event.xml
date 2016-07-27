@@ -69,13 +69,12 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="@string/location_string"
+            android:textSize="@dimen/event_text_size"
+            android:textColor="@android:color/white"
             android:drawableLeft="@drawable/ic_gps_fixed_black_18dp"
             android:drawablePadding="10sp"
             android:background="@drawable/edit_text_bg"
-            android:backgroundTint="@color/splash_blue"
             android:hapticFeedbackEnabled="true"
-            android:textColor="#FFFFFF"
-            android:textSize="@dimen/event_text_size"
             android:paddingLeft="40sp"
             android:paddingRight="40sp"
             android:layout_marginRight="15dp"/>
@@ -84,7 +83,6 @@
             android:layout_weight=".1"
             android:layout_height="match_parent"
             android:background="@drawable/edit_text_bg"
-            android:backgroundTint="@color/splash_blue"
             android:src="@drawable/ic_place_black_18dp"
             android:onClick="mapSelectLocation"
             android:hapticFeedbackEnabled="true"/>

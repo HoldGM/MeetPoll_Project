@@ -9,21 +9,18 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CursorAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.firebase.client.Firebase;
+import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -43,31 +40,32 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //--------------------------------
-        Firebase.setAndroidContext(this);
-        mRef = new Firebase("https://steadfast-leaf-137323.firebaseio.com/");
-        //--------------------------------
-
+        eventList = (ListView) findViewById(R.id.event_list);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.INTERNET}, 10);
         }
-        dbc = new DatabaseConnector(this);
-        eventList = (ListView) findViewById(R.id.event_list);
-//        DatabaseReference childRef = (FirebaseDatabase)mRef.getRef();
-//        Log.d(tag, childRef.toString());
-//        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
-//        ListAdapter adapter = new FirebaseListAdapter<Event>(this, Event.class, R.layout.cell_view, dbRef){
-//            protected void populateView(View view, Event event, int i){
-//                ((TextView)view.findViewById(R.id.list_event_host)).setText(event.getHostName());
-//                ((TextView)view.findViewById(R.id.list_event_date)).setText(event.getEventDate());
-//                ((TextView)view.findViewById(R.id.list_event_name)).setText(event.getEventName());
-//                ((TextView)view.findViewById(R.id.list_location)).setText(event.getEventLocation());
-//                ((TextView)view.findViewById(R.id.list_event_date)).setText(event.getEventTime());
-//                ((TextView)view.findViewById(R.id.list_time)).setText(event.getEventTime());
-//            }
-//        };
-//        eventList.setAdapter(adapter);
+        //--------------------------------
+        Firebase.setAndroidContext(this);
+        mRef = new Firebase("https://steadfast-leaf-137323.firebaseio.com/");
+        //--------------------------------
+//        Query query = mRef.child("events");
+//        dbc = new DatabaseConnector(this);
+//        Log.d(tag, query.toString());
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("events");
+//        dbRef.getDatabase();
+        FirebaseListAdapter adapter = new FirebaseListAdapter<Event>(this, Event.class, R.layout.cell_view, dbRef){
+            @Override
+            protected void populateView(View view, Event event, int i){
+                ((TextView)view.findViewById(R.id.list_event_host)).setText(event.getHostName());
+                ((TextView)view.findViewById(R.id.list_event_date)).setText(event.getEventDate());
+                ((TextView)view.findViewById(R.id.list_event_name)).setText(event.getEventName());
+                ((TextView)view.findViewById(R.id.list_location)).setText(event.getEventLocation());
+                ((TextView)view.findViewById(R.id.list_event_date)).setText(event.getEventDate());
+                ((TextView)view.findViewById(R.id.list_time)).setText(event.getEventTime());
+            }
+        };
+        eventList.setAdapter(adapter);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

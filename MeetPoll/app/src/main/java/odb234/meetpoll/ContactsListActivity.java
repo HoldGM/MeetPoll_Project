@@ -12,6 +12,7 @@ import android.os.Build;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,6 +41,7 @@ public class ContactsListActivity extends AppCompatActivity {
     ContentResolver cr;
     ArrayList<Contact> contacts;
     ListAdapter la;
+    String hostPhone;
     private static final String TAG = "Contact List Activity";
 
     Firebase fdb;
@@ -59,6 +61,12 @@ public class ContactsListActivity extends AppCompatActivity {
                 populateList();
             else
                 requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 10);
+            if(checkSelfPermission(Manifest.permission.READ_PHONE_STATE) !=  PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, 15);
+            }else{
+                TelephonyManager tMgr = (TelephonyManager)getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+                hostPhone = tMgr.getLine1Number();
+            }
         }else{
             populateList();
         }
@@ -73,8 +81,9 @@ public class ContactsListActivity extends AppCompatActivity {
             case R.id.send_event:
                 Intent intent = getIntent();
                 Firebase eventRef = fdb.child("events").child(intent.getBundleExtra("bundle").getString("hostName") + "_" + intent.getBundleExtra("bundle").getString("eventName"));
-                ArrayList<ContactsListActivity.Contact> invitees = collectInvites();
+                ArrayList<Contact> invitees = collectInvites();
                 Event event = new Event(intent.getBundleExtra("bundle").getString("hostName"),
+                        hostPhone,
                         intent.getBundleExtra("bundle").getString("eventName"),
                         intent.getBundleExtra("bundle").getString("eventLocation"),
                         intent.getBundleExtra("bundle").getString("date"),
@@ -212,7 +221,7 @@ public class ContactsListActivity extends AppCompatActivity {
                     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                         Integer itemPosition = (Integer) compoundButton.getTag();
                         Contact contact = getContact(itemPosition);
-                        contact.safeState = b;
+                        contact.setState(b);
                     }
                 };
                 checkBox.setOnCheckedChangeListener(l);
@@ -220,52 +229,10 @@ public class ContactsListActivity extends AppCompatActivity {
 
             Contact c = getContact(i);
             checkBox.setTag(i);
-            checkBox.setChecked(c.safeState);
+            checkBox.setChecked(c.getState());
             return currentView;
         }
     }
 
-    public class Contact{
-        private String name;
-        private String phone;
-        private boolean safeState;
 
-        public Contact(String n, String p, boolean s){
-            name = n;
-            phone = p;
-            safeState = s;
-        }
-
-        public String getName(){
-            return name;
-        }
-        public String getPhone(){
-            return phone;
-        }
-        public boolean getState(){
-            return safeState;
-        }
-        public void setState(boolean b){
-            this.safeState = b;
-        }
-        public String toString(){
-            return name + ", " + phone;
-        }
-    }
 }
-/*
-
-                Firebase eventRef = fdb.child("events").child(hostName + "_" + eventName);
-                Event event = new Event(hostName, eventName, searchLoaction, eventDate, eventTime, eventRating, locationType, locationSubtype,  ids, new ContactsListActivity.Contact[]{});
-                eventRef.setValue(event, new Firebase.CompletionListener(){
-                    @Override
-                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                        if(firebaseError != null){
-                            Log.d(TAG, "data could not be saved: "  + firebaseError.getMessage());
-                        }else{
-                            Log.d(TAG, "Firebase worked");
-                        }
-                    }
-                });
-
- */
