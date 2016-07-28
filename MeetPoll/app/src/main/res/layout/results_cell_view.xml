@@ -34,5 +34,6 @@
         android:layout_alignTop="@+id/result_list_address"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/result_list_rating"/>
+        android:id="@+id/result_list_rating"
+        android:isIndicator="true"/>
 </RelativeLayout>
