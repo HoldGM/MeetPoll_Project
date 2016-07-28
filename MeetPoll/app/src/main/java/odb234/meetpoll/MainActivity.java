@@ -1,6 +1,7 @@
 package odb234.meetpoll;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -11,11 +12,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CursorAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -31,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String tag = "permissions";
 
-    CursorAdapter ca;
     Firebase mRef;
     com.firebase.client.Query qRef;
     private static final String[] GPS_PERMS = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
@@ -47,25 +50,37 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.INTERNET}, 10);
         }
+
         //--------------------------------
         Firebase.setAndroidContext(this);
         mRef = new Firebase("https://steadfast-leaf-137323.firebaseio.com/");
         //--------------------------------
-//        Query query = mRef.child("events");
-//        dbc = new DatabaseConnector(this);
-//        Log.d(tag, query.toString());
+
         DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("events");
-//        dbRef.getDatabase();
         FirebaseListAdapter adapter = new FirebaseListAdapter<Event>(this, Event.class, R.layout.cell_view, dbRef){
             @Override
             protected void populateView(View view, Event event, int i){
+                final int finI = i;
+                final Event finEvent = event;
                 ((TextView)view.findViewById(R.id.list_event_host)).setText(event.getHostName());
                 ((TextView)view.findViewById(R.id.list_event_date)).setText(event.getEventDate());
                 ((TextView)view.findViewById(R.id.list_event_name)).setText(event.getEventName());
                 ((TextView)view.findViewById(R.id.list_location)).setText(event.getEventLocation());
                 ((TextView)view.findViewById(R.id.list_event_date)).setText(event.getEventDate());
                 ((TextView)view.findViewById(R.id.list_time)).setText(event.getEventTime());
+
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String child_event = finEvent.getHostName() + "_" + finEvent.getEventName();
+                        Intent intent = new Intent(getApplicationContext(), VoteListActivity.class);
+                        intent.putExtra("eventName", child_event);
+                        startActivity(intent);
+                        Log.d(tag, "cell view clicked: " + finI);
+                    }
+                });
             }
+
         };
         eventList.setAdapter(adapter);
 
@@ -77,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
     }
 
     @Override
@@ -90,10 +104,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch(item.getItemId()){
-            case R.id.delete_event:
-                dbc.deleteAllEvents();
-                recreate();
-                return true;
             case R.id.settings:
                 Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
                 startActivity(intent);
@@ -105,16 +115,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu,menu);
+        inflater.inflate(R.menu.main_menu, menu);
         return true;
     }
 
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        populateList();
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -127,13 +131,4 @@ public class MainActivity extends AppCompatActivity {
                 return;
         }
     }
-
-    private void populateList() {
-//        String[] from = new String[] {"host_name", "event_name", "event_location", "date", "time"};
-//        int[] to = new int[] {R.id.list_event_host,R.id.list_event_name, R.id.list_location, R.id.list_event_date, R.id.list_time};
-//        Cursor c = dbc.getCursor();
-//        ca = new SimpleCursorAdapter(MainActivity.this, R.layout.cell_view, c, from, to);
-//        eventList.setAdapter(ca);
-    }
-
 }

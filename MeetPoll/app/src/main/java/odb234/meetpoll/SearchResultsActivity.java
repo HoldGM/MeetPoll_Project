@@ -182,9 +182,6 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
             case R.id.send_event:
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                 String hostName = sp.getString("name", "host");
-//                DatabaseConnector dbc = new DatabaseConnector(this);
-//                dbc.insertEvent(hostName, eventName, searchLoaction, eventDate, eventTime, locationType, locationSubtype, eventRating, ids);
-//                Log.d(TAG, "Event inserted into DB");
                 Intent intent = new Intent(SearchResultsActivity.this, ContactsListActivity.class);
                 Bundle extras = this.getIntent().getExtras();
                 extras.putString("hostName", hostName);
@@ -215,10 +212,11 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
             case LIST_SEND:
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                 String hostName = sp.getString("name", "host");
-                DatabaseConnector dbc = new DatabaseConnector(this);
-                dbc.insertEvent(hostName, eventName, searchLoaction, eventDate, eventTime, locationType, locationSubtype, eventRating, ids);
-                Log.d(TAG, "Event inserted into DB");
-                Intent intent = new Intent(SearchResultsActivity.this, MainActivity.class);
+                Intent intent = new Intent(SearchResultsActivity.this, ContactsListActivity.class);
+                Bundle extras = this.getIntent().getExtras();
+                extras.putString("hostName", hostName);
+                intent.putExtra("bundle", extras);
+                intent.putStringArrayListExtra("ids", ids);
                 startActivity(intent);
                 break;
             default:

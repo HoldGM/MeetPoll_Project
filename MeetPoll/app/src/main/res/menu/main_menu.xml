@@ -4,11 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
     <item
-        android:id="@+id/delete_event"
-        android:title="@string/delete_event"
-        android:icon="@android:drawable/ic_delete"
-        app:showAsAction="ifRoom"/>
-    <item
         android:id="@+id/settings"
         android:title="@string/settings_string"
         app:showAsAction="never"/>

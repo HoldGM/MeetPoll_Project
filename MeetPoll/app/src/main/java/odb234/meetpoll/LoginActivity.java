@@ -111,14 +111,17 @@ public class LoginActivity extends AppCompatActivity {
         registerDialog.setPositiveButton("Register", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                if(((EditText)dialogView.findViewById(R.id.new_password)).getText().toString().equals(((EditText)dialogView.findViewById(R.id.confirm_password)).getText().toString())) {
+                if (((EditText) dialogView.findViewById(R.id.new_password)).getText().toString().equals(((EditText) dialogView.findViewById(R.id.confirm_password)).getText().toString()) &&
+                        ((EditText) dialogView.findViewById(R.id.new_password)).getText().toString().length() >= 6) {
                     registerComplete(((EditText) dialogView.findViewById(R.id.new_user)).getText().toString(), ((EditText) dialogView.findViewById(R.id.new_password)).getText().toString());
                     dialogInterface.dismiss();
-                }else{
+                } else if (!((EditText) dialogView.findViewById(R.id.new_password)).getText().toString().equals(((EditText) dialogView.findViewById(R.id.confirm_password)).getText().toString())) {
                     Toast.makeText(getApplicationContext(), "Password entered does not match", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Password too short. Password must be at least 6 characters", Toast.LENGTH_LONG).show();
                 }
             }
-        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.dismiss();

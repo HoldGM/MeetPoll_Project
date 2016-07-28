@@ -24,6 +24,6 @@
         android1:layout_alignParentRight="true"
         android1:layout_alignParentEnd="false"
         android1:layout_marginRight="20dp"
-        android1:layout_marginTop="15dp" />
+        android1:layout_marginTop="15dp"/>
 
 </RelativeLayout>
