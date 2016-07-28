@@ -7,6 +7,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -78,6 +80,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        ExitDialogFragment ef = new ExitDialogFragment();
+        ef.show(getFragmentManager(), "exitFragment");
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){

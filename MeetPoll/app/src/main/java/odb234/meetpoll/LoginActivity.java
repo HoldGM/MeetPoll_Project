@@ -1,6 +1,12 @@
 package odb234.meetpoll;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.Fragment;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -80,7 +86,6 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(Task<AuthResult> task) {
                     Log.d(TAG, "Login OnComplete: " + task.isSuccessful());
-
                     if (!task.isSuccessful()) {
                         Toast.makeText(LoginActivity.this, "Login failed.", Toast.LENGTH_LONG).show();
                     }
@@ -90,8 +95,36 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void register(View v){
-        Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-        startActivityForResult(intent, 10);
+        dialogFragment();
+
+//        Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+//        startActivityForResult(intent, 10);
+    }
+
+    public void dialogFragment(){
+        final AlertDialog.Builder registerDialog = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        final View dialogView = (View) inflater.inflate(R.layout.register_dialog, null);
+
+        registerDialog.setView(dialogView);
+        registerDialog.setTitle("Register");
+        registerDialog.setPositiveButton("Register", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if(((EditText)dialogView.findViewById(R.id.new_password)).getText().toString().equals(((EditText)dialogView.findViewById(R.id.confirm_password)).getText().toString())) {
+                    registerComplete(((EditText) dialogView.findViewById(R.id.new_user)).getText().toString(), ((EditText) dialogView.findViewById(R.id.new_password)).getText().toString());
+                    dialogInterface.dismiss();
+                }else{
+                    Toast.makeText(getApplicationContext(), "Password entered does not match", Toast.LENGTH_LONG).show();
+                }
+            }
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        registerDialog.show();
     }
 
     @Override
@@ -112,6 +145,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onComplete(Task<AuthResult> task) {
                 Log.d(TAG, "create user OnComplete: " + task.isSuccessful());
+                Log.d(TAG, mAuth.getCurrentUser().getUid().toString());
                 if(!task.isSuccessful()){
                     Toast.makeText(LoginActivity.this, "Registration failed. Account for " + newUser +" may already exist.", Toast.LENGTH_LONG).show();
                 }
