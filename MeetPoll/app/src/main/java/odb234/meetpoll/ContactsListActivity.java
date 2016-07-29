@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
@@ -26,12 +27,26 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.google.android.gms.location.places.Place;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 public class ContactsListActivity extends AppCompatActivity {
@@ -40,8 +55,13 @@ public class ContactsListActivity extends AppCompatActivity {
     ListView inviteList;
     ContentResolver cr;
     ArrayList<Contact> contacts;
+    ArrayList<LocationListing> places;
+    ArrayList<String> ids;
+    private int progress;
+    boolean asyncFinished;
     ListAdapter la;
     String hostPhone;
+    ProgressBar progressBar;
     private static final String TAG = "Contact List Activity";
 
     Firebase fdb;
@@ -55,6 +75,12 @@ public class ContactsListActivity extends AppCompatActivity {
         fdb = new Firebase("https://steadfast-leaf-137323.firebaseio.com/");
         inviteList = (ListView) findViewById(R.id.contact_list);
         contacts = new ArrayList<>();
+        places = new ArrayList<>();
+        ids = getIntent().getStringArrayListExtra("ids");
+        progressBar = (ProgressBar) findViewById(R.id.contact_progress);
+        progressBar.setMax(ids.size());
+        progressBar.setProgress(0);
+        new PlaceList().execute();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if(checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED)
@@ -91,7 +117,7 @@ public class ContactsListActivity extends AppCompatActivity {
                         intent.getBundleExtra("bundle").getDouble("rating"),
                         intent.getBundleExtra("bundle").getString("locationType"),
                         intent.getBundleExtra("bundle").getString("locationSubtype"),
-                        intent.getStringArrayListExtra("ids"), invitees);
+                        places, invitees);
                 eventRef.setValue(event, new Firebase.CompletionListener(){
                     @Override
                     public void onComplete(FirebaseError firebaseError, Firebase firebase) {
@@ -171,7 +197,7 @@ public class ContactsListActivity extends AppCompatActivity {
             View listView = inviteList.getAdapter().getView(i, null, null);
             if(((CheckBox)listView.findViewById(R.id.contact_select)).isChecked())
                 invites.add(((ContactsAdapter)inviteList.getAdapter()).getContact(i));
-            Log.d(TAG, "Contact name: " + ((TextView)listView.findViewById(R.id.contact_name)).getText().toString());
+//            Log.d(TAG, "Contact name: " + ((TextView)listView.findViewById(R.id.contact_name)).getText().toString());
         }
         return invites;
     }
@@ -231,6 +257,78 @@ public class ContactsListActivity extends AppCompatActivity {
             checkBox.setTag(i);
             checkBox.setChecked(c.getState());
             return currentView;
+        }
+    }
+
+    class PlaceList extends AsyncTask<Void, Place, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            asyncFinished = false;
+        }
+
+        @Override
+        protected Void doInBackground(Void... aVoid) {
+            Log.d(TAG, "IDs length: " + ids.size());
+            try {
+                for(int i = 0; i < ids.size(); i++) {
+                    String id = ids.get(i);
+                    String urlString = "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + id;
+                    urlString += "&key=" + getString(R.string.google_maps_key);
+                    Log.d(TAG, urlString);
+                    DefaultHttpClient client = new DefaultHttpClient();
+                    HttpGet req = new HttpGet(urlString);
+                    HttpResponse res = client.execute(req);
+                    HttpEntity jsonEntity = res.getEntity();
+                    InputStream in = jsonEntity.getContent();
+                    JSONObject jsonObject = new JSONObject(convertStreamtoString(in));
+                    JSONObject resObj = jsonObject.getJSONObject("result");
+                    String name = resObj.getString("name");
+                    String address = resObj.getString("vicinity");
+                    String phone;
+                    try {
+                        phone = resObj.getString("international_phone_number");
+                    }catch(JSONException e){
+                        phone = "";
+                    }
+
+                    float rating;
+                    try {
+                        rating = BigDecimal.valueOf(resObj.getDouble("rating")).floatValue();
+                    }catch(JSONException e){
+                        rating = 0;
+                    }
+                    double lat = resObj.getJSONObject("geometry").getJSONObject("location").getDouble("lat");
+                    double lng = resObj.getJSONObject("geometry").getJSONObject("location").getDouble("lng");
+                    places.add(new LocationListing(name, address, phone, rating, false, lat, lng, id));
+                    Log.d(TAG, "Name: " + name + ", Address: " + address + ", Rating: " + rating + ", ID: " + id);
+                    progressBar.setProgress(i);
+                }
+            }catch(Exception e){
+                Log.e(TAG, e.toString());
+            }
+            return null;
+        }
+        private String convertStreamtoString(InputStream in){
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            StringBuilder jsonStr = new StringBuilder();
+            String line;
+            try{
+                while((line = br.readLine())!= null){
+                    String t = line +"\n";
+                    jsonStr.append(t);
+                }
+                br.close();
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+            return jsonStr.toString();
+        }
+
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            asyncFinished = true;
         }
     }
 
