@@ -92,9 +92,11 @@
             android:label="Invite"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
-        <activity android:name=".LoginActivity" />
+        <activity android:name=".LoginActivity"
+            android:screenOrientation="portrait"/>
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".VoteListActivity"></activity>
+        <activity android:name=".VoteListActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>
