@@ -3,9 +3,11 @@ package odb234.meetpoll;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -55,8 +57,9 @@ public class MainActivity extends AppCompatActivity {
         Firebase.setAndroidContext(this);
         mRef = new Firebase("https://steadfast-leaf-137323.firebaseio.com/");
         //--------------------------------
-
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("events");
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String uid = sp.getString("Uid", "");
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child(uid).child("events");
         FirebaseListAdapter adapter = new FirebaseListAdapter<Event>(this, Event.class, R.layout.cell_view, dbRef){
             @Override
             protected void populateView(View view, Event event, int i){
@@ -107,6 +110,10 @@ public class MainActivity extends AppCompatActivity {
             case R.id.settings:
                 Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
                 startActivity(intent);
+                return true;
+            case R.id.logout:
+                LogoutFragment frag = new LogoutFragment();
+                frag.show(getFragmentManager(),"LogoutFragment");
                 return true;
         }
         return super.onOptionsItemSelected(item);

@@ -7,6 +7,7 @@ public class Contact{
     private String name;
     private String phone;
     private boolean safeState;
+    private boolean voted;
 
     public Contact(){}
 
@@ -14,6 +15,7 @@ public class Contact{
         name = n;
         phone = p;
         safeState = s;
+        voted = false;
     }
 
     public String getName(){
@@ -25,11 +27,13 @@ public class Contact{
     public boolean getState(){
         return safeState;
     }
+    public boolean getVoted() { return voted; }
     public void setState(boolean b){
         this.safeState = b;
     }
     public void setName(String n){ this.name = n; }
     public void setPhone(String p){ this.phone = p; }
+    public void setVoted(boolean v){ voted = v; }
     public String toString(){
         return name + ", " + phone;
     }

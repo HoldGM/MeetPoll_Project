@@ -5,11 +5,13 @@ import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -34,6 +36,11 @@ import android.widget.Toast;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.google.android.gms.location.places.Place;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -63,14 +70,21 @@ public class ContactsListActivity extends AppCompatActivity {
     String hostPhone;
     ProgressBar progressBar;
     private static final String TAG = "Contact List Activity";
+    SharedPreferences sp;
+    String uid;
 
     Firebase fdb;
+    DatabaseReference mRoot = FirebaseDatabase.getInstance().getReference();
+    DatabaseReference mEventRef;
+    private long eventIndex;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts_list);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        sp = PreferenceManager.getDefaultSharedPreferences(this);
+        uid = sp.getString("Uid", "");
         Firebase.setAndroidContext(this);
         fdb = new Firebase("https://steadfast-leaf-137323.firebaseio.com/");
         inviteList = (ListView) findViewById(R.id.contact_list);
@@ -96,6 +110,28 @@ public class ContactsListActivity extends AppCompatActivity {
         }else{
             populateList();
         }
+
+        mEventRef = mRoot.child(uid).child("events");
+        mEventRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "" + dataSnapshot.getChildrenCount());
+//                eventIndex = dataSnapshot.getChildrenCount();
+                for(DataSnapshot child : dataSnapshot.getChildren()){
+                    if(Integer.parseInt(child.getKey()) > eventIndex)
+                        eventIndex = Integer.parseInt(child.getKey());
+                }
+                if(dataSnapshot.getChildrenCount() != 0)
+                    eventIndex++;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -106,7 +142,8 @@ public class ContactsListActivity extends AppCompatActivity {
                 return true;
             case R.id.send_event:
                 Intent intent = getIntent();
-                Firebase eventRef = fdb.child("events").child(intent.getBundleExtra("bundle").getString("hostName") + "_" + intent.getBundleExtra("bundle").getString("eventName"));
+
+                Firebase eventRef = fdb.child(uid).child("events").child(""+eventIndex);
                 ArrayList<Contact> invitees = collectInvites();
                 Event event = new Event(intent.getBundleExtra("bundle").getString("hostName"),
                         hostPhone,
@@ -184,6 +221,10 @@ public class ContactsListActivity extends AppCompatActivity {
         la = new ContactsAdapter(this, contacts);
         inviteList.setAdapter(la);
         getListItems();
+    }
+
+    public void setProgressBar(int i){
+        progressBar.setProgress(i);
     }
 
     public void getListItems() {
@@ -302,7 +343,7 @@ public class ContactsListActivity extends AppCompatActivity {
                     double lng = resObj.getJSONObject("geometry").getJSONObject("location").getDouble("lng");
                     places.add(new LocationListing(name, address, phone, rating, false, lat, lng, id));
                     Log.d(TAG, "Name: " + name + ", Address: " + address + ", Rating: " + rating + ", ID: " + id);
-                    progressBar.setProgress(i);
+                    setProgressBar(i);
                 }
             }catch(Exception e){
                 Log.e(TAG, e.toString());

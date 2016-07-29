@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.icu.util.Calendar;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -63,6 +62,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -219,12 +220,12 @@ public class NewEventActivity extends AppCompatActivity {
                         locationType = getString(R.string.location_type_poi);
                         break;
                     case 3:
-                        typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.outdoor_types, android.R.layout.simple_spinner_item);
+                        typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.religious_types, android.R.layout.simple_spinner_item);
                         typeSpinner.setAdapter(typeAdapter);
                         locationType = getString(R.string.location_type_poi);
                         break;
                     case 4:
-                        typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.religious_types, android.R.layout.simple_spinner_item);
+                        typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.outdoor_types , android.R.layout.simple_spinner_item);
                         typeSpinner.setAdapter(typeAdapter);
                         locationType = getString(R.string.location_type_poi);
                         break;
@@ -414,6 +415,51 @@ public class NewEventActivity extends AppCompatActivity {
 
     }
 
+
+
+    public boolean checkDate(){
+        final Calendar calendar = java.util.Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        Log.d(tag, month + " " + day + " " + year);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int min = calendar.get(Calendar.MINUTE);
+
+        String t = "AM";
+        if(hour > 12) {
+            t = "PM";
+            hour = hour%12;
+        }
+        Log.d(tag, hour + ":" + min + " " + t);
+
+        String dateBtnTxt = dateBtn.getText().toString();
+        String timeBtnTxt = timeBtn.getText().toString();
+
+        String[] dateSplit = dateBtnTxt.split("/");
+        Log.d(tag, Arrays.deepToString(dateSplit));
+        if(Integer.parseInt(dateSplit[2]) < year)
+            return false;
+        if(Integer.parseInt(dateSplit[0]) < month && Integer.parseInt(dateSplit[2]) == year)
+            return false;
+        if(Integer.parseInt(dateSplit[2]) == year && Integer.parseInt(dateSplit[0]) == month && Integer.parseInt(dateSplit[1]) < day)
+            return false;
+
+        String[] timeSplit = timeBtnTxt.split(":|\\s+");
+        Log.d(tag, Arrays.deepToString(timeSplit));
+        if(Integer.parseInt(dateSplit[2]) == year && Integer.parseInt(dateSplit[0]) == month && Integer.parseInt(dateSplit[1]) == day) {
+            if (t.equals("PM") && timeSplit[2].equals("AM"))
+                return false;
+            if(t.equals(timeSplit[2]) && Integer.parseInt(timeSplit[0]) < hour)
+                return false;
+            if(t.equals(timeSplit[2]) && Integer.parseInt(timeSplit[0]) == hour && Integer.parseInt(timeSplit[1]) < min)
+                return false;
+        }
+
+        return true;
+    }
+
     public void saveEvent(View v) {
         String str = "";
         if(eventName.getText().toString().equals(""))
@@ -426,6 +472,11 @@ public class NewEventActivity extends AppCompatActivity {
             str += "Event Time.";
         if(!str.equals("")) {
             Toast.makeText(getApplicationContext(), "Missing information for " + str, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if(!checkDate()) {
+            Toast.makeText(getApplicationContext(), "Chosen time or date is invalid.", Toast.LENGTH_LONG).show();
             return;
         }
 

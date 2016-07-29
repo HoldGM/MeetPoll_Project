@@ -25,8 +25,12 @@
         android:backgroundTint="@color/splash_orange"
         android:padding="10dp"
         android:layout_marginTop="@dimen/activity_horizontal_margin"
-        android:layout_marginBottom="@dimen/activity_horizontal_margin"
         android:password="true"/>
+    <CheckBox
+        android:id="@+id/remember_check"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Remember me"/>
     <Button
         android:id="@+id/login_login"
         android:layout_width="125dp"
@@ -36,7 +40,8 @@
         android:text="Login"
         android:textColor="@android:color/white"
         android:textSize="@dimen/event_text_size"
-        android:onClick="login"/>
+        android:onClick="login"
+        android:layout_centerInParent="true"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

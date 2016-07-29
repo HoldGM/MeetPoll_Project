@@ -12,6 +12,7 @@ public class LocationListing {
     private double lat;
     private double lng;
     private String id;
+    private int voteCount;
 
     public LocationListing(){}
     public LocationListing(String n, String a, String p, float r, boolean s, double latitude, double longitude, String i){
@@ -23,6 +24,7 @@ public class LocationListing {
         lat = latitude;
         lng = longitude;
         id = i;
+        voteCount = 0;
     }
 
     public void setName(String n){ name = n;}
@@ -33,6 +35,7 @@ public class LocationListing {
     public void setState(boolean b){ state = b; }
     public void setLat(double l){ lat = l; }
     public void setLng(double l){ lng = l; }
+    public void setVoteCount() { voteCount++; }
 
     public String getName(){ return name; }
     public String getAddress(){ return address; }
@@ -42,6 +45,7 @@ public class LocationListing {
     public double getLat(){ return lat;}
     public double getLng(){ return lng; }
     public String getId(){ return id; }
+    public int getVoteCount(){ return voteCount; }
     public String toString(){
         return "Name: " + name + ", Address: " + address + ", Rating: " + rating + ", ID: " + id;
     }
