@@ -2,6 +2,7 @@ package odb234.meetpoll;
 
 import android.*;
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -94,7 +95,7 @@ public class ContactsListActivity extends AppCompatActivity {
         progressBar = (ProgressBar) findViewById(R.id.contact_progress);
         progressBar.setMax(ids.size());
         progressBar.setProgress(0);
-        new PlaceList().execute();
+//        new PlaceList().execute();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if(checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED)
@@ -141,31 +142,33 @@ public class ContactsListActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.send_event:
-                Intent intent = getIntent();
-
-                Firebase eventRef = fdb.child(uid).child("events").child(""+eventIndex);
-                ArrayList<Contact> invitees = collectInvites();
-                Event event = new Event(intent.getBundleExtra("bundle").getString("hostName"),
-                        hostPhone,
-                        intent.getBundleExtra("bundle").getString("eventName"),
-                        intent.getBundleExtra("bundle").getString("eventLocation"),
-                        intent.getBundleExtra("bundle").getString("date"),
-                        intent.getBundleExtra("bundle").getString("time"),
-                        intent.getBundleExtra("bundle").getDouble("rating"),
-                        intent.getBundleExtra("bundle").getString("locationType"),
-                        intent.getBundleExtra("bundle").getString("locationSubtype"),
-                        places, invitees);
-                eventRef.setValue(event, new Firebase.CompletionListener(){
-                    @Override
-                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                        if(firebaseError != null){
-                            Log.d(TAG, "data could not be saved: "  + firebaseError.getMessage());
-                        }else{
-                            Log.d(TAG, "Firebase worked");
-                        }
-                    }
-                });
-                startActivity(new Intent(ContactsListActivity.this, MainActivity.class));
+                new PlaceList().execute();
+//                Intent intent = getIntent();
+//
+//                Firebase eventRef = fdb.child(uid).child("events").child(""+eventIndex);
+//                ArrayList<Contact> invitees = collectInvites();
+//                Event event = new Event(intent.getBundleExtra("bundle").getString("hostName"),
+//                        hostPhone,
+//                        intent.getBundleExtra("bundle").getString("eventName"),
+//                        intent.getBundleExtra("bundle").getString("eventLocation"),
+//                        intent.getBundleExtra("bundle").getString("date"),
+//                        intent.getBundleExtra("bundle").getString("time"),
+//                        intent.getBundleExtra("bundle").getDouble("rating"),
+//                        eventIndex,
+//                        intent.getBundleExtra("bundle").getString("locationType"),
+//                        intent.getBundleExtra("bundle").getString("locationSubtype"),
+//                        places, invitees);
+//                eventRef.setValue(event, new Firebase.CompletionListener(){
+//                    @Override
+//                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+//                        if(firebaseError != null){
+//                            Log.d(TAG, "data could not be saved: "  + firebaseError.getMessage());
+//                        }else{
+//                            Log.d(TAG, "Firebase worked");
+//                        }
+//                    }
+//                });
+//                startActivity(new Intent(ContactsListActivity.this, MainActivity.class));
                 return true;
             case R.id.settings:
                 Intent intent2 = new Intent(ContactsListActivity.this,SettingsActivity.class);
@@ -302,9 +305,13 @@ public class ContactsListActivity extends AppCompatActivity {
     }
 
     class PlaceList extends AsyncTask<Void, Place, Void> {
+        ProgressDialog pd = new ProgressDialog(ContactsListActivity.this, ProgressDialog.STYLE_SPINNER);
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
+//            super.onPreExecute();
+            pd.setMessage("Creating Event....");
+            pd.setCancelable(false);
+            pd.show();
             asyncFinished = false;
         }
 
@@ -369,7 +376,33 @@ public class ContactsListActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            asyncFinished = true;
+            pd.dismiss();
+            Intent intent = getIntent();
+
+            Firebase eventRef = fdb.child(uid).child("events").child(""+eventIndex);
+            ArrayList<Contact> invitees = collectInvites();
+            Event event = new Event(intent.getBundleExtra("bundle").getString("hostName"),
+                    hostPhone,
+                    intent.getBundleExtra("bundle").getString("eventName"),
+                    intent.getBundleExtra("bundle").getString("eventLocation"),
+                    intent.getBundleExtra("bundle").getString("date"),
+                    intent.getBundleExtra("bundle").getString("time"),
+                    intent.getBundleExtra("bundle").getDouble("rating"),
+                    eventIndex,
+                    intent.getBundleExtra("bundle").getString("locationType"),
+                    intent.getBundleExtra("bundle").getString("locationSubtype"),
+                    places, invitees);
+            eventRef.setValue(event, new Firebase.CompletionListener(){
+                @Override
+                public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                    if(firebaseError != null){
+                        Log.d(TAG, "data could not be saved: "  + firebaseError.getMessage());
+                    }else{
+                        Log.d(TAG, "Firebase worked");
+                    }
+                }
+            });
+            startActivity(new Intent(ContactsListActivity.this, MainActivity.class));
         }
     }
 

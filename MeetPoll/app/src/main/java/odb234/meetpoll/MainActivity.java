@@ -20,15 +20,22 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.client.Firebase;
 import com.firebase.ui.database.FirebaseListAdapter;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     DatabaseConnector dbc;
 
     private static final String tag = "permissions";
-
+    ImageView newUser;
     Firebase mRef;
     com.firebase.client.Query qRef;
     private static final String[] GPS_PERMS = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
@@ -48,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         eventList = (ListView) findViewById(R.id.event_list);
-
+        newUser = (ImageView)findViewById(R.id.first_event_image);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.INTERNET}, 10);
         }
@@ -59,31 +66,61 @@ public class MainActivity extends AppCompatActivity {
         //--------------------------------
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         String uid = sp.getString("Uid", "");
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child(uid).child("events");
-        FirebaseListAdapter adapter = new FirebaseListAdapter<Event>(this, Event.class, R.layout.cell_view, dbRef){
+        final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child(uid).child("events");
+        dbRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.hasChildren()){
+                    newUser.setVisibility(View.VISIBLE);
+                }else{
+                    newUser.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        if(dbRef == null)
+            Toast.makeText(this, "No Events", Toast.LENGTH_LONG).show();
+        final FirebaseListAdapter adapter = new FirebaseListAdapter<Event>(this, Event.class, R.layout.cell_view, dbRef){
             @Override
             protected void populateView(View view, Event event, int i){
                 final int finI = i;
                 final Event finEvent = event;
+
                 ((TextView)view.findViewById(R.id.list_event_host)).setText(event.getHostName());
                 ((TextView)view.findViewById(R.id.list_event_date)).setText(event.getEventDate());
                 ((TextView)view.findViewById(R.id.list_event_name)).setText(event.getEventName());
                 ((TextView)view.findViewById(R.id.list_location)).setText(event.getEventLocation());
                 ((TextView)view.findViewById(R.id.list_event_date)).setText(event.getEventDate());
                 ((TextView)view.findViewById(R.id.list_time)).setText(event.getEventTime());
-
+                Button detailBtn = (Button) view.findViewById(R.id.edit_event);
+                view.setTag(event.getKey());
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        String child_event = finEvent.getHostName() + "_" + finEvent.getEventName();
+                        long k = (long)view.getTag();
+                        String child_event = "" + k;
                         Intent intent = new Intent(getApplicationContext(), VoteListActivity.class);
                         intent.putExtra("eventName", child_event);
                         startActivity(intent);
                         Log.d(tag, "cell view clicked: " + finI);
                     }
                 });
+                detailBtn.setTag(event.getKey());
+                detailBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        long k = (long)view.getTag();
+                        Intent intent = new Intent(getApplicationContext(), EventDetailsActivity.class);
+                        intent.putExtra("path", "" + k);
+                        Log.d(tag, dbRef.child(""+ k).toString());
+                        startActivity(intent);
+                    }
+                });
             }
-
         };
         eventList.setAdapter(adapter);
 

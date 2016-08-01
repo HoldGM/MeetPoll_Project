@@ -17,12 +17,13 @@ public class Event {
     private double rating;
     private String locationType;
     private String locationSubtype;
+    private long key;
     private ArrayList<LocationListing> places;
     private ArrayList<Contact> inviteList;
 
     public Event(){}
 
-    public Event(String hn, String hp, String en, String el, String ed, String et, double r, String lt, String lst, ArrayList<LocationListing> pl, ArrayList<Contact> il){
+    public Event(String hn, String hp, String en, String el, String ed, String et, double r, long k, String lt, String lst, ArrayList<LocationListing> pl, ArrayList<Contact> il){
         hostName = hn;
         hostPhone = hp;
         eventName = en;
@@ -30,6 +31,7 @@ public class Event {
         eventDate = ed;
         eventTime = et;
         rating = r;
+        key = k;
         locationType = lt;
         locationSubtype = lst;
         places = pl;
@@ -60,6 +62,7 @@ public class Event {
     public String getLocationSubtype(){
         return locationSubtype;
     }
+    public long getKey(){ return key; }
     public ArrayList<LocationListing> getPlaces(){
         return places;
     }
