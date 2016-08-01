@@ -73,7 +73,7 @@
         android:layout_width="0dp"
         android:layout_weight=".1"
         android:layout_height="35dp"
-        android:background="@drawable/ic_arrow_drop_down_circle_black_18dp"
+        android:background="@drawable/ic_more_vert_black_18dp"
         android:layout_gravity="center"/>
 
 </LinearLayout>

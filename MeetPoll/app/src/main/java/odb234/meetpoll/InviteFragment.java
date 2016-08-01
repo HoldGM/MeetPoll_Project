@@ -78,16 +78,19 @@ public class InviteFragment extends Fragment {
         // Inflate the layout for this fragment
 
         View rootView = inflater.inflate(R.layout.fragment_invite, container, false);
-        ListView list = (ListView)getActivity().findViewById(R.id.detail_invite_list);
+        ListView list = (ListView)rootView.findViewById(R.id.detail_invite_list);
         if(mParam1 != null && mParam2 != null){
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(mParam1).child("events").child(mParam2).child("inviteList");
             ListAdapter adapter = new FirebaseListAdapter<Contact>(getActivity(), Contact.class, R.layout.invite_contact_list, ref) {
                 @Override
                 protected void populateView(View v, Contact model, int position) {
+                    Log.d("Invite List", model.getName() + ", " + model.getPhone());
                     ((TextView)v.findViewById(R.id.detail_contact_name)).setText(model.getName());
                     ((TextView)v.findViewById(R.id.detail_contact_phone)).setText(model.getPhone());
                 }
             };
+            list.setAdapter(adapter);
+
             return rootView;
         }
 

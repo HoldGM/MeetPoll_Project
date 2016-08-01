@@ -26,6 +26,11 @@ public class MapMarker{
         name = n;
     }
 
+    public MapMarker(LatLng ll, String n){
+        name = n;
+        latLng = ll;
+    }
+
     public LatLng getLatLng(){
         return latLng;
     }

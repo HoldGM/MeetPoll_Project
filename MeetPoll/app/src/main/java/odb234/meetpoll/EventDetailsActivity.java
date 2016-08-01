@@ -1,11 +1,13 @@
 package odb234.meetpoll;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -65,10 +67,8 @@ public class EventDetailsActivity extends AppCompatActivity implements InviteFra
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_details);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -96,6 +96,9 @@ public class EventDetailsActivity extends AppCompatActivity implements InviteFra
         dbRef.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
             @Override
             public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+                String toolBarTitle = dataSnapshot.child("eventName").getValue(String.class);
+                getSupportActionBar().setTitle(toolBarTitle);
+
                 Log.d(TAG, dataSnapshot.toString());
             }
 
@@ -110,27 +113,15 @@ public class EventDetailsActivity extends AppCompatActivity implements InviteFra
 
     public void setupViewPager(ViewPager viewPager){
         SectionsPagerAdapter adapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new EventDetailFragment(), "Detail");
+        adapter.addFragment((new EventDetailFragment()).newInstance(uid, getIntent().getStringExtra("path")), "Detail");
         adapter.addFragment((new InviteFragment()).newInstance(uid, getIntent().getStringExtra("path")), "Invite");
         viewPager.setAdapter(adapter);
-    }
-
-    public void setInviteList(){
-        DatabaseReference listRef = dbRef.child("inviteList");
-        ListAdapter adapter = new FirebaseListAdapter<Contact>(this, Contact.class, R.layout.invite_contact_list, listRef){
-            @Override
-            protected void populateView(View v, Contact model, int position) {
-                ((TextView)v.findViewById(R.id.detail_contact_name)).setText(model.getName());
-                ((TextView)v.findViewById(R.id.detail_contact_phone)).setText(model.getPhone());
-            }
-        };
-        inviteList.setAdapter(adapter);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_event_details, menu);
+        getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
 
@@ -139,13 +130,19 @@ public class EventDetailsActivity extends AppCompatActivity implements InviteFra
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch(item.getItemId()){
+            case R.id.settings:
+                Intent intent = new Intent(EventDetailsActivity.this,SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.logout:
+                LogoutFragment frag = new LogoutFragment();
+                frag.show(getFragmentManager(), "LogoutFragment");
+                return true;
+            case android.R.id.home:
+                finish();
+                return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 

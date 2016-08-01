@@ -2,6 +2,8 @@ package odb234.meetpoll;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.os.Bundle;
@@ -23,6 +25,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -164,6 +167,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
             @Override
             public boolean onMarkerClick(Marker marker) {
                 marker.showInfoWindow();
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
                 Log.d(TAG, "Marker selected" + marker.getTitle().toString());
                 return true;
             }
@@ -318,7 +322,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
             super.onPostExecute(aVoid);
             for(int i = 0; i < mapMarkers.size(); i++){
                 Log.d(TAG, mapMarkers.get(i).getName());
-                mMap.addMarker(new MarkerOptions().position(mapMarkers.get(i).getLatLng()).title(mapMarkers.get(i).getName()).snippet(mapMarkers.get(i).getAddress()));
+                mMap.addMarker(new MarkerOptions().position(mapMarkers.get(i).getLatLng()).title(mapMarkers.get(i).getName()).snippet(mapMarkers.get(i).getAddress()).icon(BitmapDescriptorFactory.defaultMarker(195)));
             }
 
             if(mapMarkers.size() != 0) {

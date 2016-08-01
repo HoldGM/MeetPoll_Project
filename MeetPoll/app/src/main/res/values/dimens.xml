@@ -12,4 +12,6 @@
     <dimen name="tab_label">14sp</dimen>
     <dimen name="tab_padding_bottom">16dp</dimen>
     <dimen name="tab_max_width">264dp</dimen>
+    <!-- blue marker color 195-->
+    <!-- orange marker color 18 -->
 </resources>

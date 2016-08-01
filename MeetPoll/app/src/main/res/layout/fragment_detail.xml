@@ -1,16 +1,114 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="odb234.meetpoll.EventDetailFragment">
+    tools:context="odb234.meetpoll.EventDetailFragment"
+    android:orientation="vertical">
 
     <!-- TODO: Update blank fragment layout -->
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/map_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".5"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/splash_blue">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Top Location"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
     <TextView
+        android:id="@+id/details_location_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Detail Fragment"
-        android:textSize="40dp"
-        android:textStyle="bold"
-        android:layout_centerInParent="true"/>
-
-</RelativeLayout>
+        android:text="Location Name"
+        android:textSize="@dimen/event_text_size"
+        android:paddingTop="@dimen/button_margin"
+        android:paddingBottom="@dimen/button_margin"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
+    <TextView
+        android:id="@+id/details_location_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Location Address"
+        android:paddingTop="@dimen/button_margin"
+        android:paddingBottom="@dimen/button_margin"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
+    <TextView
+        android:id="@+id/details_location_phone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Location Phone"
+        android:paddingTop="@dimen/button_margin"
+        android:paddingBottom="@dimen/button_margin"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/splash_blue">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date / Time"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/button_margin"
+        android:paddingBottom="@dimen/button_margin"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date:"
+            android:textSize="@dimen/event_text_size"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"/>
+        <TextView
+            android:id="@+id/detail_event_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Event Date"/>
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/button_margin"
+        android:paddingBottom="@dimen/button_margin"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time:"
+            android:textSize="@dimen/event_text_size"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"/>
+        <TextView
+            android:id="@+id/detail_event_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Event Time"/>
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
+</LinearLayout>
