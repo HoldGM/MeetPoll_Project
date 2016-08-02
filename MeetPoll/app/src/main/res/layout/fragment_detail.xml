@@ -37,6 +37,7 @@
         android:paddingTop="@dimen/button_margin"
         android:paddingBottom="@dimen/button_margin"/>
     <RelativeLayout
+        android:id="@+id/detail_event_directions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
@@ -68,6 +69,7 @@
         android:layout_height="1dp"
         android:background="@android:color/darker_gray"/>
     <RelativeLayout
+        android:id="@+id/detail_call_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView

@@ -73,6 +73,7 @@ public class ContactsListActivity extends AppCompatActivity {
     private static final String TAG = "Contact List Activity";
     SharedPreferences sp;
     String uid;
+    ArrayList<Contact> invites;
 
     Firebase fdb;
     DatabaseReference mRoot = FirebaseDatabase.getInstance().getReference();
@@ -102,12 +103,6 @@ public class ContactsListActivity extends AppCompatActivity {
                 populateList();
             else
                 requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 10);
-            if(checkSelfPermission(Manifest.permission.READ_PHONE_STATE) !=  PackageManager.PERMISSION_GRANTED){
-                requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, 15);
-            }else{
-                TelephonyManager tMgr = (TelephonyManager)getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
-                hostPhone = tMgr.getLine1Number();
-            }
         }else{
             populateList();
         }
@@ -143,32 +138,6 @@ public class ContactsListActivity extends AppCompatActivity {
                 return true;
             case R.id.send_event:
                 new PlaceList().execute();
-//                Intent intent = getIntent();
-//
-//                Firebase eventRef = fdb.child(uid).child("events").child(""+eventIndex);
-//                ArrayList<Contact> invitees = collectInvites();
-//                Event event = new Event(intent.getBundleExtra("bundle").getString("hostName"),
-//                        hostPhone,
-//                        intent.getBundleExtra("bundle").getString("eventName"),
-//                        intent.getBundleExtra("bundle").getString("eventLocation"),
-//                        intent.getBundleExtra("bundle").getString("date"),
-//                        intent.getBundleExtra("bundle").getString("time"),
-//                        intent.getBundleExtra("bundle").getDouble("rating"),
-//                        eventIndex,
-//                        intent.getBundleExtra("bundle").getString("locationType"),
-//                        intent.getBundleExtra("bundle").getString("locationSubtype"),
-//                        places, invitees);
-//                eventRef.setValue(event, new Firebase.CompletionListener(){
-//                    @Override
-//                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-//                        if(firebaseError != null){
-//                            Log.d(TAG, "data could not be saved: "  + firebaseError.getMessage());
-//                        }else{
-//                            Log.d(TAG, "Firebase worked");
-//                        }
-//                    }
-//                });
-//                startActivity(new Intent(ContactsListActivity.this, MainActivity.class));
                 return true;
             case R.id.settings:
                 Intent intent2 = new Intent(ContactsListActivity.this,SettingsActivity.class);
@@ -195,6 +164,7 @@ public class ContactsListActivity extends AppCompatActivity {
                         populateList();
                 else
                     Toast.makeText(this, "Permission to access contacts required.", Toast.LENGTH_LONG).show();
+                break;
         }
 
     }
@@ -215,7 +185,16 @@ public class ContactsListActivity extends AppCompatActivity {
             if(cur.getString(indexNumber).length() > 7) {
                 String name = cur.getString(indexName);
                 String number = cur.getString(indexNumber);
-                contacts.add(new Contact(name, number, false));
+                String finNum = "";
+                for(int i = 0; i < number.length(); i++){
+                    if(number.charAt(i) >= '0' && number.charAt(i) <= '9'){
+                        finNum += number.charAt(i);
+                    }
+                }
+                if(finNum.length() > 10){
+                    finNum = finNum.substring(1);
+                }
+                contacts.add(new Contact(name, finNum, false));
                 Log.d(TAG, name + ", " + number);
             }
         }while(cur.moveToNext());
@@ -236,7 +215,8 @@ public class ContactsListActivity extends AppCompatActivity {
 
     private ArrayList<Contact> collectInvites(){
         int listCount = inviteList.getAdapter().getCount();
-        ArrayList<Contact> invites = new ArrayList<>();
+        invites = new ArrayList<>();
+        invites.add(new Contact(sp.getString("name", ""), sp.getString("phone", ""), true));
         for(int i = 0; i< listCount; i++){
             View listView = inviteList.getAdapter().getView(i, null, null);
             if(((CheckBox)listView.findViewById(R.id.contact_select)).isChecked())
@@ -280,7 +260,9 @@ public class ContactsListActivity extends AppCompatActivity {
             TextView textView = (TextView)currentView.findViewById(R.id.contact_name);
             textView.setText(contactsList.get(i).getName());
             textView = (TextView)currentView.findViewById(R.id.contact_phone);
-            textView.setText(contactsList.get(i).getPhone());
+            String phone = contactsList.get(i).getPhone();
+            phone = "(" + phone.substring(0,3) + ")" + phone.substring(3,6) + "-" + phone.substring(6);
+            textView.setText(phone);
             CheckBox checkBox = (CheckBox)currentView.getTag();
             if(checkBox == null)
             {

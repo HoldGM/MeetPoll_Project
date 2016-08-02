@@ -2,6 +2,7 @@ package odb234.meetpoll;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -39,7 +40,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventDetailsActivity extends AppCompatActivity implements InviteFragment.OnFragmentInteractionListener, EventDetailFragment.OnFragmentInteractionListener{
+public class EventDetailsActivity extends AppCompatActivity implements InviteFragment.OnFragmentInteractionListener, EventDetailFragment.OnFragmentInteractionListener, VoteCountFragment.OnFragmentInteractionListener{
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -115,6 +116,7 @@ public class EventDetailsActivity extends AppCompatActivity implements InviteFra
         SectionsPagerAdapter adapter = new SectionsPagerAdapter(getSupportFragmentManager());
         adapter.addFragment((new EventDetailFragment()).newInstance(uid, getIntent().getStringExtra("path")), "Detail");
         adapter.addFragment((new InviteFragment()).newInstance(uid, getIntent().getStringExtra("path")), "Invite");
+        adapter.addFragment((new VoteCountFragment()).newInstance(uid, getIntent().getStringExtra("path")), "Poll Results");
         viewPager.setAdapter(adapter);
     }
 
@@ -153,6 +155,11 @@ public class EventDetailsActivity extends AppCompatActivity implements InviteFra
 
     @Override
     public void onEventDetailFragmentInteraction(String string) {
+
+    }
+
+    @Override
+    public void onVoteDetailFragmentInteraction(Uri uri) {
 
     }
 

@@ -26,6 +26,11 @@ public class LocationListing {
         id = i;
         voteCount = 0;
     }
+    public LocationListing(String n, String a, int v){
+        name = n;
+        address = a;
+        voteCount = v;
+    }
 
     public void setName(String n){ name = n;}
     public void setAddress(String a){ address = a; }

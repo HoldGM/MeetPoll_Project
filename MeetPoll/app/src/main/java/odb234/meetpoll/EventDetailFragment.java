@@ -1,6 +1,7 @@
 package odb234.meetpoll;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -20,6 +22,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -61,6 +64,9 @@ public class EventDetailFragment extends Fragment implements GoogleApiClient.OnC
 
     ArrayList<MapMarker> markers;
     MapMarker topMarker;
+
+    RelativeLayout callView;
+    RelativeLayout directionView;
 
     public EventDetailFragment() {
         // Required empty public constructor
@@ -154,7 +160,7 @@ public class EventDetailFragment extends Fragment implements GoogleApiClient.OnC
                         @Override
                         public boolean onMarkerClick(Marker marker) {
                             marker.showInfoWindow();
-                            mMap.moveCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+                            mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
                             Log.d(TAG, "Marker selected" + marker.getTitle().toString());
                             return true;
                         }
@@ -168,7 +174,26 @@ public class EventDetailFragment extends Fragment implements GoogleApiClient.OnC
                     for (int i = 0; i < markers.size(); i++) {
                         bounds.include(markers.get(i).getLatLng());
                     }
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 100));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(topMarker.getLatLng(), 15));
+                }
+            });
+
+            callView = (RelativeLayout)rootView.findViewById(R.id.detail_call_view);
+            callView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse("tel:"+((TextView)rootView.findViewById(R.id.details_location_phone)).getText().toString()));
+                    startActivity(intent);
+                }
+            });
+
+            directionView = (RelativeLayout)rootView.findViewById(R.id.detail_event_directions);
+            directionView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q="+((TextView)rootView.findViewById(R.id.details_location_address)).getText().toString()));
+                    startActivity(intent);
                 }
             });
 
@@ -195,30 +220,6 @@ public class EventDetailFragment extends Fragment implements GoogleApiClient.OnC
         mapView.onLowMemory();
     }
 
-    //    @Override
-//    public void onMapReady(GoogleMap googleMap) {
-//        mMap = googleMap;
-//
-//        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-//            @Override
-//            public boolean onMarkerClick(Marker marker) {
-//                marker.showInfoWindow();
-//                mMap.moveCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
-//                Log.d(TAG, "Marker selected" + marker.getTitle().toString());
-//                return true;
-//            }
-//        });
-//        mMap.addMarker(new MarkerOptions().position(topMarker.getLatLng()).title(topMarker.getName()).icon(BitmapDescriptorFactory.defaultMarker(18)));
-//        for(int i = 0; i < markers.size(); i++){
-//            mMap.addMarker(new MarkerOptions().position(markers.get(i).getLatLng()).title(markers.get(i).getName()).icon(BitmapDescriptorFactory.defaultMarker(195)));
-//        }
-//        LatLngBounds.Builder bounds = new LatLngBounds.Builder();
-//        bounds.include(topMarker.getLatLng());
-//        for (int i = 0; i < markers.size(); i++) {
-//            bounds.include(markers.get(i).getLatLng());
-//        }
-//        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 100));
-//    }
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
 

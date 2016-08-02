@@ -167,7 +167,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
             @Override
             public boolean onMarkerClick(Marker marker) {
                 marker.showInfoWindow();
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
                 Log.d(TAG, "Marker selected" + marker.getTitle().toString());
                 return true;
             }

@@ -28,9 +28,11 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.location.places.Place;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.apache.http.HttpEntity;
@@ -58,7 +60,10 @@ public class VoteListActivity extends AppCompatActivity {
     ArrayList<LocationListing> places;
     ArrayList<String> ids;
     ListAdapter adapter;
+    String uid;
+    String path;
     int previousVote = -1;
+    SharedPreferences sp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,14 +71,14 @@ public class VoteListActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
-        String path = intent.getStringExtra("eventName");
+        path = intent.getStringExtra("eventName");
 
         gc = new Geocoder(getApplicationContext(), Locale.ENGLISH);
 
         voteList = (ListView) findViewById(R.id.vote_list);
         places = new ArrayList<>();
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        String uid = sp.getString("Uid", "");
+        sp = PreferenceManager.getDefaultSharedPreferences(this);
+        uid = sp.getString("Uid", "");
         mIdsRef = mRootRef.child(uid).child("events").child(path).child("places");
         ListAdapter adapter = new FirebaseListAdapter<LocationListing>(this, LocationListing.class, R.layout.vote_list_cell, mIdsRef) {
             @Override
@@ -89,7 +94,9 @@ public class VoteListActivity extends AppCompatActivity {
                         @Override
                         public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                             Integer itemPosition = (Integer) compoundButton.getTag();
+
                             resetRadio(itemPosition);
+
                             LocationListing ll = (LocationListing)voteList.getAdapter().getItem(itemPosition);
                             ll.setState(b);
                         }
@@ -123,6 +130,8 @@ public class VoteListActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.pick_location:
+                vote();
+                finish();
                 return true;
             case R.id.settings:
                 Intent intent2 = new Intent(VoteListActivity.this,SettingsActivity.class);
@@ -138,6 +147,42 @@ public class VoteListActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.map_menu2, menu);
         return true;
+    }
+
+    public void vote(){
+        final DatabaseReference q = FirebaseDatabase.getInstance().getReference().child(uid).child("events").child(path).child("places").child(previousVote + "");
+        q.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                final long voteCount = (long)dataSnapshot.child("voteCount").getValue();
+
+                (q.getParent().getParent().child("inviteList")).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot child : dataSnapshot.getChildren()){
+                            if((child.child("phone").getValue().toString()).equals(sp.getString("phone",""))){
+                                if(!(boolean)child.child("voted").getValue()) {
+                                    q.child("voteCount").setValue(voteCount + 1);
+                                    (child.child("voted").getRef()).setValue(true);
+                                }else{
+                                    Toast.makeText(getApplicationContext(), "You have already voted.", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
 }

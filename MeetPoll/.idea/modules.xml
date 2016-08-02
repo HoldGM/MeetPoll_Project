@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/MeetPoll.iml" filepath="$PROJECT_DIR$/MeetPoll.iml" />
       <module fileurl="file:///v/filer4b/v38q001/odb234/Documents/MeetPoll_Project/MeetPoll/MeetPoll.iml" filepath="/v/filer4b/v38q001/odb234/Documents/MeetPoll_Project/MeetPoll/MeetPoll.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file:///v/filer4b/v38q001/odb234/Documents/MeetPoll_Project/MeetPoll/app/app.iml" filepath="/v/filer4b/v38q001/odb234/Documents/MeetPoll_Project/MeetPoll/app/app.iml" />
     </modules>
   </component>

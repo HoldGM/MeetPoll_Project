@@ -42,12 +42,14 @@ public class LoginActivity extends AppCompatActivity {
     SharedPreferences sp;
     SharedPreferences.Editor editor;
     private static final String TAG = "Login Screen:";
+    static boolean registerFlag;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         Firebase.setAndroidContext(this);
         fb = new Firebase("https://steadfast-leaf-137323.firebaseio.com/");
+        registerFlag = false;
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -56,8 +58,14 @@ public class LoginActivity extends AppCompatActivity {
                 if (user != null) {
                     editor.putString("Uid", user.getUid());
                     editor.apply();
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
+                    if (registerFlag) {
+                        registerFlag = false;
+                        Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
+                        startActivity(intent);
+                    }else {
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                    }
                     Log.d(TAG, "User signed in.");
                 } else {
                     Log.d(TAG, "user signed out.");
@@ -144,6 +152,9 @@ public class LoginActivity extends AppCompatActivity {
                 if (((EditText) dialogView.findViewById(R.id.new_password)).getText().toString().equals(((EditText) dialogView.findViewById(R.id.confirm_password)).getText().toString()) &&
                         ((EditText) dialogView.findViewById(R.id.new_password)).getText().toString().length() >= 6) {
                     registerComplete(((EditText) dialogView.findViewById(R.id.new_user)).getText().toString(), ((EditText) dialogView.findViewById(R.id.new_password)).getText().toString());
+                    editor.remove("username");
+                    editor.apply();
+                    registerFlag = true;
                     dialogInterface.dismiss();
                 } else if (!((EditText) dialogView.findViewById(R.id.new_password)).getText().toString().equals(((EditText) dialogView.findViewById(R.id.confirm_password)).getText().toString())) {
                     Toast.makeText(getApplicationContext(), "Password entered does not match", Toast.LENGTH_LONG).show();
