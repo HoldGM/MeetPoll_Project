@@ -96,7 +96,6 @@ public class NewEventActivity extends AppCompatActivity {
     static Geocoder gc;
 
     private static final String API_KEY = "AIzaSyAAzuLsfoR8fRIrdEkXC8up5KfdbHV3lno";
-    private ArrayList<MyPlace> resultPlaces;
 
     protected GoogleApiClient mGoogleApiClient;
 

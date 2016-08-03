@@ -3,6 +3,7 @@ package odb234.meetpoll;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -43,12 +44,16 @@ public class LoginActivity extends AppCompatActivity {
     SharedPreferences.Editor editor;
     private static final String TAG = "Login Screen:";
     static boolean registerFlag;
+    static Toast t;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         Firebase.setAndroidContext(this);
         fb = new Firebase("https://steadfast-leaf-137323.firebaseio.com/");
+
+        t = Toast.makeText(this, "", Toast.LENGTH_LONG);
         registerFlag = false;
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -131,12 +136,55 @@ public class LoginActivity extends AppCompatActivity {
             });
         }
     }
-
     public void register(View v){
         dialogFragment();
 
 //        Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
 //        startActivityForResult(intent, 10);
+    }
+
+    public void resetPassword(View v) {
+        resetPasswordFragment reset = new resetPasswordFragment();
+        reset.show(getFragmentManager(),"resetPassword");
+    }
+    public static class resetPasswordFragment extends DialogFragment
+    {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            final EditText userInput = new EditText(getActivity());
+            userInput.setHint("Enter email");
+            builder.setView(userInput);
+            builder.setMessage("Send reset email to ")
+                    .setPositiveButton("Send", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            final String email = userInput.getText().toString();
+                            mAuth.sendPasswordResetEmail(email)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(Task<Void> task) {
+                                            if (task.isSuccessful()) {
+//                                                Toast.makeText(getView().getContext(), "Email sent to " + email + ".", Toast.LENGTH_LONG).show();
+                                                t.setText("Email sent to " + email + ".");
+                                                t.show();
+                                            } else {
+//                                                Toast.makeText(getView().getContext(), "Email failed to send to " + email + ".", Toast.LENGTH_LONG).show();
+                                                t.setText("Email failed to send to " + email + ".");
+                                                t.show();
+                                            }
+                                        }
+                                    });
+                            dismiss();
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dismiss();
+                        }
+                    });
+            return builder.create();
+        }
     }
 
     public void dialogFragment(){

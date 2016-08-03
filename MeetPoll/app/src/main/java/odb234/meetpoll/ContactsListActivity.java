@@ -65,7 +65,6 @@ public class ContactsListActivity extends AppCompatActivity {
     ArrayList<Contact> contacts;
     ArrayList<LocationListing> places;
     ArrayList<String> ids;
-    private int progress;
     boolean asyncFinished;
     ListAdapter la;
     String hostPhone;
@@ -74,7 +73,7 @@ public class ContactsListActivity extends AppCompatActivity {
     SharedPreferences sp;
     String uid;
     ArrayList<Contact> invites;
-
+    private static ArrayList<Contact> invitees;
     Firebase fdb;
     DatabaseReference mRoot = FirebaseDatabase.getInstance().getReference();
     DatabaseReference mEventRef;
@@ -93,10 +92,8 @@ public class ContactsListActivity extends AppCompatActivity {
         contacts = new ArrayList<>();
         places = new ArrayList<>();
         ids = getIntent().getStringArrayListExtra("ids");
-        progressBar = (ProgressBar) findViewById(R.id.contact_progress);
         progressBar.setMax(ids.size());
         progressBar.setProgress(0);
-//        new PlaceList().execute();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if(checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED)
@@ -137,6 +134,7 @@ public class ContactsListActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.send_event:
+                invitees = collectInvites();
                 new PlaceList().execute();
                 return true;
             case R.id.settings:
@@ -202,15 +200,6 @@ public class ContactsListActivity extends AppCompatActivity {
         Log.d(TAG, "Contacts List size: " + contacts.size());
         la = new ContactsAdapter(this, contacts);
         inviteList.setAdapter(la);
-        getListItems();
-    }
-
-    public void setProgressBar(int i){
-        progressBar.setProgress(i);
-    }
-
-    public void getListItems() {
-
     }
 
     private ArrayList<Contact> collectInvites(){
@@ -332,7 +321,6 @@ public class ContactsListActivity extends AppCompatActivity {
                     double lng = resObj.getJSONObject("geometry").getJSONObject("location").getDouble("lng");
                     places.add(new LocationListing(name, address, phone, rating, false, lat, lng, id));
                     Log.d(TAG, "Name: " + name + ", Address: " + address + ", Rating: " + rating + ", ID: " + id);
-                    setProgressBar(i);
                 }
             }catch(Exception e){
                 Log.e(TAG, e.toString());
@@ -361,8 +349,7 @@ public class ContactsListActivity extends AppCompatActivity {
             pd.dismiss();
             Intent intent = getIntent();
 
-            Firebase eventRef = fdb.child(uid).child("events").child(""+eventIndex);
-            ArrayList<Contact> invitees = collectInvites();
+            Firebase eventRef = fdb.child(uid).child("events").child("" + eventIndex);
             Event event = new Event(intent.getBundleExtra("bundle").getString("hostName"),
                     hostPhone,
                     intent.getBundleExtra("bundle").getString("eventName"),
@@ -384,6 +371,44 @@ public class ContactsListActivity extends AppCompatActivity {
                     }
                 }
             });
+            new sendInvites().execute(eventRef.getPath().toString());
+        }
+    }
+
+    class sendInvites extends AsyncTask<String, Contact, Void> {
+        @Override
+        protected Void doInBackground(String... path) {
+            for(int i=0;i<invitees.size();i++)
+            {
+                final int finI = i;
+                final String finPath = path[0];
+                mRoot.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot child : dataSnapshot.getChildren()) {
+                            if(child.child("phone").getValue().toString().equals(invitees.get(finI).getPhone()) && !child.child("phone").getValue().toString().equals(sp.getString("phone","")))
+                            {
+                                child.child("invited-events").getRef().push().setValue(finPath);
+                                break;
+                            }
+                            else
+                            {
+                                //send sms message
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
             startActivity(new Intent(ContactsListActivity.this, MainActivity.class));
         }
     }

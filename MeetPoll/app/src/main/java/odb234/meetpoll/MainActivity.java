@@ -1,130 +1,93 @@
 package odb234.meetpoll;
 
-import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.os.Bundle;
+import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.CursorAdapter;
-import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
+import android.view.ViewGroup;
+
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.client.Firebase;
-import com.firebase.ui.database.FirebaseListAdapter;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
 
-    ListView eventList;
-    DatabaseConnector dbc;
+public class MainActivity extends AppCompatActivity implements  MyEventsFragment.OnFragmentInteractionListener, EventInvitesFragment.OnFragmentInteractionListener {
 
-    private static final String tag = "permissions";
-    ImageView newUser;
+    /**
+     * The {@link android.support.v4.view.PagerAdapter} that will provide
+     * fragments for each of the sections. We use a
+     * {@link FragmentPagerAdapter} derivative, which will keep every
+     * loaded fragment in memory. If this becomes too memory intensive, it
+     * may be best to switch to a
+     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     */
+    private SectionsPagerAdapter mSectionsPagerAdapter;
+
+    /**
+     * The {@link ViewPager} that will host the section contents.
+     */
+    private ViewPager mViewPager;
+    String uid;
+    DatabaseReference dbRef;
     Firebase mRef;
-    com.firebase.client.Query qRef;
-    private static final String[] GPS_PERMS = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+
+    private final static String TAG = "Main Activity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        // Create the adapter that will return a fragment for each of the three
+        // primary sections of the activity.
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        eventList = (ListView) findViewById(R.id.event_list);
-        newUser = (ImageView)findViewById(R.id.first_event_image);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[]{Manifest.permission.INTERNET}, 10);
-        }
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        //--------------------------------
-        Firebase.setAndroidContext(this);
-        mRef = new Firebase("https://steadfast-leaf-137323.firebaseio.com/");
-        //--------------------------------
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        String uid = sp.getString("Uid", "");
-        final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child(uid).child("events");
-        dbRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.hasChildren()){
-                    newUser.setVisibility(View.VISIBLE);
-                }else{
-                    newUser.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        if(dbRef == null)
-            Toast.makeText(this, "No Events", Toast.LENGTH_LONG).show();
-        final FirebaseListAdapter adapter = new FirebaseListAdapter<Event>(this, Event.class, R.layout.cell_view, dbRef){
-            @Override
-            protected void populateView(View view, Event event, int i){
-                final int finI = i;
-                final Event finEvent = event;
-
-                ((TextView)view.findViewById(R.id.list_event_host)).setText(event.getHostName());
-                ((TextView)view.findViewById(R.id.list_event_date)).setText(event.getEventDate());
-                ((TextView)view.findViewById(R.id.list_event_name)).setText(event.getEventName());
-                ((TextView)view.findViewById(R.id.list_location)).setText(event.getEventLocation());
-                ((TextView)view.findViewById(R.id.list_event_date)).setText(event.getEventDate());
-                ((TextView)view.findViewById(R.id.list_time)).setText(event.getEventTime());
-                Button detailBtn = (Button) view.findViewById(R.id.edit_event);
-                view.setTag(event.getKey());
-                view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        long k = (long)view.getTag();
-                        String child_event = "" + k;
-                        Intent intent = new Intent(getApplicationContext(), VoteListActivity.class);
-                        intent.putExtra("eventName", child_event);
-                        startActivity(intent);
-                        Log.d(tag, "cell view clicked: " + finI);
-                    }
-                });
-                detailBtn.setTag(event.getKey());
-                detailBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        long k = (long)view.getTag();
-                        Intent intent = new Intent(getApplicationContext(), EventDetailsActivity.class);
-                        intent.putExtra("path", "" + k);
-                        Log.d(tag, dbRef.child(""+ k).toString());
-                        startActivity(intent);
-                    }
-                });
-            }
-        };
-        eventList.setAdapter(adapter);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(mViewPager);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        uid = sp.getString("Uid", "");
+        Firebase.setAndroidContext(this);
+        mRef = new Firebase("https://steadfast-leaf-137323.firebaseio.com/");
+        dbRef = FirebaseDatabase.getInstance().getReference();
+        Log.d(TAG, dbRef.toString());
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -132,6 +95,25 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        setupViewPager(mViewPager);
+    }
+
+    public void setupViewPager(ViewPager viewPager){
+        SectionsPagerAdapter adapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment((new MyEventsFragment()).newInstance(uid, "events"), "My Events");
+        adapter.addFragment((new EventInvitesFragment()).newInstance(uid, "invited-events"), "Event Invites");
+        viewPager.setAdapter(adapter);
+    }
+
+    @Override
+    public void onMyEventsFragmentInteraction(String string) {
+
+    }
+
+    @Override
+    public void onEventInvitesFragmentInteraction(String string) {
+
     }
 
     @Override
@@ -142,7 +124,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
         switch(item.getItemId()){
             case R.id.settings:
                 Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
@@ -156,23 +148,73 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-        return true;
+    /**
+     * A placeholder fragment containing a simple view.
+     */
+    public static class PlaceholderFragment extends Fragment {
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+        private static final String ARG_SECTION_NUMBER = "section_number";
+
+        public PlaceholderFragment() {
+        }
+
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        public static PlaceholderFragment newInstance(int sectionNumber) {
+            PlaceholderFragment fragment = new PlaceholderFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
+            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            return rootView;
+        }
     }
 
+    /**
+     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
+     * one of the sections/tabs/pages.
+     */
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch(requestCode){
-            case 10:
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    //do firebase stuff
-                }
-                return;
+        @Override
+        public Fragment getItem(int position) {
+            // getItem is called to instantiate the fragment for the given page.
+            // Return a PlaceholderFragment (defined as a static inner class below).
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            // Show 3 total pages.
+            return mFragmentList.size();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
+        }
+
+        public void addFragment(Fragment fragment, String title){
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
         }
     }
 }
