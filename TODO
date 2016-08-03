@@ -1,0 +1,15 @@
+add setting for  ------  if have less than 10 with a rating, fill in the rest with unrated results
+----find image of MeetPoll in ITC snap that's bigger
+add setting for number of returned search results
+
+store shared pref in db
+date/time picker reset on newInstance
+add phone number to register page ????
+allow host to add contact to event already created
+filter contacts by who has account
+change icon on main list to green check if voted, yellow clock if almost out of time, right arrow else
+tabview for main page
+tabview for map/list results page
+back button on profile page
+loading animation when loading events on main page
+loading animation when finding locations on location results page

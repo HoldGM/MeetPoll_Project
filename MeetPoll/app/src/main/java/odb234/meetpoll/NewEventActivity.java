@@ -516,7 +516,7 @@ public class NewEventActivity extends AppCompatActivity {
         intent.putExtra("time", timeBtn.getText().toString());
         intent.putExtra("locationType", locationType);
         intent.putExtra("locationSubtype", typeSpinner.getSelectedItem().toString());
-        intent.putExtra("rating", (int) Math.floor(ratingBar.getRating()));
+        intent.putExtra("rating", Math.floor(ratingBar.getRating()));
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling

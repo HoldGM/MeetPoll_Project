@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 
 /**
@@ -80,7 +81,7 @@ public class InviteFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_invite, container, false);
         ListView list = (ListView)rootView.findViewById(R.id.detail_invite_list);
         if(mParam1 != null && mParam2 != null){
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(mParam1).child("events").child(mParam2).child("inviteList");
+            Query ref = FirebaseDatabase.getInstance().getReference().child(mParam1).child("events").child(mParam2).child("inviteList").orderByChild("name");
             ListAdapter adapter = new FirebaseListAdapter<Contact>(getActivity(), Contact.class, R.layout.invite_contact_list, ref) {
                 @Override
                 protected void populateView(View v, Contact model, int position) {

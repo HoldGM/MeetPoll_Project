@@ -65,7 +65,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
     private String eventTime;
     private String locationType;
     private String locationSubtype;
-    private int eventRating;
+    private Double eventRating;
     private ArrayList<String> ids;
 
     private Switch aSwitch;
@@ -99,7 +99,7 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
         eventTime = intent.getStringExtra("time");
         locationType = intent.getStringExtra("locationType");
         locationSubtype = intent.getStringExtra("locationSubtype");
-        eventRating = intent.getIntExtra("rating", 0);
+        eventRating = intent.getDoubleExtra("rating", 0.0);
 
         aSwitch = (Switch) findViewById(R.id.map_list_select);
         aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

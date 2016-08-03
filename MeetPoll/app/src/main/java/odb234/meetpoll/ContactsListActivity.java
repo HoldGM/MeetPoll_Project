@@ -177,7 +177,7 @@ public class ContactsListActivity extends AppCompatActivity {
         String[] projection = new String[]{ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, ContactsContract.CommonDataKinds.Phone.NUMBER,
                                             ContactsContract.CommonDataKinds.Phone.PHOTO_THUMBNAIL_URI};
 
-        Cursor cur = cr.query(uri,projection, null, null, null);
+        Cursor cur = cr.query(uri,projection, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
         int indexName = cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
         int indexNumber = cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
         cur.moveToFirst();
