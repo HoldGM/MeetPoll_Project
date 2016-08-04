@@ -3,7 +3,6 @@ package odb234.meetpoll;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -13,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,12 +24,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 
 /**
@@ -99,51 +97,106 @@ public class EventInvitesFragment extends Fragment {
         if(mParam1 != null && mParam2 != null){
             View rootView = inflater.inflate(R.layout.fragment_event_invites, container, false);
             invitedEventsList = (ListView)rootView.findViewById(R.id.main_invite_eventsList);
-            DatabaseReference mRef = FirebaseDatabase.getInstance().getReference().child(sp.getString("Uid", "")).child("invited-events");
+            final DatabaseReference mRef = FirebaseDatabase.getInstance().getReference().child(sp.getString("Uid", "")).child("invited-events");
 
-            ListAdapter adapter = new FirebaseListAdapter<String>(getActivity(), String.class, R.layout.cell_view, mRef){
+            mRef.addValueEventListener(new ValueEventListener() {
                 @Override
-                protected void populateView(View v, String model, int position) {
-                    final View tempView = v;
-                    final Firebase tempBase = new Firebase(getString(R.string.firebase_path) +  model);
-                    tempView.setTag(tempBase.getPath().toString());
-                    tempBase.addValueEventListener(new com.firebase.client.ValueEventListener() {
-                        @Override
-                        public void onDataChange(com.firebase.client.DataSnapshot dataSnapshot) {
-                            ((TextView) tempView.findViewById(R.id.list_event_host)).setText(dataSnapshot.child("hostName").getValue().toString());
-                            ((TextView) tempView.findViewById(R.id.list_event_date)).setText(dataSnapshot.child("eventDate").getValue().toString());
-                            ((TextView) tempView.findViewById(R.id.list_event_name)).setText(dataSnapshot.child("eventName").getValue().toString());
-                            ((TextView) tempView.findViewById(R.id.list_time)).setText(dataSnapshot.child("eventTime").getValue().toString());
-                            long voteCount = (long)dataSnapshot.child("places").child("0").child("voteCount").getValue();
-                            String location = dataSnapshot.child("places").child("0").child("name").getValue().toString();
-                            for(com.firebase.client.DataSnapshot child : dataSnapshot.child("places").getChildren()) {
-                                if((long)child.child("voteCount").getValue() > voteCount){
-                                    voteCount = (long)child.child("voteCount").getValue();
-                                    location = child.child("name").getValue().toString();
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for(final DataSnapshot child : dataSnapshot.getChildren()){
+                        DatabaseReference temp = FirebaseDatabase.getInstance().getReference().child(child.getValue().toString());
+                        temp.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if(!dataSnapshot.hasChildren()) {
+                                    Log.d(TAG, "data is null");
+                                    (child.getRef()).removeValue();
                                 }
+                                ListAdapter adapter = new FirebaseListAdapter<String>(getActivity(), String.class, R.layout.cell_view, mRef){
+                                    @Override
+                                    protected void populateView(View v, String model, int position) {
+                                        final View tempView = v;
+                                        final Firebase tempBase = new Firebase(getString(R.string.firebase_path) +  model);
+                                        tempView.setTag(tempBase.getPath().toString());
+                                        tempBase.addValueEventListener(new com.firebase.client.ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(com.firebase.client.DataSnapshot dataSnapshot) {
+                                                ((TextView) tempView.findViewById(R.id.list_event_host)).setText(dataSnapshot.child("hostName").getValue().toString());
+                                                ((TextView) tempView.findViewById(R.id.list_event_date)).setText(dataSnapshot.child("eventDate").getValue().toString());
+                                                ((TextView) tempView.findViewById(R.id.list_event_name)).setText(dataSnapshot.child("eventName").getValue().toString());
+                                                ((TextView) tempView.findViewById(R.id.list_time)).setText(dataSnapshot.child("eventTime").getValue().toString());
+                                                String str = dataSnapshot.child("locationType").getValue().toString();
+                                                switch(str){
+                                                    case "restaurant":
+                                                        ((ImageView)tempView.findViewById(R.id.host_image)).setImageResource(R.drawable.burger);
+                                                        break;
+                                                    case "entertainment":
+                                                        ((ImageView)tempView.findViewById(R.id.host_image)).setImageResource(R.drawable.masks);
+                                                        break;
+                                                    case "cultural":
+                                                        ((ImageView)tempView.findViewById(R.id.host_image)).setImageResource(R.drawable.painting);
+                                                        break;
+                                                    case "religious":
+                                                        ((ImageView)tempView.findViewById(R.id.host_image)).setImageResource(R.drawable.religion);
+                                                        break;
+                                                    case "outdoors":
+                                                        ((ImageView)tempView.findViewById(R.id.host_image)).setImageResource(R.drawable.outdoor);
+                                                        break;
+                                                    default:
+                                                        ((ImageView)tempView.findViewById(R.id.host_image)).setImageResource(R.drawable.ic_person_black_36dp);
+                                                }
+                                                long voteCount = (long)dataSnapshot.child("places").child("0").child("voteCount").getValue();
+                                                String location = dataSnapshot.child("places").child("0").child("name").getValue().toString();
+                                                for(com.firebase.client.DataSnapshot child : dataSnapshot.child("places").getChildren()) {
+                                                    if((long)child.child("voteCount").getValue() > voteCount){
+                                                        voteCount = (long)child.child("voteCount").getValue();
+                                                        location = child.child("name").getValue().toString();
+                                                    }
+                                                }
+                                                ((TextView) tempView.findViewById(R.id.list_location)).setText(location);
+                                                tempView.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View view) {
+                                                        String path = view.getTag().toString();
+                                                        String[] pathSplit = path.split("/");
+                                                        Log.d(TAG, Arrays.deepToString(pathSplit));
+                                                        Intent intent = new Intent(getContext(), VoteListActivity.class);
+                                                        intent.putExtra("uid", pathSplit[1]);
+                                                        intent.putExtra("path", pathSplit[3]);
+                                                        startActivity(intent);
+                                                    }
+                                                });
+                                            }
+
+                                            @Override
+                                            public void onCancelled(FirebaseError firebaseError) {
+
+                                            }
+                                        });
+                                    }
+                                };
+                                invitedEventsList.setAdapter(adapter);
                             }
-                            ((TextView) tempView.findViewById(R.id.list_location)).setText(location);
-                            tempView.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    String path = view.getTag().toString();
-                                    String[] pathSplit = path.split("/");
-                                    Log.d(TAG, Arrays.deepToString(pathSplit));
-                                    Intent intent = new Intent(getContext(), VoteListActivity.class);
-                                    intent.putExtra("uid", pathSplit[1]);
-                                    intent.putExtra("path", pathSplit[3]);
-                                    startActivity(intent);
-                                }
-                            });
-                        }
 
-                        @Override
-                        public void onCancelled(FirebaseError firebaseError) {
 
-                        }
-                    });
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+//                        if(temp == null){
+//                            temp.removeValue();
+//                        }
+                    }
                 }
-            };
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+
 
 
 //            mRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -169,7 +222,7 @@ public class EventInvitesFragment extends Fragment {
 //
 //                }
 //            });
-            invitedEventsList.setAdapter(adapter);
+
             return rootView;
         }
         return inflater.inflate(R.layout.fragment_event_invites, container, false);

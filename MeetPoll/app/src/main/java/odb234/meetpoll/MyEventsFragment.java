@@ -1,18 +1,14 @@
 package odb234.meetpoll;
 
-import android.*;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +25,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -131,6 +125,26 @@ public class MyEventsFragment extends Fragment {
                     ((TextView)v.findViewById(R.id.list_event_date)).setText(model.getEventDate());
                     ((TextView)v.findViewById(R.id.list_event_name)).setText(model.getEventName());
                     ((TextView)v.findViewById(R.id.list_location)).setText(model.getEventLocation());
+                    String str = model.getLocationType();
+                    switch(str){
+                        case "restaurant":
+                            ((ImageView)v.findViewById(R.id.host_image)).setImageResource(R.drawable.burger);
+                            break;
+                        case "entertainment":
+                            ((ImageView)v.findViewById(R.id.host_image)).setImageResource(R.drawable.masks);
+                            break;
+                        case "cultural":
+                            ((ImageView)v.findViewById(R.id.host_image)).setImageResource(R.drawable.painting);
+                            break;
+                        case "religious":
+                            ((ImageView)v.findViewById(R.id.host_image)).setImageResource(R.drawable.religion);
+                            break;
+                        case "outdoors":
+                            ((ImageView)v.findViewById(R.id.host_image)).setImageResource(R.drawable.outdoor);
+                            break;
+                        default:
+                            ((ImageView)v.findViewById(R.id.host_image)).setImageResource(R.drawable.ic_person_black_36dp);
+                    }
                     ArrayList<LocationListing> places = model.getPlaces();
                     String topLocation = places.get(0).getName();
                     int numVotes = 0;

@@ -354,7 +354,7 @@ public class ContactsListActivity extends AppCompatActivity {
                     intent.getBundleExtra("bundle").getString("time"),
                     intent.getBundleExtra("bundle").getDouble("rating"),
                     eventIndex,
-                    intent.getBundleExtra("bundle").getString("locationType"),
+                    intent.getBundleExtra("bundle").getString("mainLocationType"),
                     intent.getBundleExtra("bundle").getString("locationSubtype"),
                     places, invitees);
             eventRef.setValue(event, new Firebase.CompletionListener(){

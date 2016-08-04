@@ -83,6 +83,7 @@ public class NewEventActivity extends AppCompatActivity {
     TextView radius;
     int searchRadius;
     String locationType; //Saves location type to search for
+    String mainLocationType;
 
     public static LocationManager locMan;
     static LocationListener locationListener;
@@ -205,26 +206,31 @@ public class NewEventActivity extends AppCompatActivity {
                 switch (position) {
                     case 0:
                         ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.food_types, android.R.layout.simple_spinner_item);
+                        mainLocationType = "restaurant";
                         typeSpinner.setAdapter(typeAdapter);
                         locationType = getString(R.string.locataion_type_restaurant);
                         break;
                     case 1:
                         typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.entertainment_types, android.R.layout.simple_spinner_item);
+                        mainLocationType = "entertainment";
                         typeSpinner.setAdapter(typeAdapter);
                         locationType = getString(R.string.location_type_poi);
                         break;
                     case 2:
                         typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.cultural_types, android.R.layout.simple_spinner_item);
+                        mainLocationType = "cultural";
                         typeSpinner.setAdapter(typeAdapter);
                         locationType = getString(R.string.location_type_poi);
                         break;
                     case 3:
                         typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.religious_types, android.R.layout.simple_spinner_item);
+                        mainLocationType = "religious";
                         typeSpinner.setAdapter(typeAdapter);
                         locationType = getString(R.string.location_type_poi);
                         break;
                     case 4:
                         typeAdapter = ArrayAdapter.createFromResource(getBaseContext(), R.array.outdoor_types , android.R.layout.simple_spinner_item);
+                        mainLocationType = "outdoors";
                         typeSpinner.setAdapter(typeAdapter);
                         locationType = getString(R.string.location_type_poi);
                         break;
@@ -516,6 +522,7 @@ public class NewEventActivity extends AppCompatActivity {
         intent.putExtra("locationType", locationType);
         intent.putExtra("locationSubtype", typeSpinner.getSelectedItem().toString());
         intent.putExtra("rating", Math.floor(ratingBar.getRating()));
+        intent.putExtra("mainLocationType", mainLocationType);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling

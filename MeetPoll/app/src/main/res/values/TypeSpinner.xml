@@ -21,7 +21,6 @@
         <item>Bistro</item>
     </string-array>
     <string-array name="entertainment_types">
-        <item>Any</item>
         <item>Amusement Park</item>
         <item>Aquarium</item>
         <item>Bowling</item>
@@ -32,21 +31,18 @@
         <item>Live Music</item>
     </string-array>
     <string-array name="cultural_types">
-        <item>Any</item>
         <item>Art Gallery</item>
         <item>Museum</item>
         <item>Book Store</item>
         <item>Library</item>
     </string-array>
     <string-array name="outdoor_types">
-        <item>Any</item>
         <item>Gym</item>
         <item>Spa</item>
         <item>Park</item>
         <item>Campground</item>
     </string-array>
     <string-array name="religious_types">
-        <item>Any</item>
         <item>Church</item>
         <item>Synagogue</item>
         <item>Christian</item>
