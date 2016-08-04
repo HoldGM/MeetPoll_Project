@@ -130,8 +130,12 @@ public class VoteListActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.pick_location:
-                vote();
-                finish();
+                if(checkVote()) {
+                    vote();
+                    finish();
+                }else{
+                    Toast.makeText(this, "No selection made.", Toast.LENGTH_LONG).show();
+                }
                 return true;
             case R.id.settings:
                 Intent intent2 = new Intent(VoteListActivity.this,SettingsActivity.class);
@@ -147,6 +151,13 @@ public class VoteListActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.map_menu2, menu);
         return true;
+    }
+
+    public boolean checkVote(){
+        if(previousVote == -1)
+            return false;
+        else
+            return true;
     }
 
     public void vote(){

@@ -5,15 +5,23 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.PhoneNumberFormattingTextWatcher;
+import android.telephony.PhoneNumberUtils;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 
+import com.fasterxml.jackson.databind.util.ISO8601Utils;
 import com.firebase.client.Firebase;
+import com.github.pinball83.maskededittext.MaskedEditText;
+
+import java.util.Locale;
 
 public class ProfileActivity extends AppCompatActivity {
 
     EditText nameText;
-    EditText phoneText;
+    MaskedEditText phoneText;
     SharedPreferences sp;
     SharedPreferences.Editor editor;
     Firebase fb;
@@ -26,13 +34,14 @@ public class ProfileActivity extends AppCompatActivity {
         sp = PreferenceManager.getDefaultSharedPreferences(this);
         editor = sp.edit();
         nameText = (EditText) findViewById(R.id.profile_enter_name);
-        phoneText = (EditText) findViewById(R.id.profile_enter_phone);
+        phoneText = (MaskedEditText) findViewById(R.id.profile_enter_phone);
+
 
     }
 
     public void saveProfile(View v){
         String name = nameText.getText().toString();
-        String phone = phoneText.getText().toString();
+        String phone = phoneText.getUnmaskedText().toString();
         editor.putString("name", name);
         editor.putString("phone", phone);
         editor.apply();
@@ -42,4 +51,6 @@ public class ProfileActivity extends AppCompatActivity {
         Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
         startActivity(intent);
     }
+
+
 }

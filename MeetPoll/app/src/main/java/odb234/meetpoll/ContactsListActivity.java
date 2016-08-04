@@ -78,6 +78,7 @@ public class ContactsListActivity extends AppCompatActivity {
     DatabaseReference mRoot = FirebaseDatabase.getInstance().getReference();
     DatabaseReference mEventRef;
     private long eventIndex;
+    ProgressDialog pd;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +86,7 @@ public class ContactsListActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         sp = PreferenceManager.getDefaultSharedPreferences(this);
+        pd = new ProgressDialog(ContactsListActivity.this, ProgressDialog.STYLE_SPINNER);
         uid = sp.getString("Uid", "");
         Firebase.setAndroidContext(this);
         fdb = new Firebase("https://steadfast-leaf-137323.firebaseio.com/");
@@ -92,8 +94,6 @@ public class ContactsListActivity extends AppCompatActivity {
         contacts = new ArrayList<>();
         places = new ArrayList<>();
         ids = getIntent().getStringArrayListExtra("ids");
-        progressBar.setMax(ids.size());
-        progressBar.setProgress(0);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if(checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED)
@@ -108,8 +108,6 @@ public class ContactsListActivity extends AppCompatActivity {
         mEventRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d(TAG, "" + dataSnapshot.getChildrenCount());
-//                eventIndex = dataSnapshot.getChildrenCount();
                 for(DataSnapshot child : dataSnapshot.getChildren()){
                     if(Integer.parseInt(child.getKey()) > eventIndex)
                         eventIndex = Integer.parseInt(child.getKey());
@@ -134,8 +132,10 @@ public class ContactsListActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.send_event:
-                invitees = collectInvites();
-                new PlaceList().execute();
+                if(pd != null && !pd.isShowing()) {
+                    invitees = collectInvites();
+                    new PlaceList().execute();
+                }
                 return true;
             case R.id.settings:
                 Intent intent2 = new Intent(ContactsListActivity.this,SettingsActivity.class);
@@ -210,7 +210,6 @@ public class ContactsListActivity extends AppCompatActivity {
             View listView = inviteList.getAdapter().getView(i, null, null);
             if(((CheckBox)listView.findViewById(R.id.contact_select)).isChecked())
                 invites.add(((ContactsAdapter)inviteList.getAdapter()).getContact(i));
-//            Log.d(TAG, "Contact name: " + ((TextView)listView.findViewById(R.id.contact_name)).getText().toString());
         }
         return invites;
     }
@@ -276,10 +275,8 @@ public class ContactsListActivity extends AppCompatActivity {
     }
 
     class PlaceList extends AsyncTask<Void, Place, Void> {
-        ProgressDialog pd = new ProgressDialog(ContactsListActivity.this, ProgressDialog.STYLE_SPINNER);
         @Override
         protected void onPreExecute() {
-//            super.onPreExecute();
             pd.setMessage("Creating Event....");
             pd.setCancelable(false);
             pd.show();
@@ -320,7 +317,6 @@ public class ContactsListActivity extends AppCompatActivity {
                     double lat = resObj.getJSONObject("geometry").getJSONObject("location").getDouble("lat");
                     double lng = resObj.getJSONObject("geometry").getJSONObject("location").getDouble("lng");
                     places.add(new LocationListing(name, address, phone, rating, false, lat, lng, id));
-                    Log.d(TAG, "Name: " + name + ", Address: " + address + ", Rating: " + rating + ", ID: " + id);
                 }
             }catch(Exception e){
                 Log.e(TAG, e.toString());

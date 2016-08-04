@@ -73,13 +73,6 @@ public class MainActivity extends AppCompatActivity implements  MyEventsFragment
         tabLayout.setupWithViewPager(mViewPager);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         uid = sp.getString("Uid", "");
@@ -91,6 +84,9 @@ public class MainActivity extends AppCompatActivity implements  MyEventsFragment
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                DatePickerFragment.year = 0;
+                TimePickerFragment.min = -1;
+                TimePickerFragment.hour = -1;
                 Intent intent = new Intent(MainActivity.this, NewEventActivity.class);
                 startActivity(intent);
             }

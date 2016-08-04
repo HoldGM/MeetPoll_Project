@@ -19,8 +19,8 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
 
     private static View rootView;
     private Button mBtn;
-    private static int hour = -1;
-    private static int min = -1;
+    static int hour = -1;
+    static int min = -1;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {

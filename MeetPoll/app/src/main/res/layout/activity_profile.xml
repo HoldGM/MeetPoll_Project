@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -15,14 +16,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/splash_orange"
-        android:hint="Enter your name"/>
-    <EditText
+        android:hint="Enter your name"
+        android:singleLine="true"/>
+    <com.github.pinball83.maskededittext.MaskedEditText
         android:id="@+id/profile_enter_phone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter your phone number"
         android:backgroundTint="@color/splash_orange"
-        android:phoneNumber="true"/>
+        android:inputType="number"
+        app:mask="(***)***-****"
+        app:notMaskedSymbol="*"
+        android:digits="0123456789"/>
     <Button
         android:id="@+id/profile_save_btn"
         android:layout_width="wrap_content"
@@ -31,6 +36,7 @@
         android:text="SAVE"
         android:textColor="@android:color/white"
         android:layout_gravity="center_horizontal"
-        android:onClick="saveProfile"/>
+        android:onClick="saveProfile"
+        android:maxLength="10"/>
 
 </LinearLayout>

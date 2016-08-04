@@ -32,13 +32,14 @@
         android:layout_weight=".7"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_marginRight="5dp">
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="3dp">
 
         <TextView
             android:id="@+id/list_event_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="15dp"
+            android:textSize="18dp"
             android:text="Event Name"
             android:singleLine="true"/>
 
@@ -46,7 +47,7 @@
             android:id="@+id/list_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="15dp"
+            android:textSize="14dp"
             android:text="Location"
             android:singleLine="true"/>
         <LinearLayout
@@ -58,12 +59,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="10dp"
                 android:text="Date"
-                android:textSize="15dp"/>
+                android:textSize="14dp"/>
             <TextView
                 android:id="@+id/list_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="15dp"
+                android:textSize="14dp"
                 android:text="Time"/>
         </LinearLayout>
 
