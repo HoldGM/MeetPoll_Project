@@ -71,14 +71,14 @@ public class VoteListActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
-        path = intent.getStringExtra("eventName");
+        path = intent.getStringExtra("path");
 
         gc = new Geocoder(getApplicationContext(), Locale.ENGLISH);
 
         voteList = (ListView) findViewById(R.id.vote_list);
         places = new ArrayList<>();
         sp = PreferenceManager.getDefaultSharedPreferences(this);
-        uid = sp.getString("Uid", "");
+        uid = intent.getStringExtra("uid");
         mIdsRef = mRootRef.child(uid).child("events").child(path).child("places");
         ListAdapter adapter = new FirebaseListAdapter<LocationListing>(this, LocationListing.class, R.layout.vote_list_cell, mIdsRef) {
             @Override
@@ -171,7 +171,10 @@ public class VoteListActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for(DataSnapshot child : dataSnapshot.getChildren()){
+                            Log.d(TAG, "Child Phone: " + child.child("phone").toString());
+                            Log.d(TAG, "Preferences Phone: " + sp.getString("phone", ""));
                             if((child.child("phone").getValue().toString()).equals(sp.getString("phone",""))){
+                                Log.d(TAG, "Inside if check");
                                 if(!(boolean)child.child("voted").getValue()) {
                                     q.child("voteCount").setValue(voteCount + 1);
                                     (child.child("voted").getRef()).setValue(true);

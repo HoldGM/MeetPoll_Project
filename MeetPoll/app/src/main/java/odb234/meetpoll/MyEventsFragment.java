@@ -151,7 +151,8 @@ public class MyEventsFragment extends Fragment {
                             long k = (long) view.getTag();
                             String child_event = "" + k;
                             Intent intent = new Intent(getContext(), VoteListActivity.class);
-                            intent.putExtra("eventName", child_event);
+                            intent.putExtra("uid", sp.getString("Uid", ""));
+                            intent.putExtra("path", child_event);
                             startActivity(intent);
                         }
                     });

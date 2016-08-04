@@ -17,6 +17,7 @@
         android:layout_height="wrap_content"
         android:backgroundTint="@color/splash_orange"
         android:hint="Enter your name"
+        android:capitalize="words"
         android:singleLine="true"/>
     <com.github.pinball83.maskededittext.MaskedEditText
         android:id="@+id/profile_enter_phone"
