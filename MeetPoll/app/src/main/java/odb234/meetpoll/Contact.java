@@ -8,6 +8,7 @@ public class Contact{
     private String phone;
     private boolean safeState;
     private boolean voted;
+    private String invitePath;
 
     public Contact(){}
 
@@ -16,6 +17,7 @@ public class Contact{
         phone = p;
         safeState = s;
         voted = false;
+        invitePath = "";
     }
 
     public String getName(){
@@ -31,9 +33,11 @@ public class Contact{
     public void setState(boolean b){
         this.safeState = b;
     }
+    public String getInvitePath(){return  invitePath; }
     public void setName(String n){ this.name = n; }
     public void setPhone(String p){ this.phone = p; }
     public void setVoted(boolean v){ voted = v; }
+    public void setInvitePath(String p){ invitePath  = p; }
     public String toString(){
         return name + ", " + phone;
     }

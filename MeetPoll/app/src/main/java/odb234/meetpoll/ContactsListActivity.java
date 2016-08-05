@@ -36,6 +36,7 @@ import android.widget.Toast;
 
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.MutableData;
 import com.google.android.gms.location.places.Place;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -79,6 +80,7 @@ public class ContactsListActivity extends AppCompatActivity {
     DatabaseReference mEventRef;
     private long eventIndex;
     ProgressDialog pd;
+    long newEventIndex;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -342,70 +344,134 @@ public class ContactsListActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            pd.dismiss();
-            Intent intent = getIntent();
-
-            Firebase eventRef = fdb.child(uid).child("events").child("" + eventIndex);
-            Event event = new Event(intent.getBundleExtra("bundle").getString("hostName"),
-                    hostPhone,
-                    intent.getBundleExtra("bundle").getString("eventName"),
-                    intent.getBundleExtra("bundle").getString("eventLocation"),
-                    intent.getBundleExtra("bundle").getString("date"),
-                    intent.getBundleExtra("bundle").getString("time"),
-                    intent.getBundleExtra("bundle").getDouble("rating"),
-                    eventIndex,
-                    intent.getBundleExtra("bundle").getString("mainLocationType"),
-                    intent.getBundleExtra("bundle").getString("locationSubtype"),
-                    places, invitees);
-            eventRef.setValue(event, new Firebase.CompletionListener(){
-                @Override
-                public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                    if(firebaseError != null){
-                        Log.d(TAG, "data could not be saved: "  + firebaseError.getMessage());
-                    }else{
-                        Log.d(TAG, "Firebase worked");
-                    }
-                }
-            });
-            new sendInvites().execute(eventRef.getPath().toString());
+            new sendInvites().execute();
         }
     }
 
-    class sendInvites extends AsyncTask<String, Contact, Void> {
+    class sendInvites extends AsyncTask<Void, Contact, Void> {
         @Override
-        protected Void doInBackground(String... path) {
-            for(int i=0;i<invitees.size();i++)
-            {
-                final int finI = i;
-                final String finPath = path[0];
-                mRoot.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for(DataSnapshot child : dataSnapshot.getChildren()) {
-                            if(child.child("phone").getValue().toString().equals(invitees.get(finI).getPhone()) && !child.child("phone").getValue().toString().equals(sp.getString("phone","")))
-                            {
-                                child.child("invited-events").getRef().push().setValue(finPath);
+        protected Void doInBackground(Void... aVoid) {
+            DatabaseReference indexRef = FirebaseDatabase.getInstance().getReference().child(uid)
+
+            mRoot.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Firebase eventRef = fdb.child(uid).child("events").child("" + newEventIndex);
+                    for(DataSnapshot child : dataSnapshot.getChildren()){
+                        for(int i = 0; i < invitees.size(); i++){
+                            if(child.child("phone").getValue().toString().equals(invitees.get(i).getPhone()) && !child.child("phone").getValue().toString().equals(sp.getString("phone", ""))){
+                                DatabaseReference tempRef = child.child("invited-events").getRef().push();
+                                Log.d(TAG, "TempRef Path: " + tempRef.toString());
+                                tempRef.setValue(eventRef.getPath().toString());
+                                invitees.get(i).setInvitePath(tempRef.toString());
+                                Log.d(TAG, "Invite path: " + invitees.get(i).getInvitePath());
                                 break;
-                            }
-                            else
-                            {
-                                //send sms message
                             }
                         }
                     }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
+                    for(int i = 0; i < invitees.size(); i++){
+                        Log.d(TAG, "*****" + invitees.get(i).getInvitePath());
                     }
-                });
-            }
+
+                    Intent intent = getIntent();
+
+                    Event event = new Event(intent.getBundleExtra("bundle").getString("hostName"),
+                            hostPhone,
+                            intent.getBundleExtra("bundle").getString("eventName"),
+                            intent.getBundleExtra("bundle").getString("eventLocation"),
+                            intent.getBundleExtra("bundle").getString("date"),
+                            intent.getBundleExtra("bundle").getString("time"),
+                            intent.getBundleExtra("bundle").getDouble("rating"),
+                            eventIndex,
+                            intent.getBundleExtra("bundle").getString("mainLocationType"),
+                            intent.getBundleExtra("bundle").getString("locationSubtype"),
+                            places, invitees);
+                    eventRef.setValue(event, new Firebase.CompletionListener(){
+                        @Override
+                        public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                            if(firebaseError != null){
+                                Log.d(TAG, "data could not be saved: "  + firebaseError.getMessage());
+                            }else{
+                                Log.d(TAG, "Firebase worked");
+                            }
+                        }
+                    });
+                    pd.dismiss();
+                    startActivity(new Intent(ContactsListActivity.this, MainActivity.class));
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+//            for(int i=0;i<invitees.size();i++)
+//            {
+//                final int finI = i;
+//                final String finPath = path[0];
+//                mRoot.addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                        for(DataSnapshot child : dataSnapshot.getChildren()) {
+//                            if(child.child("phone").getValue().toString().equals(invitees.get(finI).getPhone()) && !child.child("phone").getValue().toString().equals(sp.getString("phone","")))
+//                            {
+//                                DatabaseReference tempRef = child.child("invited-events").getRef().push();
+//                                Log.d(TAG, "TempRef Path: " + tempRef.toString());
+//                                tempRef.setValue(finPath);
+//                                invitees.get(finI).setInvitePath(tempRef.toString());
+//                                Log.d(TAG, "Invite path: " + invitees.get(finI).getInvitePath());
+//                                break;
+//                            }
+//                            else
+//                            {
+//                                //send sms message
+//                            }
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(DatabaseError databaseError) {
+//
+//                    }
+//                });
+//            }
+
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            startActivity(new Intent(ContactsListActivity.this, MainActivity.class));
+
+//            for(int i = 0; i < invitees.size(); i++){
+//                Log.d(TAG, "*****" + invitees.get(i).getInvitePath());
+//            }
+//
+//            Intent intent = getIntent();
+//
+//            Firebase eventRef = fdb.child(uid).child("events").child("" + newEventIndex);
+//            Event event = new Event(intent.getBundleExtra("bundle").getString("hostName"),
+//                    hostPhone,
+//                    intent.getBundleExtra("bundle").getString("eventName"),
+//                    intent.getBundleExtra("bundle").getString("eventLocation"),
+//                    intent.getBundleExtra("bundle").getString("date"),
+//                    intent.getBundleExtra("bundle").getString("time"),
+//                    intent.getBundleExtra("bundle").getDouble("rating"),
+//                    eventIndex,
+//                    intent.getBundleExtra("bundle").getString("mainLocationType"),
+//                    intent.getBundleExtra("bundle").getString("locationSubtype"),
+//                    places, invitees);
+//            eventRef.setValue(event, new Firebase.CompletionListener(){
+//                @Override
+//                public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+//                    if(firebaseError != null){
+//                        Log.d(TAG, "data could not be saved: "  + firebaseError.getMessage());
+//                    }else{
+//                        Log.d(TAG, "Firebase worked");
+//                    }
+//                }
+//            });
+//            pd.dismiss();
+//            startActivity(new Intent(ContactsListActivity.this, MainActivity.class));
         }
     }
 

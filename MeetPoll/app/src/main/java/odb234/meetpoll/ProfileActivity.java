@@ -48,6 +48,7 @@ public class ProfileActivity extends AppCompatActivity {
         String uid = sp.getString("Uid", "");
         fb.child(uid).child("username").setValue(name);
         fb.child(uid).child("phone").setValue(phone);
+        fb.child(uid).child("eventCount").setValue(0);
         Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
         startActivity(intent);
     }

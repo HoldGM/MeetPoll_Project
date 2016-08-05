@@ -109,7 +109,7 @@ public class EventInvitesFragment extends Fragment {
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 if(!dataSnapshot.hasChildren()) {
                                     Log.d(TAG, "data is null");
-                                    (child.getRef()).removeValue();
+                                    (child.getRef()).setValue(null);
                                 }
                                 ListAdapter adapter = new FirebaseListAdapter<String>(getActivity(), String.class, R.layout.cell_view, mRef){
                                     @Override
@@ -227,6 +227,7 @@ public class EventInvitesFragment extends Fragment {
         }
         return inflater.inflate(R.layout.fragment_event_invites, container, false);
     }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(String string) {
