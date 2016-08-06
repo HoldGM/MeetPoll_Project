@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -158,6 +159,7 @@ public class MyEventsFragment extends Fragment {
                     ((TextView)v.findViewById(R.id.list_event_date)).setText(model.getEventDate());
                     ((TextView)v.findViewById(R.id.list_time)).setText(model.getEventTime());
                     final Button detailButton = (Button)v.findViewById(R.id.edit_event);
+                    Log.d(TAG, "Button Key: " + model.getKey());
                     v.setTag(model.getKey());
                     v.setOnClickListener(new View.OnClickListener() {
                         @Override

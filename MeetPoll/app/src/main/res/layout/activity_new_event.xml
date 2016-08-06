@@ -91,7 +91,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="20sp">
+        android:layout_marginTop="20sp"
+        android:paddingBottom="5dp">
         <TextView
             android:layout_width="0sp"
             android:layout_weight=".2"
@@ -112,9 +113,9 @@
             android:layout_weight=".25"
             android:layout_height="wrap_content"
             android:paddingLeft="@dimen/button_margin"
-            android:text ="0 mi"
+            android:text ="Any"
             android:textSize="@dimen/event_text_size"
-            android:id="@+id/radius_value"/>
+            android:id="@+id/radius_value" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"

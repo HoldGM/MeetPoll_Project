@@ -107,6 +107,18 @@ public class ContactsListActivity extends AppCompatActivity {
         }
 
         mEventRef = mRoot.child(uid).child("events");
+        mRoot.child(uid).child("eventCount").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                newEventIndex = (long)dataSnapshot.getValue();
+                dataSnapshot.getRef().setValue(newEventIndex + 1);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         mEventRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -351,7 +363,7 @@ public class ContactsListActivity extends AppCompatActivity {
     class sendInvites extends AsyncTask<Void, Contact, Void> {
         @Override
         protected Void doInBackground(Void... aVoid) {
-            DatabaseReference indexRef = FirebaseDatabase.getInstance().getReference().child(uid)
+            DatabaseReference indexRef = FirebaseDatabase.getInstance().getReference().child(uid);
 
             mRoot.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override

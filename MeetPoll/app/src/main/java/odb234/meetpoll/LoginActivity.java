@@ -74,9 +74,11 @@ public class LoginActivity extends AppCompatActivity {
                         (fb.child(user.getUid())).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                editor.putString("phone", dataSnapshot.child("phone").getValue().toString());
-                                editor.putString("name", dataSnapshot.child("username").getValue().toString());
-                                editor.apply();
+                                if(dataSnapshot.hasChildren()) {
+                                    editor.putString("phone", dataSnapshot.child("phone").getValue().toString());
+                                    editor.putString("name", dataSnapshot.child("username").getValue().toString());
+                                    editor.apply();
+                                }
                             }
 
                             @Override

@@ -105,6 +105,7 @@ public class EventDetailFragment extends Fragment implements GoogleApiClient.OnC
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         markers = new ArrayList<>();
+        Log.d(TAG, "mParam1: " + mParam1 + ", mParam2: " + mParam2);
         if(mParam1 != null  && mParam2 != null) {
             final View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
@@ -192,7 +193,7 @@ public class EventDetailFragment extends Fragment implements GoogleApiClient.OnC
             directionView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q="+((TextView)rootView.findViewById(R.id.details_location_address)).getText().toString()));
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q="+((TextView)rootView.findViewById(R.id.details_location_address)).getText().toString()));
                     startActivity(intent);
                 }
             });

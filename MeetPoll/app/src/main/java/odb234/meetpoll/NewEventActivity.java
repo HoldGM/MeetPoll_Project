@@ -136,7 +136,11 @@ public class NewEventActivity extends AppCompatActivity {
         radiusSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                radius.setText(String.valueOf(i / 4.0 + " mi"));
+                if (i == 0) {
+                    radius.setText("Any");
+                }else {
+                    radius.setText(String.valueOf(i / 4.0 + " mi"));
+                }
                 searchRadius = (int) Math.floor((i / 4.0) * 1609);
                 Log.d(tag, "Search radius in meters: " + searchRadius);
             }
