@@ -1,17 +1,25 @@
 package odb234.meetpoll;
 
+import android.app.DatePickerDialog;
+import android.app.DialogFragment;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -35,6 +43,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 
 
 /**
@@ -45,7 +55,7 @@ import java.util.ArrayList;
  * Use the {@link EventDetailFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class EventDetailFragment extends Fragment implements GoogleApiClient.OnConnectionFailedListener  {
+public class EventDetailFragment extends Fragment implements GoogleApiClient.OnConnectionFailedListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -67,6 +77,10 @@ public class EventDetailFragment extends Fragment implements GoogleApiClient.OnC
 
     RelativeLayout callView;
     RelativeLayout directionView;
+    ImageButton editDateBtn;
+    ImageButton editTimeBtn;
+    TextView dateText;
+    TextView timeText;
 
     public EventDetailFragment() {
         // Required empty public constructor
@@ -97,7 +111,6 @@ public class EventDetailFragment extends Fragment implements GoogleApiClient.OnC
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
     }
 
     @Override
@@ -108,24 +121,30 @@ public class EventDetailFragment extends Fragment implements GoogleApiClient.OnC
         Log.d(TAG, "mParam1: " + mParam1 + ", mParam2: " + mParam2);
         if(mParam1 != null  && mParam2 != null) {
             final View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+            editDateBtn = (ImageButton)rootView.findViewById(R.id.event_detail_edit_date);
+            editTimeBtn = (ImageButton)rootView.findViewById(R.id.event_detail_edit_time);
+            dateText = (TextView)rootView.findViewById(R.id.detail_event_date);
+            timeText = (TextView)rootView.findViewById(R.id.detail_event_time);
+
+
 
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(mParam1).child("events").child(mParam2).child("places");
-            ref.addValueEventListener(new ValueEventListener() {
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     DataSnapshot topLocation = dataSnapshot.child("0");
-                    for(DataSnapshot child : dataSnapshot.getChildren()){
-                        if(child.child("voteCount").getValue(int.class) > topLocation.child("voteCount").getValue(int.class)){
+                    for (DataSnapshot child : dataSnapshot.getChildren()) {
+                        if (child.child("voteCount").getValue(int.class) > topLocation.child("voteCount").getValue(int.class)) {
                             topLocation = child;
                         }
                     }
-                    topMarker = new MapMarker(new LatLng((double) topLocation.child("lat").getValue(), (double) topLocation.child("lng").getValue()),topLocation.child("name").getValue().toString());
-                    ((TextView)rootView.findViewById(R.id.details_location_name)).setText(topLocation.child("name").getValue().toString());
-                    ((TextView)rootView.findViewById(R.id.details_location_address)).setText(topLocation.child("address").getValue().toString());
-                    ((TextView)rootView.findViewById(R.id.details_location_phone)).setText(topLocation.child("phone").getValue().toString());
-                    for(DataSnapshot child : dataSnapshot.getChildren()){
-                        if(!child.child("address").toString().equals(topLocation.child("address").toString())){
-                            markers.add(new MapMarker(new LatLng((double)child.child("lat").getValue(), (double)child.child("lng").getValue()), child.child("name").getValue().toString()));
+                    topMarker = new MapMarker(new LatLng((double) topLocation.child("lat").getValue(), (double) topLocation.child("lng").getValue()), topLocation.child("name").getValue().toString());
+                    ((TextView) rootView.findViewById(R.id.details_location_name)).setText(topLocation.child("name").getValue().toString());
+                    ((TextView) rootView.findViewById(R.id.details_location_address)).setText(topLocation.child("address").getValue().toString());
+                    ((TextView) rootView.findViewById(R.id.details_location_phone)).setText(topLocation.child("phone").getValue().toString());
+                    for (DataSnapshot child : dataSnapshot.getChildren()) {
+                        if (!child.child("address").toString().equals(topLocation.child("address").toString())) {
+                            markers.add(new MapMarker(new LatLng((double) child.child("lat").getValue(), (double) child.child("lng").getValue()), child.child("name").getValue().toString()));
                         }
                     }
                 }
@@ -138,10 +157,12 @@ public class EventDetailFragment extends Fragment implements GoogleApiClient.OnC
             (ref.getParent()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    Log.d(TAG, dataSnapshot.child("eventDate").getValue().toString());
-                    Log.d(TAG, dataSnapshot.child("eventTime").getValue().toString());
-                    ((TextView) rootView.findViewById(R.id.detail_event_date)).setText(dataSnapshot.child("eventDate").getValue().toString());
-                    ((TextView) rootView.findViewById(R.id.detail_event_time)).setText(dataSnapshot.child("eventTime").getValue().toString());
+                    if(dataSnapshot.hasChildren()) {
+                        Log.d(TAG, dataSnapshot.child("eventDate").getValue().toString());
+                        Log.d(TAG, dataSnapshot.child("eventTime").getValue().toString());
+                        ((TextView) rootView.findViewById(R.id.detail_event_date)).setText(dataSnapshot.child("eventDate").getValue().toString());
+                        ((TextView) rootView.findViewById(R.id.detail_event_time)).setText(dataSnapshot.child("eventTime").getValue().toString());
+                    }
 
                 }
 
@@ -193,15 +214,64 @@ public class EventDetailFragment extends Fragment implements GoogleApiClient.OnC
             directionView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q="+((TextView)rootView.findViewById(R.id.details_location_address)).getText().toString()));
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=" + ((TextView) rootView.findViewById(R.id.details_location_address)).getText().toString()));
                     startActivity(intent);
                 }
             });
-
+            if(!mParam1.equals(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("Uid", "")))
+            {
+                editDateBtn.setVisibility(View.GONE);
+                editTimeBtn.setVisibility(View.GONE);
+            }else {
+                setButtonListeners();
+            }
             return rootView;
         }
         return inflater.inflate(R.layout.fragment_detail, container, false);
     }
+
+    public void setButtonListeners(){
+
+        editDateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String[] date = dateText.getText().toString().split("/");
+                DatePickerDialog dpd = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener(){
+                    @Override
+                    public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+                        FirebaseDatabase.getInstance().getReference().child(mParam1).child("events").child(mParam2).child("eventDate").setValue((i1+1) + "/" + i2 + "/" + i);
+                    }
+                },Integer.parseInt(date[2]),Integer.parseInt(date[0])-1,Integer.parseInt(date[1]));
+                dpd.show();
+            }
+        });
+        editTimeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String[] time = timeText.getText().toString().split(":|\\s+");
+                int hour = Integer.parseInt(time[0]);
+                int min = Integer.parseInt(time[1]);
+                String amPm = time[2];
+
+                hour = (amPm.equals("AM"))? hour : hour + 12;
+                if(hour == 12 && amPm.equals("AM"))
+                    hour = 0;
+
+                TimePickerDialog tpd = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener(){
+                    @Override
+                    public void onTimeSet(TimePicker timePicker, int i, int i1) {
+                        String amPm = (i >= 12) ? "PM": "AM";
+                        i = (i > 12)? i % 12 : i;
+                        if(i == 0)
+                            i = 12;
+                        FirebaseDatabase.getInstance().getReference().child(mParam1).child("events").child(mParam2).child("eventTime").setValue(i + ":" + i1 + " " + amPm);
+                    }
+                }, hour, min, false);
+                tpd.show();
+            }
+        });
+    }
+
 
     @Override
     public void onResume() {

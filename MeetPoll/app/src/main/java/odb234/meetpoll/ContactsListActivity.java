@@ -69,7 +69,6 @@ public class ContactsListActivity extends AppCompatActivity {
     boolean asyncFinished;
     ListAdapter la;
     String hostPhone;
-    ProgressBar progressBar;
     private static final String TAG = "Contact List Activity";
     SharedPreferences sp;
     String uid;
@@ -78,7 +77,6 @@ public class ContactsListActivity extends AppCompatActivity {
     Firebase fdb;
     DatabaseReference mRoot = FirebaseDatabase.getInstance().getReference();
     DatabaseReference mEventRef;
-    private long eventIndex;
     ProgressDialog pd;
     long newEventIndex;
     @Override
@@ -119,24 +117,6 @@ public class ContactsListActivity extends AppCompatActivity {
 
             }
         });
-        mEventRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot child : dataSnapshot.getChildren()){
-                    if(Integer.parseInt(child.getKey()) > eventIndex)
-                        eventIndex = Integer.parseInt(child.getKey());
-                }
-                if(dataSnapshot.getChildrenCount() != 0)
-                    eventIndex++;
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -394,7 +374,7 @@ public class ContactsListActivity extends AppCompatActivity {
                             intent.getBundleExtra("bundle").getString("date"),
                             intent.getBundleExtra("bundle").getString("time"),
                             intent.getBundleExtra("bundle").getDouble("rating"),
-                            eventIndex,
+                            newEventIndex,
                             intent.getBundleExtra("bundle").getString("mainLocationType"),
                             intent.getBundleExtra("bundle").getString("locationSubtype"),
                             places, invitees);
@@ -417,73 +397,13 @@ public class ContactsListActivity extends AppCompatActivity {
 
                 }
             });
-//            for(int i=0;i<invitees.size();i++)
-//            {
-//                final int finI = i;
-//                final String finPath = path[0];
-//                mRoot.addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(DataSnapshot dataSnapshot) {
-//                        for(DataSnapshot child : dataSnapshot.getChildren()) {
-//                            if(child.child("phone").getValue().toString().equals(invitees.get(finI).getPhone()) && !child.child("phone").getValue().toString().equals(sp.getString("phone","")))
-//                            {
-//                                DatabaseReference tempRef = child.child("invited-events").getRef().push();
-//                                Log.d(TAG, "TempRef Path: " + tempRef.toString());
-//                                tempRef.setValue(finPath);
-//                                invitees.get(finI).setInvitePath(tempRef.toString());
-//                                Log.d(TAG, "Invite path: " + invitees.get(finI).getInvitePath());
-//                                break;
-//                            }
-//                            else
-//                            {
-//                                //send sms message
-//                            }
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(DatabaseError databaseError) {
-//
-//                    }
-//                });
-//            }
+
 
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-
-//            for(int i = 0; i < invitees.size(); i++){
-//                Log.d(TAG, "*****" + invitees.get(i).getInvitePath());
-//            }
-//
-//            Intent intent = getIntent();
-//
-//            Firebase eventRef = fdb.child(uid).child("events").child("" + newEventIndex);
-//            Event event = new Event(intent.getBundleExtra("bundle").getString("hostName"),
-//                    hostPhone,
-//                    intent.getBundleExtra("bundle").getString("eventName"),
-//                    intent.getBundleExtra("bundle").getString("eventLocation"),
-//                    intent.getBundleExtra("bundle").getString("date"),
-//                    intent.getBundleExtra("bundle").getString("time"),
-//                    intent.getBundleExtra("bundle").getDouble("rating"),
-//                    eventIndex,
-//                    intent.getBundleExtra("bundle").getString("mainLocationType"),
-//                    intent.getBundleExtra("bundle").getString("locationSubtype"),
-//                    places, invitees);
-//            eventRef.setValue(event, new Firebase.CompletionListener(){
-//                @Override
-//                public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-//                    if(firebaseError != null){
-//                        Log.d(TAG, "data could not be saved: "  + firebaseError.getMessage());
-//                    }else{
-//                        Log.d(TAG, "Firebase worked");
-//                    }
-//                }
-//            });
-//            pd.dismiss();
-//            startActivity(new Intent(ContactsListActivity.this, MainActivity.class));
         }
     }
 

@@ -36,11 +36,12 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
         mBtn = (Button) rootView.findViewById(R.id.event_time);
         hour = hourOfDay;
         min = minute;
-        String t = "AM";
+        String t = (hourOfDay >= 12)?"PM" : "AM";
         if(hourOfDay > 12) {
-            t = "PM";
             hourOfDay = hourOfDay%12;
         }
+        if(hourOfDay == 0)
+            hourOfDay = 12;
 
         mBtn.setText(String.format("%d:%02d %s",hourOfDay,minute,t));
     }

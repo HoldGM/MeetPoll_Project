@@ -41,9 +41,9 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:label="@string/title_activity_main"
+            android:label="MeetPoll Events"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="com.topitideas.splashscreen.MainActivity" />
 
@@ -105,8 +105,10 @@
             android:label="@string/title_activity_event_details"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
-        <activity android:name=".ProfileActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ProfileActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".AddContactActivity"></activity>
     </application>
 
 </manifest>

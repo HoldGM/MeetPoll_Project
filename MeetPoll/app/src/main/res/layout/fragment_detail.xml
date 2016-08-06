@@ -120,9 +120,16 @@
         <TextView
             android:id="@+id/detail_event_date"
             android:layout_width="0dp"
-            android:layout_weight=".8"
+            android:layout_weight=".7"
             android:layout_height="wrap_content"
             android:hint="Event Date"/>
+        <ImageButton
+            android:id="@+id/event_detail_edit_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_mode_edit_black_18dp"
+            android:background="@android:color/transparent"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"/>
     </LinearLayout>
     <View
         android:layout_width="match_parent"
@@ -145,9 +152,17 @@
         <TextView
             android:id="@+id/detail_event_time"
             android:layout_width="0dp"
-            android:layout_weight=".8"
+            android:layout_weight=".7"
             android:layout_height="wrap_content"
             android:hint="Event Time"/>
+        <ImageButton
+            android:id="@+id/event_detail_edit_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_mode_edit_black_18dp"
+            android:background="@android:color/transparent"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"/>
+
     </LinearLayout>
     <View
         android:layout_width="match_parent"

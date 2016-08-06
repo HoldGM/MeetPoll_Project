@@ -107,10 +107,6 @@ public class EventInvitesFragment extends Fragment {
                         temp.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                if(!dataSnapshot.hasChildren()) {
-                                    Log.d(TAG, "data is null");
-                                    (child.getRef()).setValue(null);
-                                }
                                 ListAdapter adapter = new FirebaseListAdapter<String>(getActivity(), String.class, R.layout.cell_view, mRef){
                                     @Override
                                     protected void populateView(View v, String model, int position) {
@@ -120,51 +116,67 @@ public class EventInvitesFragment extends Fragment {
                                         tempBase.addValueEventListener(new com.firebase.client.ValueEventListener() {
                                             @Override
                                             public void onDataChange(com.firebase.client.DataSnapshot dataSnapshot) {
-                                                ((TextView) tempView.findViewById(R.id.list_event_host)).setText(dataSnapshot.child("hostName").getValue().toString());
-                                                ((TextView) tempView.findViewById(R.id.list_event_date)).setText(dataSnapshot.child("eventDate").getValue().toString());
-                                                ((TextView) tempView.findViewById(R.id.list_event_name)).setText(dataSnapshot.child("eventName").getValue().toString());
-                                                ((TextView) tempView.findViewById(R.id.list_time)).setText(dataSnapshot.child("eventTime").getValue().toString());
-                                                String str = dataSnapshot.child("locationType").getValue().toString();
-                                                switch(str){
-                                                    case "restaurant":
-                                                        ((ImageView)tempView.findViewById(R.id.host_image)).setImageResource(R.drawable.burger);
-                                                        break;
-                                                    case "entertainment":
-                                                        ((ImageView)tempView.findViewById(R.id.host_image)).setImageResource(R.drawable.masks);
-                                                        break;
-                                                    case "cultural":
-                                                        ((ImageView)tempView.findViewById(R.id.host_image)).setImageResource(R.drawable.painting);
-                                                        break;
-                                                    case "religious":
-                                                        ((ImageView)tempView.findViewById(R.id.host_image)).setImageResource(R.drawable.religion);
-                                                        break;
-                                                    case "outdoors":
-                                                        ((ImageView)tempView.findViewById(R.id.host_image)).setImageResource(R.drawable.outdoor);
-                                                        break;
-                                                    default:
-                                                        ((ImageView)tempView.findViewById(R.id.host_image)).setImageResource(R.drawable.ic_person_black_36dp);
-                                                }
-                                                long voteCount = (long)dataSnapshot.child("places").child("0").child("voteCount").getValue();
-                                                String location = dataSnapshot.child("places").child("0").child("name").getValue().toString();
-                                                for(com.firebase.client.DataSnapshot child : dataSnapshot.child("places").getChildren()) {
-                                                    if((long)child.child("voteCount").getValue() > voteCount){
-                                                        voteCount = (long)child.child("voteCount").getValue();
-                                                        location = child.child("name").getValue().toString();
+                                                if(dataSnapshot.hasChildren()) {
+                                                    ((TextView) tempView.findViewById(R.id.list_event_host)).setText(dataSnapshot.child("hostName").getValue().toString());
+                                                    ((TextView) tempView.findViewById(R.id.list_event_date)).setText(dataSnapshot.child("eventDate").getValue().toString());
+                                                    ((TextView) tempView.findViewById(R.id.list_event_name)).setText(dataSnapshot.child("eventName").getValue().toString());
+                                                    ((TextView) tempView.findViewById(R.id.list_time)).setText(dataSnapshot.child("eventTime").getValue().toString());
+                                                    String str = dataSnapshot.child("locationType").getValue().toString();
+                                                    switch (str) {
+                                                        case "restaurant":
+                                                            ((ImageView) tempView.findViewById(R.id.host_image)).setImageResource(R.drawable.burger);
+                                                            break;
+                                                        case "entertainment":
+                                                            ((ImageView) tempView.findViewById(R.id.host_image)).setImageResource(R.drawable.masks);
+                                                            break;
+                                                        case "cultural":
+                                                            ((ImageView) tempView.findViewById(R.id.host_image)).setImageResource(R.drawable.painting);
+                                                            break;
+                                                        case "religious":
+                                                            ((ImageView) tempView.findViewById(R.id.host_image)).setImageResource(R.drawable.religion);
+                                                            break;
+                                                        case "outdoors":
+                                                            ((ImageView) tempView.findViewById(R.id.host_image)).setImageResource(R.drawable.outdoor);
+                                                            break;
+                                                        default:
+                                                            ((ImageView) tempView.findViewById(R.id.host_image)).setImageResource(R.drawable.ic_person_black_36dp);
                                                     }
-                                                }
-                                                ((TextView) tempView.findViewById(R.id.list_location)).setText(location);
-                                                tempView.setOnClickListener(new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View view) {
-                                                        String path = view.getTag().toString();
-                                                        String[] pathSplit = path.split("/");
-                                                        Log.d(TAG, Arrays.deepToString(pathSplit));
-                                                        Intent intent = new Intent(getContext(), VoteListActivity.class);
-                                                        intent.putExtra("uid", pathSplit[1]);
-                                                        intent.putExtra("path", pathSplit[3]);
-                                                        startActivity(intent);
+                                                    long voteCount = (long) dataSnapshot.child("places").child("0").child("voteCount").getValue();
+                                                    String location = dataSnapshot.child("places").child("0").child("name").getValue().toString();
+                                                    for (com.firebase.client.DataSnapshot child : dataSnapshot.child("places").getChildren()) {
+                                                        if ((long) child.child("voteCount").getValue() > voteCount) {
+                                                            voteCount = (long) child.child("voteCount").getValue();
+                                                            location = child.child("name").getValue().toString();
+                                                        }
                                                     }
-                                                });
+                                                    Button detailBtn = (Button) tempView.findViewById(R.id.edit_event);
+                                                    detailBtn.setTag(tempView.getTag());
+                                                    detailBtn.setOnClickListener(new View.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(View view) {
+                                                            String path = view.getTag().toString();
+                                                            String[] pathSplit = path.split("/");
+                                                            Log.d(TAG, Arrays.deepToString(pathSplit));
+                                                            Intent intent = new Intent(getContext(), EventDetailsActivity.class);
+                                                            intent.putExtra("uid", pathSplit[1]);
+                                                            intent.putExtra("path", pathSplit[3]);
+                                                            startActivity(intent);
+                                                        }
+                                                    });
+                                                    ((TextView) tempView.findViewById(R.id.list_location)).setText(location);
+                                                    tempView.setOnClickListener(new View.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(View view) {
+                                                            String path = view.getTag().toString();
+                                                            String[] pathSplit = path.split("/");
+                                                            Log.d(TAG, Arrays.deepToString(pathSplit));
+                                                            Intent intent = new Intent(getContext(), VoteListActivity.class);
+                                                            intent.putExtra("uid", pathSplit[1]);
+                                                            intent.putExtra("path", pathSplit[3]);
+                                                            startActivity(intent);
+                                                        }
+                                                    });
+                                                }
                                             }
 
                                             @Override
@@ -184,9 +196,6 @@ public class EventInvitesFragment extends Fragment {
 
                             }
                         });
-//                        if(temp == null){
-//                            temp.removeValue();
-//                        }
                     }
                 }
 
@@ -196,32 +205,6 @@ public class EventInvitesFragment extends Fragment {
                 }
             });
 
-
-
-
-//            mRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    ArrayList<String> tempArr = new ArrayList<String>();
-//                    for(DataSnapshot child : dataSnapshot.getChildren()){
-//                        Log.d(TAG, child.getValue().toString());
-//                        if((new Firebase(getString(R.string.firebase_path) + child.getValue().toString())) == null) {
-//                            Firebase fb = new Firebase(child.toString());
-//                            fb.removeValue();
-//                            continue;
-//                        }else {
-//                            tempArr.add(child.getValue().toString());
-//                        }
-//                    }
-//                    ListAdapter adapter = new InviteListAdapter(getContext(), tempArr);
-//                    invitedEventsList.setAdapter(adapter);
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//
-//                }
-//            });
 
             return rootView;
         }
@@ -260,80 +243,5 @@ public class EventInvitesFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onEventInvitesFragmentInteraction(String string);
-    }
-
-    public class InviteListAdapter extends BaseAdapter{
-        ArrayList<String> list;
-        LayoutInflater inflater;
-        public InviteListAdapter(Context context, ArrayList<String> l){
-            list = l;
-            inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return list.get(i);
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return i;
-        }
-
-        @Override
-        public int getCount() {
-            return list.size();
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-
-            View currentView = view;
-            if(currentView == null){
-                currentView = inflater.inflate(R.layout.cell_view, viewGroup, false);
-            }
-            final Firebase tempBase = new Firebase(getString(R.string.firebase_path) + list.get(i));
-            Log.d(TAG, tempBase.toString());
-            currentView.setTag(tempBase.toString());
-            final View replacementView = currentView;
-            Log.d(TAG, "Replacement View Tag: " + replacementView.getTag().toString());
-            tempBase.addValueEventListener(new com.firebase.client.ValueEventListener() {
-                @Override
-                public void onDataChange(com.firebase.client.DataSnapshot dataSnapshot) {
-
-                    ((TextView) replacementView.findViewById(R.id.list_event_name)).setText(dataSnapshot.child("eventName").getValue().toString());
-                    ((TextView) replacementView.findViewById(R.id.list_event_date)).setText(dataSnapshot.child("eventDate").getValue().toString());
-                    ((TextView) replacementView.findViewById(R.id.list_time)).setText(dataSnapshot.child("eventTime").getValue().toString());
-                    ((TextView) replacementView.findViewById(R.id.list_event_host)).setText(dataSnapshot.child("hostName").getValue().toString());
-                    long votes = (long) dataSnapshot.child("places").child("0").child("voteCount").getValue();
-                    String location = dataSnapshot.child("places").child("0").child("name").getValue().toString();
-
-                    for (com.firebase.client.DataSnapshot child : dataSnapshot.child("places").getChildren()) {
-                        if ((long) child.child("voteCount").getValue() > votes) {
-                            votes = (long) child.child("voteCount").getValue();
-                            location = child.child("name").getValue().toString();
-                        }
-                    }
-                    ((TextView) replacementView.findViewById(R.id.list_location)).setText(location);
-
-                }
-
-                @Override
-                public void onCancelled(FirebaseError firebaseError) {
-
-                }
-            });
-            Button detailBtn = (Button)replacementView.findViewById(R.id.edit_event);
-            detailBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    String path = view.getTag().toString();
-                    Log.d(TAG, path);
-                    Intent intent = new Intent(getContext(), EventDetailsActivity.class);
-                    intent.putExtra("fullPath", path);
-                }
-            });
-            return replacementView;
-        }
     }
 }

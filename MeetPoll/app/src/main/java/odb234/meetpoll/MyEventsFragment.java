@@ -178,6 +178,7 @@ public class MyEventsFragment extends Fragment {
                         public void onClick(View view) {
                             long k = (long) view.getTag();
                             Intent intent = new Intent(getContext(), EventDetailsActivity.class);
+                            intent.putExtra("uid", sp.getString("Uid", ""));
                             intent.putExtra("path", "" + k);
                             startActivity(intent);
                         }

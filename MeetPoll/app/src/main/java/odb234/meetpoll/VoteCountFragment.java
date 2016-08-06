@@ -89,7 +89,7 @@ public class VoteCountFragment extends Fragment {
             voteList = new ArrayList<LocationListing>();
             Query ref = FirebaseDatabase.getInstance().getReference().child(mParam1).child("events").child(mParam2).child("places").orderByChild("voteCount");
 
-            ref.addValueEventListener(new ValueEventListener() {
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     voteList = new ArrayList<LocationListing>();

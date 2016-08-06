@@ -1,5 +1,7 @@
 package odb234.meetpoll;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -24,9 +26,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -61,6 +65,7 @@ public class EventDetailsActivity extends AppCompatActivity implements InviteFra
     private TabLayout tabLayout;
     private ListView inviteList;
     String uid;
+    String path;
 
     DatabaseReference dbRef;
 
@@ -90,8 +95,8 @@ public class EventDetailsActivity extends AppCompatActivity implements InviteFra
             }
         });
 
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        uid = sp.getString("Uid", "");
+        uid = getIntent().getStringExtra("uid");
+        path = getIntent().getStringExtra("path");
         dbRef = FirebaseDatabase.getInstance().getReference().child(uid).child("events").child(getIntent().getStringExtra("path"));
         Log.d(TAG, dbRef.toString());
         dbRef.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
@@ -114,16 +119,20 @@ public class EventDetailsActivity extends AppCompatActivity implements InviteFra
 
     public void setupViewPager(ViewPager viewPager){
         SectionsPagerAdapter adapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment((new EventDetailFragment()).newInstance(uid, getIntent().getStringExtra("path")), "Detail");
-        adapter.addFragment((new InviteFragment()).newInstance(uid, getIntent().getStringExtra("path")), "Invite");
-        adapter.addFragment((new VoteCountFragment()).newInstance(uid, getIntent().getStringExtra("path")), "Poll Results");
+        adapter.addFragment((new EventDetailFragment()).newInstance(uid, path), "Detail");
+        adapter.addFragment((new InviteFragment()).newInstance(uid, path), "Invite");
+        adapter.addFragment((new VoteCountFragment()).newInstance(uid, path), "Poll Results");
         viewPager.setAdapter(adapter);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main_menu, menu);
+        if(PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("Uid","").equals(uid)) {
+            getMenuInflater().inflate(R.menu.event_detail_menu, menu);
+        }else {
+            getMenuInflater().inflate(R.menu.main_menu, menu);
+        }
         return true;
     }
 
@@ -144,8 +153,58 @@ public class EventDetailsActivity extends AppCompatActivity implements InviteFra
             case android.R.id.home:
                 finish();
                 return true;
+            case R.id.delete_event:
+                deleteDialog();
+                Log.d(TAG, "Delete Event Pressed");
+                return true;
+            case R.id.add_contact:
+                intent = new Intent(this, AddContactActivity.class);
+                intent.putExtra("path", path);
+                startActivity(intent);
+                Log.d(TAG, "Add Contact Pressed");
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void deleteDialog(){
+        final AlertDialog.Builder deleteDialog = new AlertDialog.Builder(this);
+
+        deleteDialog.setTitle("Delete Event");
+        deleteDialog.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                onDeleteConfirmed();
+                dialogInterface.dismiss();
+                finish();
+            }
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        deleteDialog.show();
+    }
+    public void onDeleteConfirmed(){
+        DatabaseReference inviteRef = dbRef.child("inviteList");
+        inviteRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+                for(com.google.firebase.database.DataSnapshot child : dataSnapshot.getChildren()){
+                    if(!child.child("invitePath").getValue().toString().equals("")){
+                        Firebase tempRef = new Firebase(child.child("invitePath").getValue().toString());
+                        tempRef.setValue(null);
+                    }
+                }
+                dbRef.setValue(null);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
