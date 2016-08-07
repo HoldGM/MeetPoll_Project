@@ -40,6 +40,7 @@ public class AddContactActivity extends AppCompatActivity {
 
     private final static String TAG = "Add Contact Activity";
     ListView inviteList;
+    ArrayList<Contact> invitees;
     ArrayList<Contact> contacts;
     ContentResolver cr;
     ListAdapter la;
@@ -152,6 +153,15 @@ public class AddContactActivity extends AppCompatActivity {
         return true;
     }
 
+    private void collectInvites(){
+        int listCount = inviteList.getAdapter().getCount();
+        invitees = new ArrayList<>();
+        for(int i = 0; i< listCount; i++){
+            View listView = inviteList.getAdapter().getView(i, null, null);
+            if(((CheckBox)listView.findViewById(R.id.contact_select)).isChecked())
+                invitees.add(((ContactsAdapter)inviteList.getAdapter()).getContact(i));
+        }
+    }
 
     private void sendNewInvites(){
         final DatabaseReference lRef = mRef.child((PreferenceManager.getDefaultSharedPreferences(this).getString("Uid", ""))).child("events").child(path).child("inviteList");
@@ -159,12 +169,13 @@ public class AddContactActivity extends AppCompatActivity {
         lRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                collectInvites();
                 long count = dataSnapshot.getChildrenCount();
-                for(int i = 0; i < contacts.size(); i++) {
+                for(int i = 0; i < invitees.size(); i++) {
                     boolean alreadyInvited = false;
                     final int finI = i;
                     for (DataSnapshot child : dataSnapshot.getChildren()) {
-                        if (child.child("phone").getValue().toString().equals(contacts.get(i).getPhone())) {
+                        if (child.child("phone").getValue().toString().equals(invitees.get(i).getPhone())) {
                             alreadyInvited = true;
                             break;
                         }
@@ -176,11 +187,11 @@ public class AddContactActivity extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                    if(child.child("phone").getValue().toString().equals(contacts.get(finI))) {
+                                    if(child.child("phone").getValue().toString().equals(invitees.get(finI))) {
                                         DatabaseReference t = child.child("invited-events").getRef().push();
                                         t.setValue("/" + sp.getString("Uid", "") + "/events/" + path);
-                                        contacts.get(finI).setInvitePath(t.toString());
-                                        lRef.child("" + c).setValue(contacts.get(finI));
+                                        invitees.get(finI).setInvitePath(t.toString());
+                                        lRef.child("" + c).setValue(invitees.get(finI));
                                     }
                                 }
 

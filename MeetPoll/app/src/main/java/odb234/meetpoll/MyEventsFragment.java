@@ -104,10 +104,10 @@ public class MyEventsFragment extends Fragment {
                 requestPermissions(new String[]{Manifest.permission.INTERNET}, 10);
             }
 
-            mRoot.addValueEventListener(new ValueEventListener() {
+            mRoot.getParent().child("eventCount").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (!dataSnapshot.hasChildren()) {
+                    if ((long)dataSnapshot.getValue() == 0) {
                         newUser.setVisibility(View.VISIBLE);
                     } else {
                         newUser.setVisibility(View.GONE);
