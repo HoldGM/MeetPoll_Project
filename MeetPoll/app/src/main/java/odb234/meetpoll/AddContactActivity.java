@@ -27,7 +27,9 @@ import android.widget.CompoundButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.firebase.client.Firebase;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,6 +37,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class AddContactActivity extends AppCompatActivity {
 
@@ -102,18 +105,22 @@ public class AddContactActivity extends AppCompatActivity {
             }
         }while(cur.moveToNext());
 
+        la = new ContactsAdapter(this, contacts);
+        inviteList.setAdapter(la);
         DatabaseReference lRef = mRef.child((PreferenceManager.getDefaultSharedPreferences(this).getString("Uid", ""))).child("events").child(path).child("inviteList");
 
         lRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot child : dataSnapshot.getChildren()){
-                    for(int i = 0; i < contacts.size(); i++){
-                        if(child.child("phone").getValue().toString().equals(contacts.get(i).getPhone())){
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                    for (int i = 0; i < contacts.size(); i++) {
+                        if (child.child("phone").getValue().toString().equals(contacts.get(i).getPhone())) {
                             contacts.get(i).setState(true);
                         }
                     }
                 }
+                ((ContactsAdapter)inviteList.getAdapter()).newList(contacts);
+                inviteList.setAdapter(la);
             }
 
             @Override
@@ -123,8 +130,6 @@ public class AddContactActivity extends AppCompatActivity {
         });
 
         Log.d(TAG, "Contacts List size: " + contacts.size());
-        la = new ContactsAdapter(this, contacts);
-        inviteList.setAdapter(la);
     }
 
     @Override
@@ -159,12 +164,13 @@ public class AddContactActivity extends AppCompatActivity {
         for(int i = 0; i< listCount; i++){
             View listView = inviteList.getAdapter().getView(i, null, null);
             if(((CheckBox)listView.findViewById(R.id.contact_select)).isChecked())
-                invitees.add(((ContactsAdapter)inviteList.getAdapter()).getContact(i));
+                invitees.add((Contact)(inviteList.getAdapter()).getItem(i));
         }
     }
 
     private void sendNewInvites(){
-        final DatabaseReference lRef = mRef.child((PreferenceManager.getDefaultSharedPreferences(this).getString("Uid", ""))).child("events").child(path).child("inviteList");
+        final DatabaseReference lRef = mRef.child((sp.getString("Uid", ""))).child("events").child(path).child("inviteList");
+        Log.w(TAG, lRef.toString());
 
         lRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -181,20 +187,20 @@ public class AddContactActivity extends AppCompatActivity {
                         }
                     }
                     if (!alreadyInvited) {
+                        DatabaseReference tempRef = FirebaseDatabase.getInstance().getReference();
                         final long c = count;
-                        final DatabaseReference tempRef = FirebaseDatabase.getInstance().getReference();
                         tempRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                    if(child.child("phone").getValue().toString().equals(invitees.get(finI))) {
-                                        DatabaseReference t = child.child("invited-events").getRef().push();
-                                        t.setValue("/" + sp.getString("Uid", "") + "/events/" + path);
-                                        invitees.get(finI).setInvitePath(t.toString());
-                                        lRef.child("" + c).setValue(invitees.get(finI));
+                                    if (child.child("phone").getValue(String.class).equals(invitees.get(finI).getPhone())) {
+                                        String str = "/" + sp.getString("Uid", "") + "/events/" + path;
+                                        DatabaseReference temp = child.child("invited-events").getRef().push();
+                                        invitees.get(finI).setInvitePath(temp.toString());
+                                        temp.setValue(str);
                                     }
                                 }
-
+                                lRef.child("" + c).setValue(invitees.get(finI));
                             }
 
                             @Override
@@ -202,6 +208,7 @@ public class AddContactActivity extends AppCompatActivity {
 
                             }
                         });
+
                         count++;
                     }
                 }
@@ -211,7 +218,7 @@ public class AddContactActivity extends AppCompatActivity {
 
             }
         });
-        finish();
+        Toast.makeText(this, "New Invites sent.", Toast.LENGTH_LONG).show();
     }
 
     private class ContactsAdapter extends BaseAdapter {
@@ -220,6 +227,9 @@ public class AddContactActivity extends AppCompatActivity {
         public ContactsAdapter(Context context, ArrayList<Contact> list){
             contactsList = list;
             inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
+        public void newList(ArrayList<Contact> list){
+            contactsList = list;
         }
         @Override
         public int getCount() {
@@ -252,6 +262,8 @@ public class AddContactActivity extends AppCompatActivity {
             {
                 checkBox = (CheckBox) currentView.findViewById(R.id.contact_select);
                 currentView.setTag(checkBox);
+                final CheckBox tempCheck = checkBox;
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(sp.getString("Uid", "")).child("events").child(path).child("inivteList");
                 CompoundButton.OnCheckedChangeListener l = new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {

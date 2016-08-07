@@ -115,6 +115,9 @@ public class NewEventActivity extends AppCompatActivity {
         locText = (EditText) findViewById(R.id.event_location); // Event location
         locBtn = (Button) findViewById(R.id.location_button); // Find location button
 
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(eventName.getWindowToken(), 0);
+        imm.hideSoftInputFromWindow(locText.getWindowToken(), 1);
         locBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
