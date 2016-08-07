@@ -8,7 +8,9 @@
         android:layout_height="wrap_content"
         android:textSize="15dp"
         android:text="Place Name"
-        android:id="@+id/results_list_name"/>
+        android:id="@+id/results_list_name"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="8dp"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,24 +18,26 @@
         android:textSize="15dp"
         android:text="Place Address"
         android:id="@+id/result_list_address"
-        android:singleLine="true"/>
+        android:singleLine="true"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
     <TextView
+        android:id="@+id/result_list_rating_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Rating: "
+        android:text="Rating:"
         android:textSize="15dp"
-        android:layout_below="@id/result_list_address"/>
+        android:layout_below="@id/result_list_address"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="8dp"/>
     <RatingBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:numStars="5"
         android:stepSize="0.1"
-        android:scaleY=".5"
-        android:scaleX=".5"
-        android:paddingTop="5dp"
-        android:layout_alignTop="@+id/result_list_address"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
+        android:layout_toRightOf="@+id/result_list_rating_text"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_alignBottom="@+id/result_list_rating_text"
+        style="?android:attr/ratingBarStyleSmall"
         android:id="@+id/result_list_rating"
         android:isIndicator="true"/>
 </RelativeLayout>

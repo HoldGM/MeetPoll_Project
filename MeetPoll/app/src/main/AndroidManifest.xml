@@ -107,7 +107,13 @@
         <activity
             android:name=".ProfileActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".AddContactActivity"
+        <activity
+            android:name=".AddContactActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TabbedSearchResultsActivity"
+            android:label="@string/title_activity_tabbed_search_results"
+            android:theme="@style/AppTheme"
             android:screenOrientation="portrait"/>
     </application>
 

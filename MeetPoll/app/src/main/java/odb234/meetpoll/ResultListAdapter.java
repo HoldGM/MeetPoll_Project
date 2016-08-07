@@ -10,27 +10,23 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+
 /**
  * Created by Otis on 7/24/2016.
  */
 public class ResultListAdapter extends BaseAdapter {
-    String[] names;
-    String[] addresses;
-    String[] ids;
-    float[] ratings;
+    ArrayList<MapMarker> markers = new ArrayList<>();
 
     LayoutInflater inflater;
-    public ResultListAdapter(Context context, String[] name, String[] add, String[] id, float[] r){
-        names = name;
-        addresses = add;
-        ids = id;
-        ratings = r;
+    public ResultListAdapter(Context context, ArrayList<MapMarker> list){
+        markers = list;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public int getCount() {
-        return names.length;
+        return markers.size();
     }
 
     @Override
@@ -49,12 +45,9 @@ public class ResultListAdapter extends BaseAdapter {
         if(currentView == null){
             currentView = inflater.inflate(R.layout.results_cell_view, viewGroup, false);
         }
-        TextView textView = (TextView)currentView.findViewById(R.id.results_list_name);
-        textView.setText(names[i]);
-        textView = (TextView)currentView.findViewById(R.id.result_list_address);
-        textView.setText(addresses[i]);
-        RatingBar rating = (RatingBar)currentView.findViewById(R.id.result_list_rating);
-        rating.setRating(ratings[i]);
+        ((TextView)currentView.findViewById(R.id.results_list_name)).setText(markers.get(i).getName());
+        ((TextView)currentView.findViewById(R.id.result_list_address)).setText(markers.get(i).getAddress());
+        ((RatingBar)currentView.findViewById(R.id.result_list_rating)).setRating(markers.get(i).getRating());
         return currentView;
     }
 }

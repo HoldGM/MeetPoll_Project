@@ -148,7 +148,9 @@ public class SearchResultsActivity extends AppCompatActivity implements OnMapRea
 
     }
 
-
+    public void setIds(ArrayList<String> idList){
+        ids = idList;
+    }
 
     /**
      * Manipulates the map once available.

@@ -516,7 +516,7 @@ public class NewEventActivity extends AppCompatActivity {
         }
         
         Log.d(tag, "After try: " + latitude + ", " + longitude);
-        Intent intent = new Intent(this, SearchResultsActivity.class);
+        Intent intent = new Intent(this, TabbedSearchResultsActivity.class);
         intent.putExtra("newLat", latitude);
         intent.putExtra("newLng", longitude);
         intent.putExtra("eventName", eventName.getText().toString());

@@ -42,8 +42,8 @@ public class SearchResultsListActivity extends AppCompatActivity {
         String[] ids = getIntent().getStringArrayExtra("ids");
         float[] ratings = getIntent().getFloatArrayExtra("ratings");
         resultList = (ListView)findViewById(R.id.results_list);
-        ListAdapter la = new ResultListAdapter(this, names, addresses, ids, ratings);
-        resultList.setAdapter(la);
+//        ListAdapter la = new ResultListAdapter(this, names, addresses, ids, ratings);
+//        resultList.setAdapter(la);
 
     }
 
