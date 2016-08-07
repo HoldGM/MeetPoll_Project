@@ -1,12 +1,8 @@
 ----find image of MeetPoll in ITC snap that's bigger
 add setting for number of returned search results
 
-store shared pref in db and update db when change in settings
-add phone to settings
 setting to send sms message if contact doesn't have app
 
-date/time picker reset on newInstance
-allow host to add contact to event already created
 tabview for map/list results page
 
 loading animation when loading events on main page

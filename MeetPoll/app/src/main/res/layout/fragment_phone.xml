@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="odb234.meetpoll.ProfileActivity">
+    <com.github.pinball83.maskededittext.MaskedEditText
+        android:id="@+id/settings_phone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter your phone number"
+        android:backgroundTint="@color/splash_orange"
+        android:inputType="number"
+        app:mask="(***)***-****"
+        app:notMaskedSymbol="*"
+        android:digits="0123456789"/>
+
+</LinearLayout>

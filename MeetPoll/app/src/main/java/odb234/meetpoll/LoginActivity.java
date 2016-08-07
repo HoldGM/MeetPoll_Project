@@ -1,15 +1,12 @@
 package odb234.meetpoll;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,7 +37,6 @@ public class LoginActivity extends AppCompatActivity {
     static EditText password;
     static LayoutInflater inflater;
     Firebase fb;
-    Firebase.AuthResultHandler handler;
     public static FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     SharedPreferences sp;
@@ -156,9 +152,6 @@ public class LoginActivity extends AppCompatActivity {
     }
     public void register(View v){
         dialogFragment();
-
-//        Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-//        startActivityForResult(intent, 10);
     }
 
     public void resetPassword(View v) {
@@ -183,11 +176,9 @@ public class LoginActivity extends AppCompatActivity {
                                         @Override
                                         public void onComplete(Task<Void> task) {
                                             if (task.isSuccessful()) {
-//                                                Toast.makeText(getView().getContext(), "Email sent to " + email + ".", Toast.LENGTH_LONG).show();
                                                 t.setText("Email sent to " + email + ".");
                                                 t.show();
                                             } else {
-//                                                Toast.makeText(getView().getContext(), "Email failed to send to " + email + ".", Toast.LENGTH_LONG).show();
                                                 t.setText("Email failed to send to " + email + ".");
                                                 t.show();
                                             }
@@ -208,7 +199,7 @@ public class LoginActivity extends AppCompatActivity {
     public void dialogFragment(){
         final AlertDialog.Builder registerDialog = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
-        final View dialogView = (View) inflater.inflate(R.layout.register_dialog, null);
+        final View dialogView = inflater.inflate(R.layout.register_dialog, null);
 
         registerDialog.setView(dialogView);
         registerDialog.setTitle("Register");
@@ -248,14 +239,13 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    public  void registerComplete(String user, String pass){
+    public  void registerComplete(String user, String p){
         final String newUser = user;
         Toast.makeText(this, "Attempting to login.", Toast.LENGTH_SHORT).show();
-        mAuth.createUserWithEmailAndPassword(newUser, pass).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        mAuth.createUserWithEmailAndPassword(newUser, p).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(Task<AuthResult> task) {
                 Log.d(TAG, "create user OnComplete: " + task.isSuccessful());
-//                Log.d(TAG, mAuth.getCurrentUser().getUid().toString());
                 if(!task.isSuccessful()){
                     Toast.makeText(LoginActivity.this, "Registration failed. Account for " + newUser +" may already exist.", Toast.LENGTH_LONG).show();
                 }

@@ -96,7 +96,6 @@
         <activity
             android:name=".LoginActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".RegisterActivity" />
         <activity
             android:name=".VoteListActivity"
             android:screenOrientation="portrait" />
