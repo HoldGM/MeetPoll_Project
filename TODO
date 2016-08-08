@@ -1,15 +1,11 @@
-----find image of MeetPoll in ITC snap that's bigger
 add setting for number of returned search results
 
-setting to send sms message if contact doesn't have app
-
-tabview for map/list results page
+---setting to send sms message if contact doesn't have app
 
 loading animation when loading events on main page
 loading animation when finding locations on location results page
 
-Notifications/setting for
-if not complete profile activity, delete account
+---Notifications/setting for
 on register activity, make errors tell why
 
-event details for invited events
+error on voting activity

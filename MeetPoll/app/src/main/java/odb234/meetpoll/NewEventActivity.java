@@ -353,6 +353,11 @@ public class NewEventActivity extends AppCompatActivity {
         DatePickerFragment newFragment = DatePickerFragment.newInstance(v);
         newFragment.show(getFragmentManager(), "datePicker");
     }
+    public void hide_keyboard(View v)
+    {
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+    }
 
     private AdapterView.OnItemClickListener mAutocompleteClickListener
             = new AdapterView.OnItemClickListener() {

@@ -2,7 +2,8 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:onClick="hide_keyboard">
     <LinearLayout
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -13,7 +14,15 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         tools:context="odb234.meetpoll.LoginActivity"
         android:orientation="vertical">
-
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/splash_img2"
+            android:layout_gravity="center" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/meetpoll_logo_2"/>
         <EditText
             android:id="@+id/login_username"
             android:layout_width="match_parent"
@@ -35,35 +44,33 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Remember me"/>
-        <Button
-            android:id="@+id/login_login"
-            android:layout_width="125dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/edit_text_bg"
-            android:text="Login"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/event_text_size"
-            android:onClick="login"
-            android:layout_centerInParent="true"/>
-        <TextView
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="or"
-            android:layout_gravity="center_horizontal"
-            android:textSize="@dimen/event_text_size"
-            android:layout_marginTop="@dimen/activity_vertical_margin"/>
-        <Button
-            android:id="@+id/login_register"
-            android:layout_width="125dp"
-            android:layout_height="wrap_content"
-            android:text="Register"
-            android:textSize="@dimen/event_text_size"
-            android:background="@drawable/edit_text_bg"
-            android:layout_gravity="center_horizontal"
-            android:textColor="@android:color/white"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:onClick="register"/>
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/activity_vertical_margin">
+            <Button
+                android:id="@+id/login_login"
+                android:layout_width="125dp"
+                android:layout_height="wrap_content"
+                android:text="Login"
+                android:textSize="@dimen/event_text_size"
+                android:background="@drawable/edit_text_bg"
+                android:textColor="@android:color/white"
+                android:onClick="login"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"/>
+            <Button
+                android:id="@+id/login_register"
+                android:layout_width="125dp"
+                android:layout_height="wrap_content"
+                android:text="Register"
+                android:textSize="@dimen/event_text_size"
+                android:background="@drawable/edit_text_bg"
+                android:textColor="@android:color/white"
+                android:onClick="register"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
+        </LinearLayout>
     </LinearLayout>
     <TextView
         android:id="@+id/login_forgot_password"

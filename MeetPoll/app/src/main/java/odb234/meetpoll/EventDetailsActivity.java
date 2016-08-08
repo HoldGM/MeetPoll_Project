@@ -120,7 +120,7 @@ public class EventDetailsActivity extends AppCompatActivity implements InviteFra
     public void setupViewPager(ViewPager viewPager){
         SectionsPagerAdapter adapter = new SectionsPagerAdapter(getSupportFragmentManager());
         adapter.addFragment((new EventDetailFragment()).newInstance(uid, path), "Detail");
-        adapter.addFragment((new InviteFragment()).newInstance(uid, path), "Invite");
+        adapter.addFragment((new InviteFragment()).newInstance(uid, path), "Invitees");
         adapter.addFragment((new VoteCountFragment()).newInstance(uid, path), "Poll Results");
         viewPager.setAdapter(adapter);
     }

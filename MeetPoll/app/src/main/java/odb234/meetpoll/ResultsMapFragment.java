@@ -3,9 +3,11 @@ package odb234.meetpoll;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -85,6 +87,8 @@ public class ResultsMapFragment extends Fragment{
     private Double eventRating;
     private ArrayList<String> ids;
 
+    SharedPreferences sp;
+
     private Switch aSwitch;
 
     private ArrayList<MapMarker> mapMarkers;
@@ -122,6 +126,7 @@ public class ResultsMapFragment extends Fragment{
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         pd = new ProgressDialog(getActivity(), ProgressDialog.STYLE_SPINNER);
+        sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         Intent intent = getActivity().getIntent();
         newLat = intent.getDoubleExtra("newLat", 30);
         newLng = intent.getDoubleExtra("newLng", -97);
@@ -262,8 +267,9 @@ public class ResultsMapFragment extends Fragment{
         private void addMarkers(JSONArray jsonArray){
             ids = new ArrayList<>();
             mapMarkers = new ArrayList<>();
+            int numResults = sp.getInt("numResults",10);
             ArrayList<MapMarker> tempMarkers = new ArrayList<>();
-            for(int i = 0; i < jsonArray.length() && i < 10; i++){
+            for(int i = 0; i < jsonArray.length() && i < numResults; i++){
                 try {
                     double lat = jsonArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lat");
                     double lng = jsonArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lng");
@@ -293,7 +299,6 @@ public class ResultsMapFragment extends Fragment{
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-
             mapView.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
