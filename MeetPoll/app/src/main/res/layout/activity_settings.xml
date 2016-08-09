@@ -45,7 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/phone"
-            android:textSize="25sp"
+            android:textSize="25dp"
             android:layout_marginLeft="10sp"
             android:layout_marginBottom="5dp"/>
         <TextView
@@ -63,18 +63,37 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
         <TextView
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight=".4"
-            android:textSize="17dp"
-            android:text="Max search results" />
-        <SeekBar
-            android:layout_width="0dp"
-            android:layout_weight=".6"
+            android:textSize="25dp"
+            android:text="Max search results"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            />
+            android:orientation="horizontal">
+            <SeekBar
+                android:id="@+id/settings_max_results"
+                android:layout_width="0dp"
+                android:layout_weight=".85"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="5dp"
+                android:max="15"
+                android:scrollbarSize="@dimen/activity_vertical_margin"
+                style="@android:style/Widget.Holo.SeekBar"/>
+            <TextView
+                android:id="@+id/settings_results_text"
+                android:layout_width="0dp"
+                android:layout_weight=".15"
+                android:layout_height="wrap_content"
+                android:textSize="17dp"
+                android:text="10"/>
+        </LinearLayout>
     </LinearLayout>
     <View
         android:layout_width="match_parent"

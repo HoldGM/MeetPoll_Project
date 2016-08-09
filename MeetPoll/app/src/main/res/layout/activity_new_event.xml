@@ -97,8 +97,7 @@
             android:layout_weight=".55"
             android:layout_height="wrap_content"
             android:scrollbarSize="@android:dimen/dialog_min_width_major"
-            android:max="20"
-            android:onClick="showRadiusValue"/>
+            android:max="20"/>
         <TextView
             android:layout_width="0sp"
             android:layout_weight=".25"

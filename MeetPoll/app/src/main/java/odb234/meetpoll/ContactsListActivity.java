@@ -187,11 +187,9 @@ public class ContactsListActivity extends AppCompatActivity {
                     finNum = finNum.substring(1);
                 }
                 contacts.add(new Contact(name, finNum, false));
-                Log.d(TAG, name + ", " + number);
             }
         }while(cur.moveToNext());
 
-        Log.d(TAG, "Contacts List size: " + contacts.size());
         la = new ContactsAdapter(this, contacts);
         inviteList.setAdapter(la);
     }
@@ -279,7 +277,6 @@ public class ContactsListActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... aVoid) {
-            Log.d(TAG, "IDs length: " + ids.size());
             try {
                 for(int i = 0; i < ids.size(); i++) {
                     String id = ids.get(i);
@@ -353,17 +350,17 @@ public class ContactsListActivity extends AppCompatActivity {
                         for(int i = 0; i < invitees.size(); i++){
                             if(child.child("phone").getValue().toString().equals(invitees.get(i).getPhone()) && !child.child("phone").getValue().toString().equals(sp.getString("phone", ""))){
                                 DatabaseReference tempRef = child.child("invited-events").getRef().push();
-                                Log.d(TAG, "TempRef Path: " + tempRef.toString());
+//                                Log.d(TAG, "TempRef Path: " + tempRef.toString());
                                 tempRef.setValue(eventRef.getPath().toString());
                                 invitees.get(i).setInvitePath(tempRef.toString());
-                                Log.d(TAG, "Invite path: " + invitees.get(i).getInvitePath());
+//                                Log.d(TAG, "Invite path: " + invitees.get(i).getInvitePath());
                                 break;
                             }
                         }
                     }
-                    for(int i = 0; i < invitees.size(); i++){
-                        Log.d(TAG, "*****" + invitees.get(i).getInvitePath());
-                    }
+//                    for(int i = 0; i < invitees.size(); i++){
+//                        Log.d(TAG, "*****" + invitees.get(i).getInvitePath());
+//                    }
 
                     Intent intent = getIntent();
 
@@ -383,8 +380,6 @@ public class ContactsListActivity extends AppCompatActivity {
                         public void onComplete(FirebaseError firebaseError, Firebase firebase) {
                             if(firebaseError != null){
                                 Log.d(TAG, "data could not be saved: "  + firebaseError.getMessage());
-                            }else{
-                                Log.d(TAG, "Firebase worked");
                             }
                         }
                     });

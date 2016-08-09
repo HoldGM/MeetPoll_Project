@@ -217,12 +217,10 @@ public class ResultsMapFragment extends Fragment{
         @Override
         protected Void doInBackground(Void... voids) {
 
-            Log.d(TAG, "Starting nearby places search");
 
             PlacesService service = new PlacesService(getString(R.string.google_maps_key));
             try{
                 String urlString = service.makeUrl(newLat, newLng, locationType, locationSubtype, radius);
-                Log.d(TAG, "JSON String: " + urlString);
                 DefaultHttpClient client = new DefaultHttpClient();
                 HttpGet req = new HttpGet(urlString);
                 HttpResponse res = client.execute(req);
@@ -235,7 +233,6 @@ public class ResultsMapFragment extends Fragment{
                     for(int i = 0; i < resArray.length(); i++){
                         double lat = resArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lat");
                         double lng = resArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lng");
-                        Log.d(TAG, resArray.getJSONObject(i).getString("name") + "  lat:" + lat + ", lng: " + lng);
                     }
                 }
             }catch(JSONException e){
@@ -284,7 +281,6 @@ public class ResultsMapFragment extends Fragment{
                         rating = 0;
                     }
                     if(rating >= eventRating) {
-                        Log.d(TAG, name + " rating: " + rating);
                         mapMarkers.add(new MapMarker(new LatLng(lat, lng), address, id, rating, name));
                         ids.add(id);
                     }else{

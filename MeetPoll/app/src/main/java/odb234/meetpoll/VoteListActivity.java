@@ -57,7 +57,6 @@ public class VoteListActivity extends AppCompatActivity {
                 ((TextView)v.findViewById(R.id.vote_name)).setText(model.getName());
                 ((TextView)v.findViewById(R.id.vote_address)).setText(model.getAddress());
                 ((RatingBar)v.findViewById(R.id.vote_rating)).setRating(model.getRating());
-                Log.d(TAG,model.getName() + " " + position);
                 final RadioButton btn = (RadioButton)v.findViewById(R.id.vote_radio_btn);
                 btn.setChecked(position == previousVote);
                 btn.setTag(position);
@@ -70,7 +69,21 @@ public class VoteListActivity extends AppCompatActivity {
                 });
             }
         };
+        DatabaseReference endRef = mIdsRef.getParent().getRef();
+        endRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.hasChildren()){
+                    Toast.makeText(getApplication(), "Sorry, this event has been cancelled.", Toast.LENGTH_LONG).show();
+                    finish();
+                }
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         voteList.setAdapter(adapter);
     }
 
@@ -141,14 +154,16 @@ public class VoteListActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 final long voteCount = (long)dataSnapshot.child("voteCount").getValue();
 
+                if(!dataSnapshot.hasChildren()){
+                    Toast.makeText(getBaseContext(), "This Event has been cancelled.", Toast.LENGTH_LONG).show();
+                    finish();
+                }
+
                 (q.getParent().getParent().child("inviteList")).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for(DataSnapshot child : dataSnapshot.getChildren()){
-                            Log.d(TAG, "Child Phone: " + child.child("phone").toString());
-                            Log.d(TAG, "Preferences Phone: " + sp.getString("phone", ""));
                             if((child.child("phone").getValue().toString()).equals(sp.getString("phone",""))){
-                                Log.d(TAG, "Inside if check");
                                 if(!(boolean)child.child("voted").getValue()) {
                                     q.child("voteCount").setValue(voteCount + 1);
                                     (child.child("voted").getRef()).setValue(true);

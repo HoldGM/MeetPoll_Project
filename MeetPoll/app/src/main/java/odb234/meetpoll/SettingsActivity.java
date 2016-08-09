@@ -33,6 +33,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.firebase.client.Firebase;
@@ -60,7 +61,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     static Firebase fb;
 
-
+    SeekBar maxResults;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +73,8 @@ public class SettingsActivity extends AppCompatActivity {
         nameTV = (TextView)findViewById(R.id.your_name);
         phoneTV = (TextView)findViewById(R.id.your_phone);
         sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        nameTV.setText(sp.getString("name",nameTV.getText().toString()));
+        nameTV.setText(sp.getString("name", nameTV.getText().toString()));
         String phone = sp.getString("phone", "");
-        Log.d(TAG,"Phone : " + phone);
         if(!phone.equals(""))
             phoneTV.setText("(" + phone.substring(0,3) + ")" + phone.substring(3,6) + "-" + phone.substring(6));
         else
@@ -82,6 +82,28 @@ public class SettingsActivity extends AppCompatActivity {
         editor = sp.edit();
         fm = getFragmentManager();
         fb = new Firebase(getString(R.string.firebase_path) + "/" + sp.getString("Uid",""));
+        maxResults = (SeekBar)findViewById(R.id.settings_max_results);
+        maxResults.setProgress(sp.getInt("numResults", 10) - 5);
+        TextView resultsText = (TextView) findViewById(R.id.settings_results_text);
+        resultsText.setText((maxResults.getProgress() + 5) +"");
+        maxResults.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                ((TextView)findViewById(R.id.settings_results_text)).setText("" + (i + 5));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                editor.putInt("numResults", seekBar.getProgress() + 5);
+                editor.apply();
+            }
+        });
+
         Log.d(TAG,fb.toString());
 
     }

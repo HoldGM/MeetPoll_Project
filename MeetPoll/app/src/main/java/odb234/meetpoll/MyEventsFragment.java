@@ -1,6 +1,7 @@
 package odb234.meetpoll;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,11 +21,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.client.Firebase;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -54,9 +57,8 @@ public class MyEventsFragment extends Fragment {
     ListView eventsList;
     ImageView newUser;
     DatabaseReference mRoot;
-
+    int last;
     SharedPreferences sp;
-
     public MyEventsFragment() {
         // Required empty public constructor
     }
@@ -90,6 +92,7 @@ public class MyEventsFragment extends Fragment {
         sp = PreferenceManager.getDefaultSharedPreferences(getContext());
         mRoot = FirebaseDatabase.getInstance().getReference().child(mParam1).child(mParam2);
 
+
     }
 
     @Override
@@ -103,11 +106,10 @@ public class MyEventsFragment extends Fragment {
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
                 requestPermissions(new String[]{Manifest.permission.INTERNET}, 10);
             }
-
-            mRoot.getParent().child("eventCount").addValueEventListener(new ValueEventListener() {
+            mRoot.getRef().getParent().child("eventCount").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    if ((long)dataSnapshot.getValue() == 0) {
+                    if ( (long)dataSnapshot.getValue() == 0) {
                         newUser.setVisibility(View.VISIBLE);
                     } else {
                         newUser.setVisibility(View.GONE);
@@ -119,6 +121,7 @@ public class MyEventsFragment extends Fragment {
 
                 }
             });
+
             ListAdapter adapter = new FirebaseListAdapter<Event>(getActivity(), Event.class, R.layout.cell_view, mRoot) {
                 @Override
                 protected void populateView(View v, Event model, int position) {
@@ -159,7 +162,6 @@ public class MyEventsFragment extends Fragment {
                     ((TextView)v.findViewById(R.id.list_event_date)).setText(model.getEventDate());
                     ((TextView)v.findViewById(R.id.list_time)).setText(model.getEventTime());
                     final Button detailButton = (Button)v.findViewById(R.id.edit_event);
-                    Log.d(TAG, "Button Key: " + model.getKey());
                     v.setTag(model.getKey());
                     v.setOnClickListener(new View.OnClickListener() {
                         @Override

@@ -20,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -118,7 +119,6 @@ public class EventDetailFragment extends Fragment implements GoogleApiClient.OnC
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         markers = new ArrayList<>();
-        Log.d(TAG, "mParam1: " + mParam1 + ", mParam2: " + mParam2);
         if(mParam1 != null  && mParam2 != null) {
             final View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
             editDateBtn = (ImageButton)rootView.findViewById(R.id.event_detail_edit_date);
@@ -129,23 +129,28 @@ public class EventDetailFragment extends Fragment implements GoogleApiClient.OnC
 
 
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(mParam1).child("events").child(mParam2).child("places");
-            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            ref.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    DataSnapshot topLocation = dataSnapshot.child("0");
-                    for (DataSnapshot child : dataSnapshot.getChildren()) {
-                        if (child.child("voteCount").getValue(int.class) > topLocation.child("voteCount").getValue(int.class)) {
-                            topLocation = child;
+                    if(dataSnapshot.hasChildren()) {
+                        DataSnapshot topLocation = dataSnapshot.child("0");
+                        for (DataSnapshot child : dataSnapshot.getChildren()) {
+                            if (child.child("voteCount").getValue(int.class) > topLocation.child("voteCount").getValue(int.class)) {
+                                topLocation = child;
+                            }
                         }
-                    }
-                    topMarker = new MapMarker(new LatLng((double) topLocation.child("lat").getValue(), (double) topLocation.child("lng").getValue()), topLocation.child("name").getValue().toString());
-                    ((TextView) rootView.findViewById(R.id.details_location_name)).setText(topLocation.child("name").getValue().toString());
-                    ((TextView) rootView.findViewById(R.id.details_location_address)).setText(topLocation.child("address").getValue().toString());
-                    ((TextView) rootView.findViewById(R.id.details_location_phone)).setText(topLocation.child("phone").getValue().toString());
-                    for (DataSnapshot child : dataSnapshot.getChildren()) {
-                        if (!child.child("address").toString().equals(topLocation.child("address").toString())) {
-                            markers.add(new MapMarker(new LatLng((double) child.child("lat").getValue(), (double) child.child("lng").getValue()), child.child("name").getValue().toString()));
+                        topMarker = new MapMarker(new LatLng((double) topLocation.child("lat").getValue(), (double) topLocation.child("lng").getValue()), topLocation.child("name").getValue().toString());
+                        ((TextView) rootView.findViewById(R.id.details_location_name)).setText(topLocation.child("name").getValue().toString());
+                        ((TextView) rootView.findViewById(R.id.details_location_address)).setText(topLocation.child("address").getValue().toString());
+                        ((TextView) rootView.findViewById(R.id.details_location_phone)).setText(topLocation.child("phone").getValue().toString());
+                        for (DataSnapshot child : dataSnapshot.getChildren()) {
+                            if (!child.child("address").toString().equals(topLocation.child("address").toString())) {
+                                markers.add(new MapMarker(new LatLng((double) child.child("lat").getValue(), (double) child.child("lng").getValue()), child.child("name").getValue().toString()));
+                            }
                         }
+                    }else{
+                        Toast.makeText(getActivity(), "Sorry, this event has been cancelled.", Toast.LENGTH_LONG).show();
+                        getActivity().finish();
                     }
                 }
 
@@ -158,8 +163,6 @@ public class EventDetailFragment extends Fragment implements GoogleApiClient.OnC
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if(dataSnapshot.hasChildren()) {
-                        Log.d(TAG, dataSnapshot.child("eventDate").getValue().toString());
-                        Log.d(TAG, dataSnapshot.child("eventTime").getValue().toString());
                         ((TextView) rootView.findViewById(R.id.detail_event_date)).setText(dataSnapshot.child("eventDate").getValue().toString());
                         ((TextView) rootView.findViewById(R.id.detail_event_time)).setText(dataSnapshot.child("eventTime").getValue().toString());
                     }
@@ -183,7 +186,6 @@ public class EventDetailFragment extends Fragment implements GoogleApiClient.OnC
                         public boolean onMarkerClick(Marker marker) {
                             marker.showInfoWindow();
                             mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
-                            Log.d(TAG, "Marker selected" + marker.getTitle().toString());
                             return true;
                         }
                     });

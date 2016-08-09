@@ -101,7 +101,7 @@ public class AddContactActivity extends AppCompatActivity {
                     finNum = finNum.substring(1);
                 }
                 contacts.add(new Contact(name, finNum, false));
-                Log.d(TAG, name + ", " + number);
+//                Log.d(TAG, name + ", " + number);
             }
         }while(cur.moveToNext());
 
@@ -129,7 +129,7 @@ public class AddContactActivity extends AppCompatActivity {
             }
         });
 
-        Log.d(TAG, "Contacts List size: " + contacts.size());
+//        Log.d(TAG, "Contacts List size: " + contacts.size());
     }
 
     @Override
@@ -170,7 +170,7 @@ public class AddContactActivity extends AppCompatActivity {
 
     private void sendNewInvites(){
         final DatabaseReference lRef = mRef.child((sp.getString("Uid", ""))).child("events").child(path).child("inviteList");
-        Log.w(TAG, lRef.toString());
+//        Log.w(TAG, lRef.toString());
 
         lRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

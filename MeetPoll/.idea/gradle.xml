@@ -8,8 +8,8 @@
         <option name="gradleJvm" value="1.8" />
         <option name="modules">
           <set>
-            <option value="/v/filer4b/v38q001/rspiegel/Documents/MeetPoll_Project/MeetPoll" />
-            <option value="/v/filer4b/v38q001/rspiegel/Documents/MeetPoll_Project/MeetPoll/app" />
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/app" />
           </set>
         </option>
       </GradleProjectSettings>

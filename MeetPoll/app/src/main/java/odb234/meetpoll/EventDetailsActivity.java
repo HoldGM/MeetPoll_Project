@@ -155,13 +155,11 @@ public class EventDetailsActivity extends AppCompatActivity implements InviteFra
                 return true;
             case R.id.delete_event:
                 deleteDialog();
-                Log.d(TAG, "Delete Event Pressed");
                 return true;
             case R.id.add_contact:
                 intent = new Intent(this, AddContactActivity.class);
                 intent.putExtra("path", path);
                 startActivity(intent);
-                Log.d(TAG, "Add Contact Pressed");
                 return true;
         }
         return super.onOptionsItemSelected(item);

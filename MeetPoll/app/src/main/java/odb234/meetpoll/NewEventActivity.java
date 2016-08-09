@@ -378,8 +378,6 @@ public class NewEventActivity extends AppCompatActivity {
                 placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
             }
 
-
-            Log.d(tag, "Autocomplete Place Picker" + placeResult);
             autoCompleteUpdateLocation();
         }
     };
@@ -428,7 +426,6 @@ public class NewEventActivity extends AppCompatActivity {
         locText.setText(address.getAddressLine(0) + ", " + address.getAddressLine(1));
         longitude = location.getLongitude();
         latitude = location.getLatitude();
-        Log.d(tag, "Before recreate: " + latitude + ", " + longitude);
 
     }
 
@@ -504,10 +501,8 @@ public class NewEventActivity extends AppCompatActivity {
         if( latitude == 0.0 || longitude == 0.0 ){
             List<Address> tempAdd = null;
             try {
-                Log.d(tag, "Inside try start");
                 while(gc.isPresent()) {
                     tempAdd = gc.getFromLocationName(locText.getText().toString(), 5);
-                    Log.d(tag, "Inside Try: " + tempAdd.get(0).toString());
                     if(tempAdd.size() > 0 && tempAdd != null) {
                         Address a = tempAdd.get(0);
                         latitude = a.getLatitude();
@@ -520,7 +515,6 @@ public class NewEventActivity extends AppCompatActivity {
             }
         }
         
-        Log.d(tag, "After try: " + latitude + ", " + longitude);
         Intent intent = new Intent(this, TabbedSearchResultsActivity.class);
         intent.putExtra("newLat", latitude);
         intent.putExtra("newLng", longitude);
@@ -572,7 +566,6 @@ public class NewEventActivity extends AppCompatActivity {
     private void autoCompleteUpdateLocation(){
         List<Address> tempAdd = null;
         try {
-            Log.d(tag, "Updating autocomplete location");
             if(gc.isPresent()) {
                 tempAdd = gc.getFromLocationName(locText.getText().toString(), 1);
                 Address a = tempAdd.get(0);

@@ -87,9 +87,9 @@ public class LoginActivity extends AppCompatActivity {
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                     }
-                    Log.d(TAG, "User signed in.");
+//                    Log.d(TAG, "User signed in.");
                 } else {
-                    Log.d(TAG, "user signed out.");
+//                    Log.d(TAG, "user signed out.");
                 }
             }
         };
@@ -142,13 +142,12 @@ public class LoginActivity extends AppCompatActivity {
             editor.putString("username",username.getText().toString());
             editor.apply();
         }
-        if(username.getText().equals("") || password.getText().equals("")){
+        if(username.getText().toString().equals("") || password.getText().toString().equals("")){
             Toast.makeText(this, "Username or Password missing.", Toast.LENGTH_LONG).show();
         }else{
             mAuth.signInWithEmailAndPassword(username.getText().toString(), password.getText().toString()).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(Task<AuthResult> task) {
-                    Log.d(TAG, "Login OnComplete: " + task.isSuccessful());
                     if (!task.isSuccessful()) {
                         Toast.makeText(LoginActivity.this, "Login failed.", Toast.LENGTH_LONG).show();
                     }

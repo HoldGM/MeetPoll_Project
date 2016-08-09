@@ -156,7 +156,6 @@ public class EventInvitesFragment extends Fragment {
                                                         public void onClick(View view) {
                                                             String path = view.getTag().toString();
                                                             String[] pathSplit = path.split("/");
-                                                            Log.d(TAG, Arrays.deepToString(pathSplit));
                                                             Intent intent = new Intent(getContext(), EventDetailsActivity.class);
                                                             intent.putExtra("uid", pathSplit[1]);
                                                             intent.putExtra("path", pathSplit[3]);
@@ -169,7 +168,6 @@ public class EventInvitesFragment extends Fragment {
                                                         public void onClick(View view) {
                                                             String path = view.getTag().toString();
                                                             String[] pathSplit = path.split("/");
-                                                            Log.d(TAG, Arrays.deepToString(pathSplit));
                                                             Intent intent = new Intent(getContext(), VoteListActivity.class);
                                                             intent.putExtra("uid", pathSplit[1]);
                                                             intent.putExtra("path", pathSplit[3]);

@@ -3,6 +3,7 @@ package odb234.meetpoll;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
@@ -12,11 +13,15 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseListAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 
 /**
@@ -81,13 +86,28 @@ public class InviteFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_invite, container, false);
         ListView list = (ListView)rootView.findViewById(R.id.detail_invite_list);
         if(mParam1 != null && mParam2 != null){
+            DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference().child(mParam1).child("events").child(mParam2);
+            ref1.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(!dataSnapshot.hasChildren()){
+                        Toast.makeText(getActivity(), "Sorry, this event has been cancelled.", Toast.LENGTH_LONG).show();
+                        getActivity().finish();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
             Query ref = FirebaseDatabase.getInstance().getReference().child(mParam1).child("events").child(mParam2).child("inviteList").orderByChild("name");
             ListAdapter adapter = new FirebaseListAdapter<Contact>(getActivity(), Contact.class, R.layout.invite_contact_list, ref) {
                 @Override
                 protected void populateView(View v, Contact model, int position) {
-                    Log.d("Invite List", model.getName() + ", " + model.getPhone());
                     ((TextView)v.findViewById(R.id.detail_contact_name)).setText(model.getName());
-                    ((TextView)v.findViewById(R.id.detail_contact_phone)).setText(model.getPhone());
+                    String str = "(" + model.getPhone().substring(0,3) + ")" + model.getPhone().substring(3,6) + "-" + model.getPhone().substring(6);
+                    ((TextView)v.findViewById(R.id.detail_contact_phone)).setText(str);
                 }
             };
             list.setAdapter(adapter);

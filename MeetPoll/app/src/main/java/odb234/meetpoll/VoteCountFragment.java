@@ -12,6 +12,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.type.ArrayType;
 import com.firebase.ui.database.FirebaseListAdapter;
@@ -89,15 +90,16 @@ public class VoteCountFragment extends Fragment {
             voteList = new ArrayList<LocationListing>();
             Query ref = FirebaseDatabase.getInstance().getReference().child(mParam1).child("events").child(mParam2).child("places").orderByChild("voteCount");
 
-            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            ref.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(!dataSnapshot.hasChildren()){
+                        Toast.makeText(getActivity(), "Sorry, this event has been cancelled", Toast.LENGTH_LONG).show();
+                    }
                     voteList = new ArrayList<LocationListing>();
                     for (DataSnapshot child : dataSnapshot.getChildren()) {
-                        Log.d("Vote Detail Fragment", child.child("name").getValue().toString() + ": " + child.child("voteCount").getValue().toString());
                         voteList.add(0, new LocationListing(child.child("name").getValue().toString(), child.child("address").getValue().toString(), (int) ((long) child.child("voteCount").getValue())));
                     }
-                    Log.d("Vote Detail Fragment", voteList.size() + "");
                     ListAdapter adapter = new reverseAdapter(getContext(), voteList);
                     list.setAdapter(adapter);
                 }

@@ -41,6 +41,7 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Firebase.setAndroidContext(this);
         fb = new Firebase("https://steadfast-leaf-137323.firebaseio.com/");
         sp = PreferenceManager.getDefaultSharedPreferences(this);
         editor = sp.edit();
