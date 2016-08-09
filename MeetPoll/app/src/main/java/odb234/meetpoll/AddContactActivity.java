@@ -141,6 +141,7 @@ public class AddContactActivity extends AppCompatActivity {
                 return true;
             case R.id.send_event:
                 sendNewInvites();
+                finish();
                 return true;
             case R.id.settings:
                 Intent intent2 = new Intent(AddContactActivity.this,SettingsActivity.class);

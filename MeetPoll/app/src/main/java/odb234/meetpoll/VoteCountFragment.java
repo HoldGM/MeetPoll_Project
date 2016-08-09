@@ -15,7 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.type.ArrayType;
+import com.firebase.client.Firebase;
 import com.firebase.ui.database.FirebaseListAdapter;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -94,7 +96,10 @@ public class VoteCountFragment extends Fragment {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if(!dataSnapshot.hasChildren()){
-                        Toast.makeText(getActivity(), "Sorry, this event has been cancelled", Toast.LENGTH_LONG).show();
+                        if(!FirebaseAuth.getInstance().getCurrentUser().getUid().toString().equals(mParam1)) {
+                            Toast.makeText(getActivity(), "Sorry, this event has been cancelled", Toast.LENGTH_LONG).show();
+                        }
+                        getActivity().finish();
                     }
                     voteList = new ArrayList<LocationListing>();
                     for (DataSnapshot child : dataSnapshot.getChildren()) {

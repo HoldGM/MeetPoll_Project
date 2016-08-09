@@ -98,7 +98,6 @@ public class EventDetailsActivity extends AppCompatActivity implements InviteFra
         uid = getIntent().getStringExtra("uid");
         path = getIntent().getStringExtra("path");
         dbRef = FirebaseDatabase.getInstance().getReference().child(uid).child("events").child(getIntent().getStringExtra("path"));
-        Log.d(TAG, dbRef.toString());
         dbRef.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
             @Override
             public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {

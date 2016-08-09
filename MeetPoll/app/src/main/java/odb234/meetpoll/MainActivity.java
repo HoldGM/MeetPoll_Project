@@ -80,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements  MyEventsFragment
         Firebase.setAndroidContext(this);
         mRef = new Firebase("https://steadfast-leaf-137323.firebaseio.com/");
         dbRef = FirebaseDatabase.getInstance().getReference();
-        Log.d(TAG, dbRef.toString());
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

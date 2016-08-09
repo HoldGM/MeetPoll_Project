@@ -36,6 +36,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -149,7 +150,9 @@ public class EventDetailFragment extends Fragment implements GoogleApiClient.OnC
                             }
                         }
                     }else{
-                        Toast.makeText(getActivity(), "Sorry, this event has been cancelled.", Toast.LENGTH_LONG).show();
+                        if(!FirebaseAuth.getInstance().getCurrentUser().getUid().toString().equals(mParam1)) {
+                            Toast.makeText(getActivity(), "Sorry, this event has been cancelled", Toast.LENGTH_LONG).show();
+                        }
                         getActivity().finish();
                     }
                 }

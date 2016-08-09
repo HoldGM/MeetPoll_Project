@@ -18,6 +18,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.firebase.ui.database.FirebaseListAdapter;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -74,7 +75,9 @@ public class VoteListActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(!dataSnapshot.hasChildren()){
-                    Toast.makeText(getApplication(), "Sorry, this event has been cancelled.", Toast.LENGTH_LONG).show();
+                    if(!FirebaseAuth.getInstance().getCurrentUser().getUid().toString().equals(uid)) {
+                        Toast.makeText(getBaseContext(), "Sorry, this event has been cancelled", Toast.LENGTH_LONG).show();
+                    }
                     finish();
                 }
             }

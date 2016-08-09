@@ -282,7 +282,6 @@ public class ContactsListActivity extends AppCompatActivity {
                     String id = ids.get(i);
                     String urlString = "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + id;
                     urlString += "&key=" + getString(R.string.google_maps_key);
-                    Log.d(TAG, urlString);
                     DefaultHttpClient client = new DefaultHttpClient();
                     HttpGet req = new HttpGet(urlString);
                     HttpResponse res = client.execute(req);
