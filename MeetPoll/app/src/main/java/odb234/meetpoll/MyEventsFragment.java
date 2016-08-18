@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.IntegerRes;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,6 +32,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 /**
@@ -56,7 +58,7 @@ public class MyEventsFragment extends Fragment {
 
     ListView eventsList;
     ImageView newUser;
-    DatabaseReference mRoot;
+    Query mRoot;
     int last;
     SharedPreferences sp;
     public MyEventsFragment() {
@@ -90,7 +92,7 @@ public class MyEventsFragment extends Fragment {
         }
 
         sp = PreferenceManager.getDefaultSharedPreferences(getContext());
-        mRoot = FirebaseDatabase.getInstance().getReference().child(mParam1).child(mParam2);
+        mRoot = FirebaseDatabase.getInstance().getReference().child(mParam1).child(mParam2).orderByChild("eventDateTime");
 
 
     }
@@ -126,7 +128,6 @@ public class MyEventsFragment extends Fragment {
                 @Override
                 protected void populateView(View v, Event model, int position) {
                     ((TextView)v.findViewById(R.id.list_event_host)).setText(model.getHostName());
-                    ((TextView)v.findViewById(R.id.list_event_date)).setText(model.getEventDate());
                     ((TextView)v.findViewById(R.id.list_event_name)).setText(model.getEventName());
                     ((TextView)v.findViewById(R.id.list_location)).setText(model.getEventLocation());
                     String str = model.getLocationType();
@@ -159,8 +160,15 @@ public class MyEventsFragment extends Fragment {
                         }
                     }
                     ((TextView)v.findViewById(R.id.list_location)).setText(topLocation);
-                    ((TextView)v.findViewById(R.id.list_event_date)).setText(model.getEventDate());
-                    ((TextView)v.findViewById(R.id.list_time)).setText(model.getEventTime());
+                    String dateTime = model.getEventDateTime();
+                    String[] split = dateTime.split("\\s+");
+                    String date = split[0].substring(4, 6) + "/" + split[0].substring(6) + "/" + split[0].substring(0,4);
+                    int hour = Integer.parseInt(split[1].substring(0,2));
+                    String amPm = (hour >= 12)? "PM" : "AM";
+                    hour = hour % 12;
+                    hour = (hour == 0)? 12 : hour;
+                    ((TextView)v.findViewById(R.id.list_event_date)).setText(date);
+                    ((TextView)v.findViewById(R.id.list_time)).setText(hour + ":" + split[1].substring(2) + " " + amPm);
                     final Button detailButton = (Button)v.findViewById(R.id.edit_event);
                     v.setTag(model.getKey());
                     v.setOnClickListener(new View.OnClickListener() {

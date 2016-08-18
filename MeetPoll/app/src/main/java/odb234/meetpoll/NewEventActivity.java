@@ -85,6 +85,9 @@ public class NewEventActivity extends AppCompatActivity {
     String locationType; //Saves location type to search for
     String mainLocationType;
 
+    String dateOut;
+    String timeOut;
+
     public static LocationManager locMan;
     static LocationListener locationListener;
 
@@ -523,8 +526,7 @@ public class NewEventActivity extends AppCompatActivity {
         if(searchRadius > 0) {
             intent.putExtra("radius", searchRadius);
         }
-        intent.putExtra("date", dateBtn.getText().toString());
-        intent.putExtra("time", timeBtn.getText().toString());
+        intent.putExtra("dateTime", dateOut + " " + timeOut);
         intent.putExtra("locationType", locationType);
         intent.putExtra("locationSubtype", typeSpinner.getSelectedItem().toString());
         intent.putExtra("rating", Math.floor(ratingBar.getRating()));

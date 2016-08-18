@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.IntegerRes;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -53,6 +54,10 @@ public class EventInvitesFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+    private ArrayList<Event> eventList;
+    private ArrayList<String> pathList;
+
+    DatabaseReference mRef;
 
     private static final String TAG = "Invited Events Fragment";
 
@@ -86,7 +91,37 @@ public class EventInvitesFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
+        eventList = new ArrayList<>();
+        pathList = new ArrayList<>();
         sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+        mRef = FirebaseDatabase.getInstance().getReference().child(sp.getString("Uid", "")).child("invited-events");
+        mRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot child : dataSnapshot.getChildren()) {
+                    DatabaseReference temp = FirebaseDatabase.getInstance().getReference().child(child.getValue(String.class));
+                    pathList.add(child.getValue(String.class));
+                    temp.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Log.d(TAG, "onCreate: " + dataSnapshot.child("eventName").getValue(String.class));
+                            eventList.add(dataSnapshot.getValue(Event.class));
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+                Log.d(TAG, "Path list length: " + pathList.size());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -94,11 +129,12 @@ public class EventInvitesFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
+        for(int i = 0; i < eventList.size(); i++){
+            Log.d(TAG, eventList.get(i).toString());
+        }
         if(mParam1 != null && mParam2 != null){
             View rootView = inflater.inflate(R.layout.fragment_event_invites, container, false);
             invitedEventsList = (ListView)rootView.findViewById(R.id.main_invite_eventsList);
-            final DatabaseReference mRef = FirebaseDatabase.getInstance().getReference().child(sp.getString("Uid", "")).child("invited-events");
-
             mRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -107,6 +143,9 @@ public class EventInvitesFragment extends Fragment {
                         temp.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
+                                eventList.add(dataSnapshot.getValue(Event.class));
+                                Event event = dataSnapshot.getValue(Event.class);
+                                eventList.add(event);
                                 ListAdapter adapter = new FirebaseListAdapter<String>(getActivity(), String.class, R.layout.cell_view, mRef){
                                     @Override
                                     protected void populateView(View v, String model, int position) {
@@ -117,10 +156,18 @@ public class EventInvitesFragment extends Fragment {
                                             @Override
                                             public void onDataChange(com.firebase.client.DataSnapshot dataSnapshot) {
                                                 if(dataSnapshot.hasChildren()) {
+
                                                     ((TextView) tempView.findViewById(R.id.list_event_host)).setText(dataSnapshot.child("hostName").getValue().toString());
-                                                    ((TextView) tempView.findViewById(R.id.list_event_date)).setText(dataSnapshot.child("eventDate").getValue().toString());
+                                                    String dateTime = dataSnapshot.child("eventDateTime").getValue(String.class);
+                                                    String[] split = dateTime.split("\\s+");
+                                                    String date = split[0].substring(4, 6) + "/" + split[0].substring(6) + "/" + split[0].substring(0,4);
+                                                    int hour = Integer.parseInt(split[1].substring(0,2));
+                                                    String amPm = (hour >= 12) ? "PM" : "AM";
+                                                    hour = hour % 12;
+                                                    hour = (hour == 0) ? 12 : hour;
+                                                    ((TextView) tempView.findViewById(R.id.list_event_date)).setText(date);
+                                                    ((TextView) tempView.findViewById(R.id.list_time)).setText(hour + ":" + split[1].substring(2) + " " + amPm);
                                                     ((TextView) tempView.findViewById(R.id.list_event_name)).setText(dataSnapshot.child("eventName").getValue().toString());
-                                                    ((TextView) tempView.findViewById(R.id.list_time)).setText(dataSnapshot.child("eventTime").getValue().toString());
                                                     String str = dataSnapshot.child("locationType").getValue().toString();
                                                     switch (str) {
                                                         case "restaurant":
@@ -175,6 +222,7 @@ public class EventInvitesFragment extends Fragment {
                                                         }
                                                     });
                                                 }
+
                                             }
 
                                             @Override
@@ -182,9 +230,11 @@ public class EventInvitesFragment extends Fragment {
 
                                             }
                                         });
+
                                     }
                                 };
                                 invitedEventsList.setAdapter(adapter);
+
                             }
 
 
@@ -207,6 +257,26 @@ public class EventInvitesFragment extends Fragment {
             return rootView;
         }
         return inflater.inflate(R.layout.fragment_event_invites, container, false);
+    }
+
+    public void populateList(DataSnapshot snapshot){
+        eventList = new ArrayList<>();
+        for(final DataSnapshot child : snapshot.getChildren()){
+            DatabaseReference temp = FirebaseDatabase.getInstance().getReference().child(child.getValue().toString());
+            temp.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    eventList.add(dataSnapshot.getValue(Event.class));
+                    Log.d(TAG, dataSnapshot.child("eventName").getValue(String.class));
+                    Log.d(TAG, Arrays.deepToString(eventList.toArray()));
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+
     }
 
 
@@ -242,4 +312,86 @@ public class EventInvitesFragment extends Fragment {
         // TODO: Update argument type and name
         void onEventInvitesFragmentInteraction(String string);
     }
+
+    class EventListAdapter extends BaseAdapter{
+        ArrayList<Event> events;
+        LayoutInflater inflater;
+        public EventListAdapter(Context context, ArrayList<Event> e){
+            events = e;
+            inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            events = sortList(events);
+        }
+
+        private ArrayList<Event> sortList(ArrayList<Event> e){
+            ArrayList<Event> left = new ArrayList<>();
+            ArrayList<Event> right = new ArrayList<>();
+            int center;
+            if(e.size() == 1){
+                return e;
+            }else{
+                center = e.size()/2;
+                //left half
+                left = new ArrayList<>(e.subList(0, center));
+                //right half;
+                right = new ArrayList<>(e.subList(center, e.size()));
+                left = sortList(left);
+                right = sortList(right);
+                merge(left, right, e);
+            }
+            return e;
+        }
+
+        private void merge(ArrayList<Event> left, ArrayList<Event> right, ArrayList<Event> whole){
+            int leftIndex = 0;
+            int rightIndex = 0;
+            int wholeIndex = 0;
+            while(leftIndex < left.size() && rightIndex < right.size()){
+                if(left.get(leftIndex).getEventDateTime().compareTo(right.get(rightIndex).getEventDateTime()) < 0 ){
+                    whole.set(wholeIndex, left.get(leftIndex));
+                    leftIndex++;
+                }else{
+                    whole.set(wholeIndex, right.get(rightIndex));
+                    rightIndex++;
+                }
+                wholeIndex++;
+            }
+            if(leftIndex >= left.size()){
+                for(;rightIndex < right.size(); rightIndex++){
+                    whole.set(wholeIndex, right.get(rightIndex));
+                    wholeIndex++;
+                }
+            }else{
+                for(;leftIndex < left.size(); leftIndex++){
+                    whole.set(wholeIndex, left.get(leftIndex));
+                    wholeIndex++;
+                }
+            }
+        }
+        @Override
+        public long getItemId(int i) {
+            return i;
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return events.get(i);
+        }
+
+        @Override
+        public int getCount() {
+            return events.size();
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            View currentView = view;
+            if(currentView == null){
+                currentView = inflater.inflate(R.layout.cell_view, viewGroup);
+            }
+
+
+            return null;
+        }
+    }
+
 }

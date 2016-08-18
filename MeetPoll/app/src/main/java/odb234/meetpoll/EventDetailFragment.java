@@ -166,8 +166,17 @@ public class EventDetailFragment extends Fragment implements GoogleApiClient.OnC
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if(dataSnapshot.hasChildren()) {
-                        ((TextView) rootView.findViewById(R.id.detail_event_date)).setText(dataSnapshot.child("eventDate").getValue().toString());
-                        ((TextView) rootView.findViewById(R.id.detail_event_time)).setText(dataSnapshot.child("eventTime").getValue().toString());
+                        String dateTime = dataSnapshot.child("eventDateTime").getValue(String.class);
+                        String[] dateTimeSplit = dateTime.split("\\s+");
+                        String date = dateTimeSplit[0].substring(4, 6) +"/" + dateTimeSplit[0].substring(6) +"/" + dateTimeSplit[0].substring(0,4);
+                        int hour = Integer.parseInt(dateTimeSplit[1].substring(0,2));
+                        int min = Integer.parseInt(dateTimeSplit[1].substring(2));
+                        String amPm = (hour >= 12)? "PM" : "AM";
+                        hour = hour % 12;
+                        hour = (hour == 0)? 12:hour;
+
+                        ((TextView) rootView.findViewById(R.id.detail_event_date)).setText(date);
+                        ((TextView) rootView.findViewById(R.id.detail_event_time)).setText(String.format("%d:%02d %s", hour, min, amPm));
                     }
 
                 }

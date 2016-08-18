@@ -5,6 +5,7 @@ import android.app.DialogFragment;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TimePicker;
@@ -21,6 +22,7 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
     private Button mBtn;
     static int hour = -1;
     static int min = -1;
+    private static final String TAG = "Time Picker Fragment";
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -36,13 +38,14 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
         mBtn = (Button) rootView.findViewById(R.id.event_time);
         hour = hourOfDay;
         min = minute;
+        Log.d(TAG, "Hour: " + hourOfDay + ", Min: " + min);
         String t = (hourOfDay >= 12)?"PM" : "AM";
         if(hourOfDay > 12) {
             hourOfDay = hourOfDay%12;
         }
         if(hourOfDay == 0)
             hourOfDay = 12;
-
+        ((NewEventActivity)getActivity()).timeOut = String.format("%02d%02d", hour, min);
         mBtn.setText(String.format("%d:%02d %s",hourOfDay,minute,t));
     }
     public static TimePickerFragment newInstance(View v) {
