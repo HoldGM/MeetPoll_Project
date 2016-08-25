@@ -217,6 +217,7 @@ public class LoginActivity extends AppCompatActivity {
                     editor.remove("username");
                     editor.apply();
                     registerFlag = true;
+
                     dialogInterface.dismiss();
                 } else if (!((EditText) dialogView.findViewById(R.id.new_password)).getText().toString().equals(((EditText) dialogView.findViewById(R.id.confirm_password)).getText().toString())) {
                     Toast.makeText(getApplicationContext(), "Password entered does not match", Toast.LENGTH_LONG).show();

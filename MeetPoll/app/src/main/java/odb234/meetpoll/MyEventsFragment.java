@@ -111,7 +111,7 @@ public class MyEventsFragment extends Fragment {
             mRoot.getRef().getParent().child("eventCount").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    if ( (long)dataSnapshot.getValue() == 0) {
+                    if ( dataSnapshot.getValue(Long.class).equals((long)0)) {
                         newUser.setVisibility(View.VISIBLE);
                     } else {
                         newUser.setVisibility(View.GONE);

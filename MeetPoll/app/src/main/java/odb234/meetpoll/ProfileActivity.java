@@ -60,6 +60,8 @@ public class ProfileActivity extends AppCompatActivity {
         fb.child(uid).child("username").setValue(name);
         fb.child(uid).child("phone").setValue(phone);
         fb.child(uid).child("eventCount").setValue(0);
+        NewRegisterAsync registerTask = new NewRegisterAsync(getApplicationContext());
+        registerTask.execute();
         Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
         startActivity(intent);
     }
