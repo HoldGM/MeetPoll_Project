@@ -76,6 +76,6 @@ Increase internal functionality and support for third-party apps.
 
 ##Use Cases:
 
-• User can easily track the preferred meeting location of multiple people without resorting to individual phone or SMS services.
+**• User can easily track the preferred meeting location of multiple people without resorting to individual phone or SMS services.
 • Application can be scalable to larger group events for businesses or professional event planners.
 • Users will have a central location for seeing all upcoming events that they are planning or have been invited to.
