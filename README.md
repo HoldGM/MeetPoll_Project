@@ -1,8 +1,8 @@
-MeetPoll_Project
+#MeetPoll_Project
 
-CS371M Android App Project
+##CS371M Android App Project
 
-Alpha Version: Initial user activities and map integration. Features:
+###Alpha Version: Initial user activities and map integration. Features:
 
 • Splash Screen
 
@@ -21,11 +21,12 @@ Alpha Version: Initial user activities and map integration. Features:
 
 • Map integration for venue search. 
 • Useable Google Maps API integration.
-Beta Version:
+
+##Beta Version:
 
 Complete app life cycle for event creation, invite and voting notifications, vote tallying, and detailed event viewer.
 
-Features:
+###Features:
 
 • Backend interface
 
@@ -47,11 +48,11 @@ Features:
 
 • Events will be linked to host contact information. • Telephone and SMS links will be available directly from the app but supported by outside app for permissions.
 
-Future Release:
+##Future Release:
 
 Increase internal functionality and support for third-party apps.
 
-Features:
+###Features:
 
 • Increase venue options
 
@@ -73,7 +74,7 @@ Features:
 
 • Zagat • Restaurant ratings service.
 
-Use Cases:
+##Use Cases:
 
 • User can easily track the preferred meeting location of multiple people without resorting to individual phone or SMS services.
 • Application can be scalable to larger group events for businesses or professional event planners.
